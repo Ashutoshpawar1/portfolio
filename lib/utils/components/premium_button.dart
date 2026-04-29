@@ -6,6 +6,7 @@ class PremiumButton extends StatefulWidget {
   final VoidCallback onTap;
   final bool isPrimary;
   final IconData? icon;
+  final bool enableShine;
 
   const PremiumButton({
     super.key,
@@ -13,6 +14,7 @@ class PremiumButton extends StatefulWidget {
     required this.onTap,
     this.isPrimary = true,
     this.icon,
+    this.enableShine = false,
   });
 
   @override
@@ -53,27 +55,65 @@ class _PremiumButtonState extends State<PremiumButton> {
                 ),
             ],
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (widget.icon != null) ...[
-                Icon(
-                  widget.icon,
-                  size: 20,
-                  color: widget.isPrimary ? AppColors.black : AppColors.white,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                if (widget.enableShine)
+                  AnimatedPositioned(
+                    duration: const Duration(milliseconds: 550),
+                    curve: Curves.easeOutCubic,
+                    left: _isHovered ? 90 : -70,
+                    child: IgnorePointer(
+                      child: Transform.rotate(
+                        angle: 0.35,
+                        child: Container(
+                          width: 44,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                Colors.white.withOpacity(0),
+                                Colors.white.withOpacity(
+                                  widget.isPrimary ? 0.22 : 0.12,
+                                ),
+                                Colors.white.withOpacity(0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (widget.icon != null) ...[
+                      Icon(
+                        widget.icon,
+                        size: 20,
+                        color: widget.isPrimary
+                            ? AppColors.black
+                            : AppColors.white,
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Text(
+                      widget.label,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        letterSpacing: 0.3,
+                        color: widget.isPrimary
+                            ? AppColors.black
+                            : AppColors.white,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(width: 10),
               ],
-              Text(
-                widget.label,
-                style: TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 15,
-                  letterSpacing: 0.3,
-                  color: widget.isPrimary ? AppColors.black : AppColors.white,
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

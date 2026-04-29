@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../../routes/app_router.dart';
 import '../../utils/animated/custom_cursor.dart';
 import '../../utils/animated/floating_circles.dart';
 import '../../utils/components/top_menu_button.dart';
@@ -12,7 +14,6 @@ import '../../utils/components/premium_button.dart';
 import '../../utils/components/social_links.dart';
 import '../../utils/components/project_card.dart';
 import '../../utils/components/timeline_item.dart';
-import '../../utils/components/contact_section.dart';
 import '../../controllers/home_controller.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -64,10 +65,6 @@ class HomePage extends StatelessWidget {
                       _sectionWrapper(
                         color: AppColors.black,
                         child: const _ExperienceSection(),
-                      ),
-                      _sectionWrapper(
-                        color: AppColors.surface,
-                        child: const ContactSection(),
                       ),
                       const SizedBox(height: 50),
                     ],
@@ -236,8 +233,9 @@ class _HeroTopBar extends StatelessWidget {
                 Expanded(
                   child: PremiumButton(
                     label: AppStrings.contactMe,
-                    onTap: () {},
+                    onTap: () => context.push(AppRouter.contact),
                     isPrimary: false,
+                    enableShine: true,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -274,8 +272,9 @@ class _HeroTopBar extends StatelessWidget {
               children: [
                 PremiumButton(
                   label: AppStrings.contactMe,
-                  onTap: () {},
+                  onTap: () => context.push(AppRouter.contact),
                   isPrimary: false,
+                  enableShine: true,
                 ),
                 const SizedBox(width: 12),
                 TopMenuButton(

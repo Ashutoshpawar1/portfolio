@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
 import '../../../utils/components/premium_button.dart';
+import '../../../utils/components/site_footer.dart';
 
 class ContactContent extends StatelessWidget {
   final VoidCallback onClose;
@@ -10,28 +11,31 @@ class ContactContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool isCompact = constraints.maxWidth < 980;
+      return LayoutBuilder(
+        builder: (context, constraints) {
+          final bool isCompact = constraints.maxWidth < 980;
+          final bool isMobile = constraints.maxWidth < 720;
 
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: EdgeInsets.fromLTRB(
-            isCompact ? 20 : 32,
-            24,
-            isCompact ? 20 : 32,
-            40,
-          ),
-          child: Column(
-            children: [
-              _ContactTopBar(onClose: onClose, isCompact: isCompact),
-              const SizedBox(height: 48),
-              isCompact
-                  ? const _MobileContactBody()
-                  : const _DesktopContactBody(),
-            ],
-          ),
-        );
+          return SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding: EdgeInsets.fromLTRB(
+              isCompact ? (isMobile ? 18 : 24) : 32,
+              isMobile ? 18 : 24,
+              isCompact ? (isMobile ? 18 : 24) : 32,
+              40,
+            ),
+            child: Column(
+              children: [
+                _ContactTopBar(onClose: onClose, isCompact: isCompact),
+                SizedBox(height: isMobile ? 28 : 48),
+                isCompact
+                    ? const _MobileContactBody()
+                    : const _DesktopContactBody(),
+                SizedBox(height: isMobile ? 38 : 54),
+                SiteFooter(compactBrand: isCompact),
+              ],
+            ),
+          );
       },
     );
   }
@@ -51,13 +55,13 @@ class _ContactTopBar extends StatelessWidget {
         children: [
           Row(
             children: [
-              Text(
-                AppStrings.logoText,
-                style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  fontSize: 44,
-                  color: Colors.white.withOpacity(0.82),
+                Text(
+                  AppStrings.logoText,
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                    fontSize: 38,
+                    color: Colors.white.withOpacity(0.82),
+                  ),
                 ),
-              ),
               const Spacer(),
               PremiumButton(
                 label: "CLOSE",
@@ -226,7 +230,7 @@ class _ContactHeadlineBlock extends StatelessWidget {
         Text(
           "LET'S\nWORK\nTOGETHER",
           style: Theme.of(context).textTheme.displayLarge?.copyWith(
-            fontSize: isCompact ? 88 : 120,
+            fontSize: isCompact ? 74 : 120,
             color: Colors.white.withOpacity(0.82),
             height: 0.88,
           ),
@@ -238,7 +242,7 @@ class _ContactHeadlineBlock extends StatelessWidget {
             "Have a project in mind? We'd love to hear about it. Let's create something great together.",
             style: TextStyle(
               color: AppColors.grey,
-              fontSize: 20,
+              fontSize: 18,
               height: 1.45,
               fontWeight: FontWeight.w500,
             ),
@@ -375,28 +379,58 @@ class _ContactFormCard extends StatelessWidget {
           const SizedBox(height: 18),
           const _ContactInput(hint: "Message", minLines: 4, maxLines: 5),
           const SizedBox(height: 20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Expanded(
-                child: Text(
-                  "By submitting you agree to our Terms of Service and Privacy Policy",
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.6),
-                    fontSize: 14,
-                    height: 1.45,
-                    fontWeight: FontWeight.w500,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              final bool stacked = constraints.maxWidth < 520;
+
+              if (stacked) {
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "By submitting you agree to our Terms of Service and Privacy Policy",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                        height: 1.45,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    PremiumButton(
+                      label: "SUBSCRIBE",
+                      onTap: () {},
+                      isPrimary: false,
+                      icon: Icons.north_east,
+                    ),
+                  ],
+                );
+              }
+
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Expanded(
+                    child: Text(
+                      "By submitting you agree to our Terms of Service and Privacy Policy",
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.6),
+                        fontSize: 14,
+                        height: 1.45,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              const SizedBox(width: 18),
-              PremiumButton(
-                label: "SUBSCRIBE",
-                onTap: () {},
-                isPrimary: false,
-                icon: Icons.north_east,
-              ),
-            ],
+                  const SizedBox(width: 18),
+                  PremiumButton(
+                    label: "SUBSCRIBE",
+                    onTap: () {},
+                    isPrimary: false,
+                    icon: Icons.north_east,
+                  ),
+                ],
+              );
+            },
           ),
         ],
       ),
@@ -422,7 +456,7 @@ class _ContactInput extends StatelessWidget {
       maxLines: maxLines,
       style: const TextStyle(
         color: AppColors.white,
-        fontSize: 20,
+        fontSize: 18,
         fontWeight: FontWeight.w600,
       ),
       decoration: InputDecoration(

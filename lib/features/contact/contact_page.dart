@@ -87,7 +87,7 @@ class _ContactPageState extends State<ContactPage>
                           curve: const Interval(0.00, 0.50),
                         ),
                         color: const Color(0xFFFF4D2D),
-                        label: "",
+                        label: AppStrings.logoText,
                       ),
                       _TransitionPanel(
                         animation: CurvedAnimation(
@@ -95,7 +95,7 @@ class _ContactPageState extends State<ContactPage>
                           curve: const Interval(0.10, 0.62),
                         ),
                         color: const Color(0xFFFF5536),
-                        label: "",
+                        label: AppStrings.logoText,
                       ),
                       _TransitionPanel(
                         animation: CurvedAnimation(
@@ -111,7 +111,7 @@ class _ContactPageState extends State<ContactPage>
                           curve: const Interval(0.26, 0.82),
                         ),
                         color: const Color(0xFFFF6242),
-                        label: "",
+                        label: AppStrings.logoText,
                       ),
                     ],
                   );
@@ -147,18 +147,83 @@ class _TransitionPanel extends StatelessWidget {
       position: slide,
       child: Container(
         color: color,
-        child: Center(
-          child: label.isEmpty
-              ? const SizedBox.shrink()
-              : Text(
-                  label,
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: Colors.black.withOpacity(0.88),
-                    fontSize: 72,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ).animate().fadeIn(duration: 350.ms),
-        ),
+        child: label.isEmpty
+            ? const SizedBox.shrink()
+            : Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 44,
+                ),
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool compact = constraints.maxWidth < 900;
+
+                    if (compact) {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: Theme.of(context).textTheme.displayLarge
+                                ?.copyWith(
+                                  color: Colors.black.withOpacity(0.92),
+                                  fontSize: 110,
+                                  height: 0.9,
+                                ),
+                          ),
+                          const SizedBox(height: 26),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Beyond\nVisuals.\nBuilt with\nVision.",
+                              textAlign: TextAlign.right,
+                              style: Theme.of(context).textTheme.displayMedium
+                                  ?.copyWith(
+                                    color: Colors.black.withOpacity(0.9),
+                                    fontSize: 42,
+                                  ),
+                            ),
+                          ),
+                        ],
+                      ).animate().fadeIn(duration: 280.ms);
+                    }
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          flex: 7,
+                          child: Text(
+                            label,
+                            style: Theme.of(context).textTheme.displayLarge
+                                ?.copyWith(
+                                  color: Colors.black.withOpacity(0.92),
+                                  fontSize: 190,
+                                  height: 0.84,
+                                ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 3,
+                          child: Align(
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              "Beyond\nVisuals.\nBuilt with\nVision.",
+                              textAlign: TextAlign.right,
+                              style: Theme.of(context).textTheme.displayMedium
+                                  ?.copyWith(
+                                    color: Colors.black.withOpacity(0.9),
+                                    fontSize: 54,
+                                  ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).animate().fadeIn(duration: 280.ms);
+                  },
+                ),
+              ),
       ),
     );
   }

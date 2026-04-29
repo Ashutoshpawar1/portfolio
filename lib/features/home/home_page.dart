@@ -13,6 +13,7 @@ import '../../utils/components/animated_section_title.dart';
 import '../../utils/components/premium_button.dart';
 import '../../utils/components/social_links.dart';
 import '../../utils/components/project_card.dart';
+import '../../utils/components/site_footer.dart';
 import '../../utils/components/timeline_item.dart';
 import '../../controllers/home_controller.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -66,7 +67,7 @@ class HomePage extends StatelessWidget {
                         color: AppColors.black,
                         child: const _ExperienceSection(),
                       ),
-                      const SizedBox(height: 50),
+                      const SiteFooter(),
                     ],
                   ),
                 ),
@@ -150,31 +151,114 @@ class _HeroSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (width < 900) {
+    if (width < 720) {
       return _MobileHeroLayout(width: width);
     }
 
+    if (width < 1180) {
+      return _TabletHeroLayout(width: width);
+    }
+
+    return _DesktopHeroLayout(width: width);
+  }
+}
+
+class _DesktopHeroLayout extends StatelessWidget {
+  final double width;
+
+  const _DesktopHeroLayout({required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    final double horizontalPadding = width >= 1600 ? 42 : 28;
+    final double heroImageSize = width >= 1600 ? 470 : 390;
+    final double watermarkSize = width >= 1600 ? 150 : 126;
+    final double introWidth = width >= 1600 ? 360 : 320;
+    final double sideWidth = width >= 1600 ? 280 : 230;
+
     return SizedBox(
       height: MediaQuery.of(context).size.height.clamp(760.0, 980.0),
-      child: Stack(
-        children: [
-          const Positioned.fill(child: _HeroFrameLines()),
-          const Positioned(left: 28, top: 44, child: _HeroWatermark()),
-          const Positioned(left: 0, right: 0, top: 20, child: _HeroTopBar()),
-          const Positioned(
-            left: 72,
-            bottom: 78,
-            child: SizedBox(width: 420, child: _HeroIntroBlock()),
-          ),
-          Positioned(
-            top: 130,
-            right: 52,
-            child: SizedBox(
-              width: width > 1400 ? 320 : 260,
-              child: const _HeroSidePitch(),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          horizontalPadding,
+          20,
+          horizontalPadding,
+          28,
+        ),
+          child: Column(
+            children: [
+              const _HeroTopBar(),
+              const SizedBox(height: 18),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Positioned.fill(
+                      child: _HeroFrameLines(
+                        horizontalPadding: width >= 1600 ? 94 : 86,
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _HeroWatermark(fontSize: watermarkSize),
+                          const SizedBox(height: 22),
+                          Expanded(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: introWidth,
+                                  child: const _HeroIntroBlock(),
+                                ),
+                                const Spacer(),
+                                _HeroVisualContent(size: heroImageSize),
+                                const Spacer(),
+                                SizedBox(
+                                  width: sideWidth,
+                                  child: const _HeroSidePitch(),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+              ),
             ),
-          ),
-          const Center(child: _HeroVisualContent(size: 470)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TabletHeroLayout extends StatelessWidget {
+  final double width;
+
+  const _TabletHeroLayout({required this.width});
+
+  @override
+  Widget build(BuildContext context) {
+    final double horizontal = width < 900 ? 28 : 42;
+    final double imageSize = width < 900 ? 340 : 390;
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(horizontal, 28, horizontal, 56),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const _HeroTopBar(isCompact: true),
+          const SizedBox(height: 28),
+          _HeroWatermark(fontSize: width < 900 ? 108 : 132, compact: true),
+          const SizedBox(height: 24),
+          Center(child: _HeroVisualContent(size: imageSize)),
+          const SizedBox(height: 28),
+          const _HeroSidePitch(isCompact: true, centerAligned: true),
+          const SizedBox(height: 28),
+          const _HeroIntroBlock(isCompact: true, centered: true),
         ],
       ),
     );
@@ -197,11 +281,11 @@ class _MobileHeroLayout extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const _HeroTopBar(isCompact: true),
-          const SizedBox(height: 28),
-          const _HeroWatermark(compact: true),
           const SizedBox(height: 24),
-          const Center(child: _HeroVisualContent(size: 300)),
-          const SizedBox(height: 32),
+          _HeroWatermark(fontSize: width < 420 ? 88 : 102, compact: true),
+          const SizedBox(height: 24),
+          Center(child: _HeroVisualContent(size: width < 420 ? 260 : 290)),
+          const SizedBox(height: 28),
           const _HeroSidePitch(isCompact: true),
           const SizedBox(height: 24),
           const _HeroIntroBlock(isCompact: true),
@@ -239,9 +323,11 @@ class _HeroTopBar extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 12),
-                TopMenuButton(
-                  label: AppStrings.menu,
-                  onTap: controller.toggleMenu,
+                Flexible(
+                  child: TopMenuButton(
+                    label: AppStrings.menu,
+                    onTap: controller.toggleMenu,
+                  ),
                 ),
               ],
             ),
@@ -323,15 +409,16 @@ class _StatusChip extends StatelessWidget {
 
 class _HeroWatermark extends StatelessWidget {
   final bool compact;
+  final double? fontSize;
 
-  const _HeroWatermark({this.compact = false});
+  const _HeroWatermark({this.compact = false, this.fontSize});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       AppStrings.logoText,
       style: Theme.of(context).textTheme.displayLarge?.copyWith(
-        fontSize: compact ? 82 : 186,
+        fontSize: fontSize ?? (compact ? 82 : 186),
         color: Colors.white.withOpacity(compact ? 0.82 : 0.74),
         height: 0.9,
       ),
@@ -341,20 +428,23 @@ class _HeroWatermark extends StatelessWidget {
 
 class _HeroIntroBlock extends StatelessWidget {
   final bool isCompact;
+  final bool centered;
 
-  const _HeroIntroBlock({this.isCompact = false});
+  const _HeroIntroBlock({this.isCompact = false, this.centered = false});
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment:
+          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
       children: [
         Text(
           "Flutter developer focused on polished mobile and web products.",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: isCompact ? 28 : 36,
+            fontSize: isCompact ? 24 : 36,
             fontWeight: FontWeight.w700,
           ),
+          textAlign: centered ? TextAlign.center : TextAlign.start,
         ),
         const SizedBox(height: 16),
         Text(
@@ -364,11 +454,13 @@ class _HeroIntroBlock extends StatelessWidget {
             color: AppColors.grey,
             height: 1.7,
           ),
+          textAlign: centered ? TextAlign.center : TextAlign.start,
         ),
         const SizedBox(height: 28),
         Wrap(
           spacing: 16,
           runSpacing: 16,
+          alignment: centered ? WrapAlignment.center : WrapAlignment.start,
           children: [
             PremiumButton(label: AppStrings.viewProjects, onTap: () {}),
             PremiumButton(
@@ -388,28 +480,36 @@ class _HeroIntroBlock extends StatelessWidget {
 
 class _HeroSidePitch extends StatelessWidget {
   final bool isCompact;
+  final bool centerAligned;
 
-  const _HeroSidePitch({this.isCompact = false});
+  const _HeroSidePitch({
+    this.isCompact = false,
+    this.centerAligned = false,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment: isCompact
-          ? CrossAxisAlignment.start
-          : CrossAxisAlignment.end,
+      crossAxisAlignment: centerAligned
+          ? CrossAxisAlignment.center
+          : (isCompact ? CrossAxisAlignment.start : CrossAxisAlignment.end),
       children: [
         Text(
           "Beyond Flutter.\nBuilt with Vision.",
-          textAlign: isCompact ? TextAlign.start : TextAlign.right,
+          textAlign: centerAligned
+              ? TextAlign.center
+              : (isCompact ? TextAlign.start : TextAlign.right),
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontSize: isCompact ? 56 : 74,
+            fontSize: isCompact ? 52 : 74,
             color: Colors.white.withOpacity(0.78),
           ),
         ),
         const SizedBox(height: 14),
         Text(
           AppStrings.devSubtitle,
-          textAlign: isCompact ? TextAlign.start : TextAlign.right,
+          textAlign: centerAligned
+              ? TextAlign.center
+              : (isCompact ? TextAlign.start : TextAlign.right),
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             color: AppColors.grey,
           ),
@@ -420,13 +520,15 @@ class _HeroSidePitch extends StatelessWidget {
 }
 
 class _HeroFrameLines extends StatelessWidget {
-  const _HeroFrameLines();
+  final double horizontalPadding;
+
+  const _HeroFrameLines({this.horizontalPadding = 120});
 
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 120),
+        padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -553,6 +655,7 @@ class _ProjectsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 150),
       child: Column(
@@ -561,7 +664,7 @@ class _ProjectsSection extends StatelessWidget {
           const SizedBox(height: 70),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 32),
+            padding: EdgeInsets.symmetric(horizontal: width < 720 ? 20 : 32),
             clipBehavior: Clip.none,
             physics: const BouncingScrollPhysics(),
             child: Row(
@@ -579,8 +682,12 @@ class _SkillsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 150, horizontal: 32),
+      padding: EdgeInsets.symmetric(
+        vertical: 150,
+        horizontal: width < 720 ? 20 : 32,
+      ),
       child: Column(
         children: [
           const AnimatedSectionTitle(title: AppStrings.skills),
@@ -635,8 +742,12 @@ class _ExperienceSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final double width = MediaQuery.of(context).size.width;
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 150, horizontal: 32),
+      padding: EdgeInsets.symmetric(
+        vertical: 150,
+        horizontal: width < 720 ? 20 : 32,
+      ),
       child: Column(
         children: [
           const AnimatedSectionTitle(title: AppStrings.experience),

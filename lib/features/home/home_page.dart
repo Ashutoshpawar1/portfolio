@@ -185,47 +185,47 @@ class _DesktopHeroLayout extends StatelessWidget {
           horizontalPadding,
           28,
         ),
-          child: Column(
-            children: [
-              const _HeroTopBar(),
-              const SizedBox(height: 18),
-              Expanded(
-                child: Stack(
-                  children: [
-                    Positioned.fill(
-                      child: _HeroFrameLines(
-                        horizontalPadding: width >= 1600 ? 94 : 86,
-                      ),
+        child: Column(
+          children: [
+            const _HeroTopBar(),
+            const SizedBox(height: 18),
+            Expanded(
+              child: Stack(
+                children: [
+                  Positioned.fill(
+                    child: _HeroFrameLines(
+                      horizontalPadding: width >= 1600 ? 94 : 86,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _HeroWatermark(fontSize: watermarkSize),
-                          const SizedBox(height: 22),
-                          Expanded(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: introWidth,
-                                  child: const _HeroIntroBlock(),
-                                ),
-                                const Spacer(),
-                                _HeroVisualContent(size: heroImageSize),
-                                const Spacer(),
-                                SizedBox(
-                                  width: sideWidth,
-                                  child: const _HeroSidePitch(),
-                                ),
-                              ],
-                            ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _HeroWatermark(fontSize: watermarkSize),
+                        const SizedBox(height: 22),
+                        Expanded(
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: introWidth,
+                                child: const _HeroIntroBlock(),
+                              ),
+                              const Spacer(),
+                              _HeroVisualContent(size: heroImageSize),
+                              const Spacer(),
+                              SizedBox(
+                                width: sideWidth,
+                                child: const _HeroSidePitch(),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                ],
               ),
             ),
           ],
@@ -435,8 +435,9 @@ class _HeroIntroBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: centered
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         Text(
           "Flutter developer focused on polished mobile and web products.",
@@ -482,10 +483,7 @@ class _HeroSidePitch extends StatelessWidget {
   final bool isCompact;
   final bool centerAligned;
 
-  const _HeroSidePitch({
-    this.isCompact = false,
-    this.centerAligned = false,
-  });
+  const _HeroSidePitch({this.isCompact = false, this.centerAligned = false});
 
   @override
   Widget build(BuildContext context) {
@@ -510,9 +508,9 @@ class _HeroSidePitch extends StatelessWidget {
           textAlign: centerAligned
               ? TextAlign.center
               : (isCompact ? TextAlign.start : TextAlign.right),
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppColors.grey,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.grey),
         ),
       ],
     ).animate().fadeIn(delay: 350.ms).slideX(begin: isCompact ? 0 : 0.08);
@@ -558,60 +556,50 @@ class _HeroVisualContent extends StatelessWidget {
           ..rotateX(-controller.parallaxY * 0.05)
           ..translate(controller.parallaxX * 24, controller.parallaxY * 18),
         alignment: Alignment.center,
-        child: Container(
-          width: size,
-          height: size * 1.2,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.42),
-                blurRadius: 60,
-                offset: const Offset(0, 24),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.network(
-                  'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1200&auto=format&fit=crop',
-                  fit: BoxFit.cover,
-                ),
-                DecoratedBox(
+        child:
+            Container(
+                  width: size,
+                  height: size * 1.2,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withOpacity(0.82),
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.25),
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.42),
+                        blurRadius: 60,
+                        offset: const Offset(0, 24),
+                      ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          'lib/assets/images/ashu_profile.png',
+                          fit: BoxFit.cover,
+                        ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.black.withOpacity(0.4),
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.3),
+                              ],
+                              stops: const [0.05, 0.45, 1],
+                            ),
+                          ),
+                        ),
                       ],
-                      stops: const [0.05, 0.45, 1],
                     ),
                   ),
-                ),
-                Positioned(
-                  left: -40,
-                  top: 38,
-                  child: Transform.rotate(
-                    angle: -0.45,
-                    child: Container(
-                      width: size * 0.96,
-                      height: size * 0.18,
-                      color: Colors.black.withOpacity(0.72),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ).animate().fadeIn(duration: 900.ms).scale(
-              begin: const Offset(0.96, 0.96),
-            ),
+                )
+                .animate()
+                .fadeIn(duration: 900.ms)
+                .scale(begin: const Offset(0.96, 0.96)),
       ),
     );
   }
@@ -668,7 +656,9 @@ class _ProjectsSection extends StatelessWidget {
             clipBehavior: Clip.none,
             physics: const BouncingScrollPhysics(),
             child: Row(
-              children: appProjects.map((p) => ProjectCard(project: p)).toList(),
+              children: appProjects
+                  .map((p) => ProjectCard(project: p))
+                  .toList(),
             ),
           ),
         ],
@@ -699,8 +689,14 @@ class _SkillsSection extends StatelessWidget {
             children: [
               _buildSkillColumn("Mobile Stack", const [
                 SkillProgressBar(skill: "Flutter Architecture", progress: 0.95),
-                SkillProgressBar(skill: "Material 3 / UI Design", progress: 0.9),
-                SkillProgressBar(skill: "GetX / State Management", progress: 0.95),
+                SkillProgressBar(
+                  skill: "Material 3 / UI Design",
+                  progress: 0.9,
+                ),
+                SkillProgressBar(
+                  skill: "GetX / State Management",
+                  progress: 0.95,
+                ),
               ]),
               _buildSkillColumn("Services & Web", const [
                 SkillProgressBar(skill: "Firebase / Supabase", progress: 0.85),

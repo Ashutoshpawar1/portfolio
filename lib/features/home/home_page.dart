@@ -17,6 +17,7 @@ import '../../utils/components/site_footer.dart';
 import '../../utils/components/timeline_item.dart';
 import '../../controllers/home_controller.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'widgets/tool_wave_section.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -66,6 +67,10 @@ class HomePage extends StatelessWidget {
                       _sectionWrapper(
                         color: AppColors.black,
                         child: const _ExperienceSection(),
+                      ),
+                      _sectionWrapper(
+                        color: AppColors.surface,
+                        child: const ToolWaveSection(),
                       ),
                       const SiteFooter(),
                     ],
@@ -170,11 +175,17 @@ class _DesktopHeroLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool tightDesktop = width < 1450;
     final double horizontalPadding = width >= 1600 ? 42 : 28;
-    final double heroImageSize = width >= 1600 ? 470 : 390;
-    final double watermarkSize = width >= 1600 ? 150 : 126;
-    final double introWidth = width >= 1600 ? 360 : 320;
-    final double sideWidth = width >= 1600 ? 280 : 230;
+    final double heroImageSize = width >= 1600
+        ? 470
+        : (tightDesktop ? 330 : 390);
+    final double watermarkSize = width >= 1600
+        ? 150
+        : (tightDesktop ? 112 : 126);
+    final double introWidth = width >= 1600 ? 380 : (tightDesktop ? 420 : 340);
+    final double sideWidth = width >= 1600 ? 280 : (tightDesktop ? 210 : 230);
+    final double contentGap = tightDesktop ? 28 : 40;
 
     return SizedBox(
       height: MediaQuery.of(context).size.height.clamp(760.0, 980.0),
@@ -208,16 +219,42 @@ class _DesktopHeroLayout extends StatelessWidget {
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              SizedBox(
-                                width: introWidth,
-                                child: const _HeroIntroBlock(),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: introWidth,
+                                ),
+                                child: _HeroIntroBlock(
+                                  headlineFontSize: tightDesktop ? 30 : 36,
+                                  bodyFontSize: tightDesktop ? 16 : 18,
+                                  contentSpacing: tightDesktop ? 12 : 16,
+                                  actionSpacing: tightDesktop ? 22 : 28,
+                                  socialSpacing: tightDesktop ? 22 : 28,
+                                ),
                               ),
-                              const Spacer(),
-                              _HeroVisualContent(size: heroImageSize),
-                              const Spacer(),
-                              SizedBox(
-                                width: sideWidth,
-                                child: const _HeroSidePitch(),
+                              SizedBox(width: contentGap),
+                              Expanded(
+                                flex: 6,
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: _HeroVisualContent(
+                                    size: heroImageSize,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: contentGap),
+                              Expanded(
+                                flex: 4,
+                                child: Align(
+                                  alignment: Alignment.centerRight,
+                                  child: ConstrainedBox(
+                                    constraints: BoxConstraints(
+                                      maxWidth: sideWidth,
+                                    ),
+                                    child: _HeroSidePitch(
+                                      titleFontSize: tightDesktop ? 62 : 74,
+                                    ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -429,8 +466,21 @@ class _HeroWatermark extends StatelessWidget {
 class _HeroIntroBlock extends StatelessWidget {
   final bool isCompact;
   final bool centered;
+  final double? headlineFontSize;
+  final double? bodyFontSize;
+  final double contentSpacing;
+  final double actionSpacing;
+  final double socialSpacing;
 
-  const _HeroIntroBlock({this.isCompact = false, this.centered = false});
+  const _HeroIntroBlock({
+    this.isCompact = false,
+    this.centered = false,
+    this.headlineFontSize,
+    this.bodyFontSize,
+    this.contentSpacing = 16,
+    this.actionSpacing = 28,
+    this.socialSpacing = 28,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -442,22 +492,22 @@ class _HeroIntroBlock extends StatelessWidget {
         Text(
           "Flutter developer focused on polished mobile and web products.",
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: isCompact ? 24 : 36,
+            fontSize: headlineFontSize ?? (isCompact ? 24 : 36),
             fontWeight: FontWeight.w700,
           ),
           textAlign: centered ? TextAlign.center : TextAlign.start,
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: contentSpacing),
         Text(
           AppStrings.devDescriptionLong,
           style: TextStyle(
-            fontSize: isCompact ? 16 : 18,
+            fontSize: bodyFontSize ?? (isCompact ? 16 : 18),
             color: AppColors.grey,
             height: 1.7,
           ),
           textAlign: centered ? TextAlign.center : TextAlign.start,
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: actionSpacing),
         Wrap(
           spacing: 16,
           runSpacing: 16,
@@ -472,7 +522,7 @@ class _HeroIntroBlock extends StatelessWidget {
             ),
           ],
         ),
-        const SizedBox(height: 28),
+        SizedBox(height: socialSpacing),
         const SocialLinks(),
       ],
     ).animate().fadeIn(delay: 250.ms, duration: 700.ms).slideY(begin: 0.08);
@@ -482,8 +532,13 @@ class _HeroIntroBlock extends StatelessWidget {
 class _HeroSidePitch extends StatelessWidget {
   final bool isCompact;
   final bool centerAligned;
+  final double? titleFontSize;
 
-  const _HeroSidePitch({this.isCompact = false, this.centerAligned = false});
+  const _HeroSidePitch({
+    this.isCompact = false,
+    this.centerAligned = false,
+    this.titleFontSize,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +553,7 @@ class _HeroSidePitch extends StatelessWidget {
               ? TextAlign.center
               : (isCompact ? TextAlign.start : TextAlign.right),
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontSize: isCompact ? 52 : 74,
+            fontSize: titleFontSize ?? (isCompact ? 52 : 74),
             color: Colors.white.withOpacity(0.78),
           ),
         ),

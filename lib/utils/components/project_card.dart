@@ -80,10 +80,43 @@ class _ProjectCardState extends State<ProjectCard> {
       child: Stack(
         children: [
           Image.network(
-            widget.project.imageUrl,
+            widget.project.imageUrl.isNotEmpty
+                ? widget.project.imageUrl
+                : "https://images.unsplash.com/photo-1555066931-4365d14bab8c", // Dummy tech image
             height: 220,
             width: double.infinity,
             fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              return Container(
+                height: 220,
+                width: double.infinity,
+                color: AppColors.surfaceElevated,
+                child: const Center(
+                  child: Icon(
+                    Icons.code_rounded,
+                    color: AppColors.grey,
+                    size: 50,
+                  ),
+                ),
+              );
+            },
+            loadingBuilder: (context, child, loadingProgress) {
+              if (loadingProgress == null) return child;
+              return Container(
+                height: 220,
+                width: double.infinity,
+                color: AppColors.surfaceElevated,
+                child: Center(
+                  child: CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                        : null,
+                    color: AppColors.white.withOpacity(0.2),
+                  ),
+                ),
+              );
+            },
           ),
           Positioned.fill(
             child: DecoratedBox(

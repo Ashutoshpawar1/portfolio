@@ -36,7 +36,7 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const _BackdropTitle(title: "TOOLS ARE USING"),
+              const _BackdropTitle(title: "TOOLS"),
               const SizedBox(height: 26),
               LayoutBuilder(
                 builder: (context, constraints) {
@@ -44,26 +44,28 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
                   final bool tablet = constraints.maxWidth < 1180;
 
                   return Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.all(compact ? 20 : 28),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF171717),
-                      borderRadius: BorderRadius.circular(compact ? 28 : 40),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x22000000),
-                          blurRadius: 38,
-                          offset: Offset(0, 18),
-                        ),
-                      ],
-                    ),
-                    child: compact
-                        ? _buildCompactLayout(constraints.maxWidth)
-                        : _buildWideLayout(
-                            constraints.maxWidth,
-                            tablet: tablet,
+                        width: double.infinity,
+                        padding: EdgeInsets.all(compact ? 20 : 28),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF171717),
+                          borderRadius: BorderRadius.circular(
+                            compact ? 28 : 40,
                           ),
-                  )
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x22000000),
+                              blurRadius: 38,
+                              offset: Offset(0, 18),
+                            ),
+                          ],
+                        ),
+                        child: compact
+                            ? _buildCompactLayout(constraints.maxWidth)
+                            : _buildWideLayout(
+                                constraints.maxWidth,
+                                tablet: tablet,
+                              ),
+                      )
                       .animate()
                       .fadeIn(duration: 700.ms)
                       .slideY(begin: 0.08, end: 0);
@@ -102,10 +104,7 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
             right: -10,
             bottom: 16,
             height: tablet ? 250 : 300,
-            child: _WaveLogos(
-              controller: _loopController,
-              compact: false,
-            ),
+            child: _WaveLogos(controller: _loopController, compact: false),
           ),
           Positioned(
             right: 0,
@@ -134,10 +133,7 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
         const SizedBox(height: 24),
         SizedBox(
           height: smallPhone ? 170 : 195,
-          child: _WaveLogos(
-            controller: _loopController,
-            compact: true,
-          ),
+          child: _WaveLogos(controller: _loopController, compact: true),
         ),
         const SizedBox(height: 16),
         Center(
@@ -191,8 +187,9 @@ class _SectionCopy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      crossAxisAlignment:
-          center ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+      crossAxisAlignment: center
+          ? CrossAxisAlignment.center
+          : CrossAxisAlignment.start,
       children: [
         Wrap(
           alignment: center ? WrapAlignment.center : WrapAlignment.start,
@@ -200,10 +197,8 @@ class _SectionCopy extends StatelessWidget {
           runSpacing: 10,
           children: _platforms
               .map(
-                (platform) => _PlatformChip(
-                  label: platform.label,
-                  icon: platform.icon,
-                ),
+                (platform) =>
+                    _PlatformChip(label: platform.label, icon: platform.icon),
               )
               .toList(),
         ),
@@ -298,9 +293,8 @@ class _WaveLogos extends StatelessWidget {
 
             for (int i = 0; i < _toolBadges.length * 2; i++) {
               final _ToolBadgeData data = _toolBadges[i % _toolBadges.length];
-              final double x = ((i * spacing) + travel) % (totalTrack * 2) -
-                  badgeSize -
-                  26;
+              final double x =
+                  ((i * spacing) + travel) % (totalTrack * 2) - badgeSize - 26;
 
               if (x < -badgeSize || x > waveWidth + badgeSize) {
                 continue;
@@ -315,7 +309,8 @@ class _WaveLogos extends StatelessWidget {
                   (compact ? 4 : 6);
               final double y = baseY - arch + floatY;
               final double tilt =
-                  data.tilt + math.sin((progress * math.pi * 2) + i * 0.16) * 0.04;
+                  data.tilt +
+                  math.sin((progress * math.pi * 2) + i * 0.16) * 0.04;
 
               badges.add(
                 Positioned(
@@ -323,20 +318,14 @@ class _WaveLogos extends StatelessWidget {
                   top: y,
                   child: Transform.rotate(
                     angle: tilt,
-                    child: _ToolBadgeCard(
-                      data: data,
-                      size: badgeSize,
-                    ),
+                    child: _ToolBadgeCard(data: data, size: badgeSize),
                   ),
                 ),
               );
             }
 
             return ClipRect(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: badges,
-              ),
+              child: Stack(clipBehavior: Clip.none, children: badges),
             );
           },
         );
@@ -477,9 +466,7 @@ class _PhoneShowcase extends StatelessWidget {
                               color: const Color(0xFF1A1A1A),
                               borderRadius: BorderRadius.circular(28),
                             ),
-                            child: _PhoneChatPane(
-                              compact: compact,
-                            ),
+                            child: _PhoneChatPane(compact: compact),
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -534,7 +521,8 @@ class _PhoneChatPane extends StatelessWidget {
         final bool dense = compact || constraints.maxHeight < 330;
         final bool ultraDense = constraints.maxHeight < 296;
         final double gap = ultraDense ? 7 : (dense ? 8 : 10);
-        final double maxBubbleWidth = constraints.maxWidth * (dense ? 0.72 : 0.76);
+        final double maxBubbleWidth =
+            constraints.maxWidth * (dense ? 0.72 : 0.76);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -618,10 +606,7 @@ class _FloatingOrbitBadge extends StatelessWidget {
       top: anchors[index].dy + offsetY,
       child: Transform.rotate(
         angle: angle,
-        child: _ToolBadgeCard(
-          data: data,
-          size: compact ? 42 : 50,
-        ),
+        child: _ToolBadgeCard(data: data, size: compact ? 42 : 50),
       ),
     );
   }

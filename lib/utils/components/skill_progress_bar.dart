@@ -5,62 +5,103 @@ import 'package:flutter_animate/flutter_animate.dart';
 class SkillProgressBar extends StatelessWidget {
   final String skill;
   final double progress;
+  final IconData icon;
+  final Color? accentColor;
 
   const SkillProgressBar({
     super.key,
     required this.skill,
     required this.progress,
+    required this.icon,
+    this.accentColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
+    final effectiveColor =
+        accentColor ?? const Color(0xFF6366F1); // Default purple-blue
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: effectiveColor.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, size: 18, color: effectiveColor),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Text(
                 skill,
                 style: const TextStyle(
                   color: AppColors.white,
-                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
                 ),
               ),
-              Text(
-                "${(progress * 100).toInt()}%",
-                style: const TextStyle(
-                  color: AppColors.grey,
-                  fontWeight: FontWeight.w700,
-                ),
+            ),
+            Text(
+              "${(progress * 100).toInt()}%",
+              style: TextStyle(
+                color: effectiveColor.withOpacity(0.9),
+                fontSize: 14,
+                fontWeight: FontWeight.w800,
               ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          Stack(
-            children: [
-              Container(
-                height: 10,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: AppColors.white.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(999),
-                ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Stack(
+          children: [
+            Container(
+              height: 6,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: AppColors.white.withOpacity(0.05),
+                borderRadius: BorderRadius.circular(999),
               ),
-              AnimatedContainer(
-                duration: const Duration(seconds: 1),
-                height: 10,
-                width: constraints.maxWidth * progress,
-                decoration: BoxDecoration(
-                  gradient: AppColors.primaryGradient,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ).animate().shimmer(duration: 2.seconds, color: Colors.white24),
-            ],
-          ),
-        ],
-      ),
+            ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                return AnimatedContainer(
+                      duration: const Duration(milliseconds: 1500),
+                      curve: Curves.easeOutQuart,
+                      height: 6,
+                      width: constraints.maxWidth * progress,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            effectiveColor.withOpacity(0.7),
+                            effectiveColor,
+                            effectiveColor.withOpacity(0.8),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(999),
+                        boxShadow: [
+                          BoxShadow(
+                            color: effectiveColor.withOpacity(0.35),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                    )
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .shimmer(
+                      duration: 2500.ms,
+                      color: Colors.white.withOpacity(0.2),
+                    );
+              },
+            ),
+          ],
+        ),
+      ],
     );
   }
 }

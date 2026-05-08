@@ -472,43 +472,45 @@ class _HeroVisualContent extends StatelessWidget {
           ..rotateX(-controller.parallaxY * 0.05)
           ..translate(controller.parallaxX * 24, controller.parallaxY * 18),
         alignment: Alignment.center,
-        child: Container(
-          width: size,
-          height: size * 1.2,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.42),
-                blurRadius: 60,
-                offset: const Offset(0, 24),
-              ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(32),
-            child: Stack(
-              fit: StackFit.expand,
-              children: [
-                Image.asset(
-                  'lib/assets/images/ashu_profile.png',
-                  fit: BoxFit.cover,
-                ),
-                DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.black.withOpacity(0.4),
-                        Colors.transparent,
-                        Colors.black.withOpacity(0.3),
-                      ],
-                      stops: const [0.05, 0.45, 1],
-                    ),
-                  ),
+        child: RepaintBoundary(
+          child: Container(
+            width: size,
+            height: size * 1.2,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(32),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.42),
+                  blurRadius: 60,
+                  offset: const Offset(0, 24),
                 ),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(32),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  Image.asset(
+                    'lib/assets/images/ashu_profile.png',
+                    fit: BoxFit.cover,
+                  ),
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [
+                          Colors.black.withOpacity(0.4),
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.3),
+                        ],
+                        stops: const [0.05, 0.45, 1],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         )

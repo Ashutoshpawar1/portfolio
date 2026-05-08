@@ -11,54 +11,48 @@ class ProjectsSection extends StatefulWidget {
   State<ProjectsSection> createState() => _ProjectsSectionState();
 }
 
-class _ProjectsSectionState extends State<ProjectsSection> {
+class _ProjectsSectionState extends State<ProjectsSection>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
-  Timer? _timer;
-  double _scrollSpeed = 1.0;
-  bool _isReversed = true; // Content moves left to right
+  late AnimationController _animationController;
+  double _scrollSpeed = 60.0; // Pixels per second
+  bool _isReversed = true;
 
   @override
   void initState() {
     super.initState();
-    // Start at a large offset to allow left-to-right scrolling immediately
     _scrollController = ScrollController(initialScrollOffset: 5000);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startAutoScroll();
-    });
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..addListener(_handleScroll);
+    _animationController.repeat();
   }
 
-  void _startAutoScroll() {
-    _timer = Timer.periodic(const Duration(milliseconds: 20), (timer) {
-      if (_scrollController.hasClients) {
-        final currentScroll = _scrollController.offset;
+  void _handleScroll() {
+    if (_scrollController.hasClients) {
+      final double delta = _scrollSpeed / 60.0; // Approximate for 60fps
+      final currentScroll = _scrollController.offset;
 
-        if (_isReversed) {
-          // Moving Left to Right: Decrement offset
-          if (currentScroll <= 0) {
-            // Jump to a middle point of the infinite-like list
-            _scrollController.jumpTo(
-              _scrollController.position.maxScrollExtent / 2,
-            );
-          } else {
-            _scrollController.jumpTo(currentScroll - _scrollSpeed);
-          }
+      if (_isReversed) {
+        if (currentScroll <= 0) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent / 2);
         } else {
-          // Moving Right to Left: Increment offset
-          if (currentScroll >= _scrollController.position.maxScrollExtent) {
-            _scrollController.jumpTo(
-              _scrollController.position.maxScrollExtent / 2,
-            );
-          } else {
-            _scrollController.jumpTo(currentScroll + _scrollSpeed);
-          }
+          _scrollController.jumpTo(currentScroll - delta);
+        }
+      } else {
+        if (currentScroll >= _scrollController.position.maxScrollExtent) {
+          _scrollController.jumpTo(_scrollController.position.maxScrollExtent / 2);
+        } else {
+          _scrollController.jumpTo(currentScroll + delta);
         }
       }
-    });
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
+    _animationController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -76,8 +70,8 @@ class _ProjectsSectionState extends State<ProjectsSection> {
           SizedBox(
             height: 520,
             child: MouseRegion(
-              onEnter: (_) => setState(() => _scrollSpeed = 0.3),
-              onExit: (_) => setState(() => _scrollSpeed = 1.0),
+              onEnter: (_) => setState(() => _scrollSpeed = 20.0),
+              onExit: (_) => setState(() => _scrollSpeed = 60.0),
               child: ListView.builder(
                 controller: _scrollController,
                 scrollDirection: Axis.horizontal,

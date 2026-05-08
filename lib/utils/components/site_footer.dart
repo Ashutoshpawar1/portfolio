@@ -9,12 +9,7 @@ class SiteFooter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const _FooterContent(),
-        _FooterBrandBand(compact: compactBrand),
-      ],
-    );
+    return _FooterBrandBand(compact: compactBrand);
   }
 }
 

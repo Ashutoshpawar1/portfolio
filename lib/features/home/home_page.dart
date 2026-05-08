@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/animated/custom_cursor.dart';
 import '../../utils/animated/floating_circles.dart';
+import '../../utils/components/brand_transition_panels.dart';
 import '../../utils/components/menu_overlay.dart';
 import '../../utils/components/site_footer.dart';
 import '../../controllers/home_controller.dart';
@@ -43,38 +44,63 @@ class HomePage extends StatelessWidget {
                     controller.updateScroll(notification.metrics.pixels);
                     return false;
                   },
-                  child: ListView(
+                  child: SingleChildScrollView(
+                    controller: controller.scrollController,
                     physics: const BouncingScrollPhysics(),
-                    children: [
-                      _sectionWrapper(child: HeroSection(width: width)),
-                      _sectionWrapper(
-                        color: AppColors.surface,
-                        child: const AboutMeSection(),
-                      ),
-                      _sectionWrapper(
-                        color: AppColors.black,
-                        child: const ProjectsSection(),
-                      ),
-                      _sectionWrapper(
-                        color: AppColors.surface,
-                        child: const SkillsSection(),
-                      ),
-                      _sectionWrapper(
-                        color: AppColors.black,
-                        child: const ExperienceSection(),
-                      ),
-                      _sectionWrapper(
-                        color: AppColors.surface,
-                        child: const ToolWaveSection(),
-                      ),
-                      const SiteFooter(),
-                    ],
+                    child: Column(
+                      children: [
+                        _sectionWrapper(
+                          key: controller.heroSectionKey,
+                          child: HeroSection(width: width),
+                        ),
+                        _sectionWrapper(
+                          key: controller.aboutSectionKey,
+                          color: AppColors.surface,
+                          child: const AboutMeSection(),
+                        ),
+                        _sectionWrapper(
+                          key: controller.projectsSectionKey,
+                          color: AppColors.black,
+                          child: const ProjectsSection(),
+                        ),
+                        _sectionWrapper(
+                          key: controller.skillsSectionKey,
+                          color: AppColors.surface,
+                          child: const SkillsSection(),
+                        ),
+                        _sectionWrapper(
+                          key: controller.experienceSectionKey,
+                          color: AppColors.black,
+                          child: const ExperienceSection(),
+                        ),
+                        _sectionWrapper(
+                          key: controller.toolsSectionKey,
+                          color: AppColors.surface,
+                          child: const ToolWaveSection(),
+                        ),
+                        const SiteFooter(),
+                      ],
+                    ),
                   ),
                 ),
                 const CustomCursor(),
                 Obx(
                   () => controller.isMenuOpen
-                      ? MenuOverlay(onClose: controller.toggleMenu)
+                      ? MenuOverlay(
+                          onClose: controller.closeMenu,
+                          onNavigate: controller.startSectionTransition,
+                        )
+                      : const SizedBox.shrink(),
+                ),
+                Obx(
+                  () => controller.isSectionTransitionVisible
+                      ? Positioned.fill(
+                          child: BrandTransitionOverlay(
+                            label: "ASHUTOSH",
+                            onReveal: controller.navigateToPendingSection,
+                            onComplete: controller.finishSectionTransition,
+                          ),
+                        )
                       : const SizedBox.shrink(),
                 ),
               ],
@@ -85,8 +111,9 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _sectionWrapper({required Widget child, Color? color}) {
+  Widget _sectionWrapper({Key? key, required Widget child, Color? color}) {
     return Container(
+      key: key,
       width: double.infinity,
       decoration: BoxDecoration(
         color: color,

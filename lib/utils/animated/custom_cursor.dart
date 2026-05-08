@@ -1,35 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../controllers/home_controller.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
-class CustomCursor extends StatelessWidget {
+import '../../controllers/home_controller.dart';
+
+class CustomCursor extends StatefulWidget {
   const CustomCursor({super.key});
+
+  @override
+  State<CustomCursor> createState() => _CustomCursorState();
+}
+
+class _CustomCursorState extends State<CustomCursor>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _rotationController = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _rotationController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
 
-    return Obx(() {
-      return AnimatedPositioned(
-        duration: const Duration(milliseconds: 50),
-        curve: Curves.easeOutCubic,
-        left: controller.mousePos.dx - 15,
-        top: controller.mousePos.dy - 15,
-        child: IgnorePointer(
-          child: Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.2),
-              shape: BoxShape.circle,
+    return IgnorePointer(
+      child: ValueListenableBuilder<Offset>(
+        valueListenable: controller.mousePos,
+        child: RepaintBoundary(
+          child: RotationTransition(
+            turns: _rotationController,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.16),
+                shape: BoxShape.circle,
+              ),
+              child: const Center(
+                child: FlutterLogo(size: 20),
+              ),
             ),
-            child: const Center(child: FlutterLogo(size: 20))
-                .animate(onPlay: (c) => c.repeat())
-                .rotate(duration: const Duration(seconds: 2)),
           ),
         ),
-      );
-    });
+        builder: (context, position, child) {
+          return Transform.translate(
+            offset: Offset(position.dx - 15, position.dy - 15),
+            child: child,
+          );
+        },
+      ),
+    );
   }
 }

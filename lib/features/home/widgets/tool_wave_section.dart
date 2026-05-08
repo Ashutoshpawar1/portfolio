@@ -324,8 +324,10 @@ class _WaveLogos extends StatelessWidget {
               );
             }
 
-            return ClipRect(
-              child: Stack(clipBehavior: Clip.none, children: badges),
+            return RepaintBoundary(
+              child: ClipRect(
+                child: Stack(clipBehavior: Clip.none, children: badges),
+              ),
             );
           },
         );
@@ -344,46 +346,48 @@ class _ToolBadgeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool showWordmark = size >= 64;
 
-    return Tooltip(
-      message: data.label,
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          gradient: data.gradient,
-          color: data.gradient == null ? data.background : null,
-          borderRadius: BorderRadius.circular(size * 0.26),
-          border: Border.all(color: data.borderColor),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x33000000),
-              blurRadius: 22,
-              offset: Offset(0, 12),
-            ),
-          ],
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                data.icon,
-                size: showWordmark ? size * 0.28 : size * 0.40,
-                color: data.foreground,
+    return RepaintBoundary(
+      child: Tooltip(
+        message: data.label,
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            gradient: data.gradient,
+            color: data.gradient == null ? data.background : null,
+            borderRadius: BorderRadius.circular(size * 0.26),
+            border: Border.all(color: data.borderColor),
+            boxShadow: const [
+              BoxShadow(
+                color: Color(0x33000000),
+                blurRadius: 22,
+                offset: Offset(0, 12),
               ),
-              if (showWordmark) ...[
-                SizedBox(height: size * 0.04),
-                Text(
-                  data.mark,
-                  style: TextStyle(
-                    color: data.foreground,
-                    fontSize: size * 0.14,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.4,
-                  ),
-                ),
-              ],
             ],
+          ),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  data.icon,
+                  size: showWordmark ? size * 0.28 : size * 0.40,
+                  color: data.foreground,
+                ),
+                if (showWordmark) ...[
+                  SizedBox(height: size * 0.04),
+                  Text(
+                    data.mark,
+                    style: TextStyle(
+                      color: data.foreground,
+                      fontSize: size * 0.14,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.4,
+                    ),
+                  ),
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -416,94 +420,108 @@ class _PhoneShowcase extends StatelessWidget {
     return SizedBox(
       width: width + (compact ? 30 : 110),
       height: phoneHeight + 40,
-      child: AnimatedBuilder(
-        animation: controller,
-        builder: (context, child) {
-          final double progress = controller.value * math.pi * 2;
-          final double phoneLift = math.sin(progress) * 8;
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          AnimatedBuilder(
+            animation: controller,
+            builder: (context, child) {
+              final double progress = controller.value * math.pi * 2;
+              return Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  for (int i = 0; i < orbitBadges.length; i++)
+                    _FloatingOrbitBadge(
+                      data: orbitBadges[i],
+                      progress: progress,
+                      index: i,
+                      compact: compact,
+                    ),
+                ],
+              );
+            },
+          ),
+          AnimatedBuilder(
+            animation: controller,
+            builder: (context, child) {
+              final double progress = controller.value * math.pi * 2;
+              final double phoneLift = math.sin(progress) * 8;
 
-          return Stack(
-            clipBehavior: Clip.none,
-            children: [
-              for (int i = 0; i < orbitBadges.length; i++)
-                _FloatingOrbitBadge(
-                  data: orbitBadges[i],
-                  progress: progress,
-                  index: i,
-                  compact: compact,
-                ),
-              Positioned(
+              return Positioned(
                 left: compact ? 16 : 42,
                 bottom: 8,
                 child: Transform.translate(
                   offset: Offset(0, phoneLift),
-                  child: Container(
-                    width: width,
-                    height: phoneHeight,
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF121212),
-                      borderRadius: BorderRadius.circular(36),
-                      border: Border.all(
-                        color: AppColors.orange.withValues(alpha: 0.88),
-                        width: 2.4,
-                      ),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x55000000),
-                          blurRadius: 30,
-                          offset: Offset(0, 20),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Expanded(
-                          flex: 62,
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF1A1A1A),
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                            child: _PhoneChatPane(compact: compact),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          flex: 38,
-                          child: Container(
-                            padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF161616),
-                              borderRadius: BorderRadius.circular(28),
-                            ),
-                            child: Column(
-                              children: [
-                                const _PhoneActionRow(),
-                                const Spacer(),
-                                _AnimatedWaveform(controller: controller),
-                                const Spacer(),
-                                const Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Icon(
-                                    Icons.language,
-                                    color: AppColors.orange,
-                                    size: 22,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: child,
+                ),
+              );
+            },
+            child: Container(
+              width: width,
+              height: phoneHeight,
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF121212),
+                borderRadius: BorderRadius.circular(36),
+                border: Border.all(
+                  color: AppColors.orange.withValues(alpha: 0.88),
+                  width: 2.4,
+                ),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x55000000),
+                    blurRadius: 30,
+                    offset: Offset(0, 20),
                   ),
+                ],
+              ),
+              child: RepaintBoundary(
+                child: Column(
+                  children: [
+                    Expanded(
+                      flex: 62,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1A1A1A),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: _PhoneChatPane(compact: compact),
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Expanded(
+                      flex: 38,
+                      child: Container(
+                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF161616),
+                          borderRadius: BorderRadius.circular(28),
+                        ),
+                        child: Column(
+                          children: [
+                            const _PhoneActionRow(),
+                            const Spacer(),
+                            _AnimatedWaveform(controller: controller),
+                            const Spacer(),
+                            const Align(
+                              alignment: Alignment.centerLeft,
+                              child: Icon(
+                                Icons.language,
+                                color: AppColors.orange,
+                                size: 22,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          );
-        },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -633,13 +651,14 @@ class _AnimatedWaveform extends StatelessWidget {
                 0.62 + (math.sin(progress + (index * 0.55)).abs() * 0.72);
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 140),
+              child: SizedBox(
                 width: 6,
                 height: bars[index] * factor,
-                decoration: BoxDecoration(
-                  color: AppColors.orange,
-                  borderRadius: BorderRadius.circular(999),
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: AppColors.orange,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
                 ),
               ),
             );

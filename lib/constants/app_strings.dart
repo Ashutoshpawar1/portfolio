@@ -21,7 +21,9 @@ class AppStrings {
   static const String home = "HOME";
   static const String aboutMe = "ABOUT ME";
   static const String projects = "PROJECTS";
+  static const String projectSection = "PROJECT SECTION";
   static const String playground = "PLAYGROUND";
+  static const String tools = "TOOLS";
 
   static const String aboutTitle = "ABOUT ME";
   static const String aboutContent =

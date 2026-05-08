@@ -34,39 +34,53 @@ class _FloatingCirclesState extends State<FloatingCircles>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Stack(
-          children: _circles.map((circle) {
-            final double t = _controller.value;
-            final double x =
-                circle.baseX + math.sin(t * 2 * math.pi + circle.phase) * 50;
-            final double y =
-                circle.baseY + math.cos(t * 2 * math.pi + circle.phase) * 50;
-
-            return Positioned(
-              left: x,
-              top: y,
-              child: Container(
-                width: circle.size,
-                height: circle.size,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: RadialGradient(
-                    colors: [
-                      AppColors.orange.withOpacity(circle.opacity),
-                      AppColors.orange.withOpacity(0),
-                    ],
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        );
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          return CustomPaint(
+            painter: _CirclesPainter(
+              circles: _circles,
+              progress: _controller.value,
+            ),
+            size: Size.infinite,
+          );
+        },
+      ),
     );
   }
+}
+
+class _CirclesPainter extends CustomPainter {
+  final List<CircleModel> circles;
+  final double progress;
+
+  _CirclesPainter({required this.circles, required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    for (final circle in circles) {
+      final double t = progress;
+      final double x =
+          circle.baseX + math.sin(t * 2 * math.pi + circle.phase) * 50;
+      final double y =
+          circle.baseY + math.cos(t * 2 * math.pi + circle.phase) * 50;
+
+      final paint = Paint()
+        ..shader = RadialGradient(
+          colors: [
+            AppColors.orange.withOpacity(circle.opacity),
+            AppColors.orange.withOpacity(0),
+          ],
+        ).createShader(Rect.fromCircle(center: Offset(x, y), radius: circle.size / 2));
+
+      canvas.drawCircle(Offset(x, y), circle.size / 2, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _CirclesPainter oldDelegate) =>
+      oldDelegate.progress != progress;
 }
 
 class CircleModel {
@@ -77,8 +91,8 @@ class CircleModel {
   late double phase;
 
   CircleModel() {
-    baseX = math.Random().nextDouble() * 1500;
-    baseY = math.Random().nextDouble() * 1000;
+    baseX = math.Random().nextDouble() * 2000;
+    baseY = math.Random().nextDouble() * 2000;
     size = math.Random().nextDouble() * 300 + 100;
     opacity = math.Random().nextDouble() * 0.1;
     phase = math.Random().nextDouble() * 2 * math.pi;

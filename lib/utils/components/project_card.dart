@@ -19,6 +19,18 @@ class _ProjectCardState extends State<ProjectCard> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isCompactCard = screenWidth < 520;
+    final double cardWidth = screenWidth < 440
+        ? screenWidth - 40
+        : (screenWidth < 720 ? 320.0 : 350.0);
+    final double cardHeight = screenWidth < 440
+        ? 490.0
+        : (screenWidth < 900 ? 500.0 : 490.0);
+    final double imageHeight = screenWidth < 440
+        ? 180.0
+        : (screenWidth < 900 ? 200.0 : 220.0);
+
     return MouseRegion(
       onEnter: (event) => setState(() {
         _isHovered = true;
@@ -30,8 +42,6 @@ class _ProjectCardState extends State<ProjectCard> {
         duration: const Duration(milliseconds: 200),
         tween: Tween(begin: 0.0, end: _isHovered ? 1.0 : 0.0),
         builder: (context, value, child) {
-          final cardWidth = 350.0;
-          final cardHeight = 450.0;
           final centerX = cardWidth / 2;
           final centerY = cardHeight / 2;
           final dx = (_mousePos.dx - centerX) / centerX;
@@ -47,15 +57,19 @@ class _ProjectCardState extends State<ProjectCard> {
             alignment: Alignment.center,
             child: Container(
               width: cardWidth,
-              margin: const EdgeInsets.only(right: 30, bottom: 20),
+              height: cardHeight,
+              margin: EdgeInsets.only(
+                right: screenWidth < 720 ? 12 : 30,
+                bottom: 20,
+              ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   if (_isHovered)
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 35,
-                      offset: const Offset(0, 18),
+                      color: Colors.black.withOpacity(0.4),
+                      blurRadius: 44,
+                      offset: const Offset(0, 24),
                     ),
                 ],
               ),
@@ -63,8 +77,15 @@ class _ProjectCardState extends State<ProjectCard> {
                 padding: const EdgeInsets.all(0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [_buildImage(), _buildContent(context)],
+                  children: [
+                    _buildImage(imageHeight),
+                    Expanded(
+                      child: _buildContent(
+                        context,
+                        isCompactCard: isCompactCard,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -74,49 +95,54 @@ class _ProjectCardState extends State<ProjectCard> {
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(double imageHeight) {
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Stack(
         children: [
-          Image.network(
-            widget.project.imageUrl.isNotEmpty
-                ? widget.project.imageUrl
-                : "https://images.unsplash.com/photo-1555066931-4365d14bab8c", // Dummy tech image
-            height: 220,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) {
-              return Container(
-                height: 220,
-                width: double.infinity,
-                color: AppColors.surfaceElevated,
-                child: const Center(
-                  child: Icon(
-                    Icons.code_rounded,
-                    color: AppColors.grey,
-                    size: 50,
+          AnimatedScale(
+            scale: _isHovered ? 1.06 : 1,
+            duration: const Duration(milliseconds: 700),
+            curve: Curves.easeOutCubic,
+            child: Image.network(
+              widget.project.imageUrl.isNotEmpty
+                  ? widget.project.imageUrl
+                  : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+              height: imageHeight,
+              width: double.infinity,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  height: imageHeight,
+                  width: double.infinity,
+                  color: AppColors.surfaceElevated,
+                  child: const Center(
+                    child: Icon(
+                      Icons.code_rounded,
+                      color: AppColors.grey,
+                      size: 50,
+                    ),
                   ),
-                ),
-              );
-            },
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return Container(
-                height: 220,
-                width: double.infinity,
-                color: AppColors.surfaceElevated,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    value: loadingProgress.expectedTotalBytes != null
-                        ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                        : null,
-                    color: AppColors.white.withOpacity(0.2),
+                );
+              },
+              loadingBuilder: (context, child, loadingProgress) {
+                if (loadingProgress == null) return child;
+                return Container(
+                  height: imageHeight,
+                  width: double.infinity,
+                  color: AppColors.surfaceElevated,
+                  child: Center(
+                    child: CircularProgressIndicator(
+                      value: loadingProgress.expectedTotalBytes != null
+                          ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                          : null,
+                      color: AppColors.white.withOpacity(0.2),
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
           Positioned.fill(
             child: DecoratedBox(
@@ -150,18 +176,19 @@ class _ProjectCardState extends State<ProjectCard> {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, {required bool isCompactCard}) {
     return Padding(
-      padding: const EdgeInsets.all(25),
+      padding: EdgeInsets.all(isCompactCard ? 20 : 25),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Text(
             widget.project.title,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: AppColors.white,
               fontWeight: FontWeight.w700,
-              fontSize: 22,
+              fontSize: isCompactCard ? 20 : 22,
             ),
           ),
           const SizedBox(height: 12),
@@ -171,22 +198,32 @@ class _ProjectCardState extends State<ProjectCard> {
               color: AppColors.grey,
               height: 1.5,
             ),
-            maxLines: 2,
+            maxLines: isCompactCard ? 3 : 2,
             overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: isCompactCard ? 16 : 20),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: widget.project.tech.map(_buildTechBadge).toList(),
           ),
-          const SizedBox(height: 25),
-          Row(
-            children: [
-              _buildActionButton(Icons.link, "View Demo"),
-              const SizedBox(width: 20),
-              _buildActionButton(Icons.code, "Source"),
-            ],
+          const Spacer(),
+          AnimatedSlide(
+            duration: const Duration(milliseconds: 260),
+            curve: Curves.easeOutCubic,
+            offset: _isHovered ? Offset.zero : const Offset(0, 0.12),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 260),
+              opacity: _isHovered ? 1 : 0.82,
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: [
+                  _buildActionButton(Icons.link, "View Demo"),
+                  _buildActionButton(Icons.code, "Source"),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -215,20 +252,31 @@ class _ProjectCardState extends State<ProjectCard> {
   Widget _buildActionButton(IconData icon, String label) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 18, color: AppColors.grey),
-          const SizedBox(width: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              color: AppColors.grey,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 240),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: _isHovered
+              ? AppColors.white.withOpacity(0.06)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: AppColors.divider),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 18, color: AppColors.grey),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.grey,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

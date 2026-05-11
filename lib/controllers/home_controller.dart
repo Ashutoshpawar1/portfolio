@@ -32,6 +32,7 @@ class HomeController extends GetxController {
   // Scroll offset for background/title effects
   final _scrollOffset = 0.0.obs;
   double get scrollOffset => _scrollOffset.value;
+  Size? _lastViewportSize;
 
   HomeSection? _pendingSection;
 
@@ -50,24 +51,46 @@ class HomeController extends GetxController {
   }
 
   void updateMousePos(Offset pos) {
-    if (mousePos.value != pos) {
+    final Offset current = mousePos.value;
+    if ((current - pos).distanceSquared > 1) {
       mousePos.value = pos;
     }
   }
 
   void updateScroll(double offset) {
-    _scrollOffset.value = offset;
+    if ((_scrollOffset.value - offset).abs() > 2) {
+      _scrollOffset.value = offset;
+    }
   }
 
   void updateParallax(Offset position, Size size) {
-    _parallaxX.value = (position.dx - size.width / 2) / (size.width / 2);
-    _parallaxY.value = (position.dy - size.height / 2) / (size.height / 2);
+    _lastViewportSize = size;
+    final double nextParallaxX =
+        (position.dx - size.width / 2) / (size.width / 2);
+    final double nextParallaxY =
+        (position.dy - size.height / 2) / (size.height / 2);
+
+    if ((_parallaxX.value - nextParallaxX).abs() > 0.012) {
+      _parallaxX.value = nextParallaxX;
+    }
+    if ((_parallaxY.value - nextParallaxY).abs() > 0.012) {
+      _parallaxY.value = nextParallaxY;
+    }
     updateMousePos(position);
   }
 
   void resetParallax() {
-    _parallaxX.value = 0.0;
-    _parallaxY.value = 0.0;
+    if (_parallaxX.value != 0.0) {
+      _parallaxX.value = 0.0;
+    }
+    if (_parallaxY.value != 0.0) {
+      _parallaxY.value = 0.0;
+    }
+
+    final Size? size = _lastViewportSize;
+    if (size != null) {
+      updateMousePos(Offset(size.width / 2, size.height / 2));
+    }
   }
 
   Future<void> navigateToSection(HomeSection section) async {
@@ -75,8 +98,8 @@ class HomeController extends GetxController {
       if (scrollController.hasClients) {
         await scrollController.animateTo(
           0,
-          duration: const Duration(milliseconds: 700),
-          curve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 900),
+          curve: Curves.easeInOutCubicEmphasized,
         );
       }
       return;
@@ -95,8 +118,8 @@ class HomeController extends GetxController {
     if (targetContext != null) {
       await Scrollable.ensureVisible(
         targetContext,
-        duration: const Duration(milliseconds: 720),
-        curve: Curves.easeOutCubic,
+        duration: const Duration(milliseconds: 900),
+        curve: Curves.easeInOutCubicEmphasized,
         alignment: 0.03,
       );
     }

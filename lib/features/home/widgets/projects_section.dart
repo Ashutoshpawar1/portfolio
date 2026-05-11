@@ -1,8 +1,10 @@
-import 'dart:async';
+import 'package:animate_do/animate_do.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import '../../../constants/app_strings.dart';
 import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/project_card.dart';
+import '../../../utils/components/scroll_reveal.dart';
 
 class ProjectsSection extends StatefulWidget {
   const ProjectsSection({super.key});
@@ -11,79 +13,93 @@ class ProjectsSection extends StatefulWidget {
   State<ProjectsSection> createState() => _ProjectsSectionState();
 }
 
-class _ProjectsSectionState extends State<ProjectsSection>
-    with SingleTickerProviderStateMixin {
-  late ScrollController _scrollController;
-  late AnimationController _animationController;
-  double _scrollSpeed = 60.0; // Pixels per second
-  bool _isReversed = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _scrollController = ScrollController(initialScrollOffset: 5000);
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 1),
-    )..addListener(_handleScroll);
-    _animationController.repeat();
-  }
-
-  void _handleScroll() {
-    if (_scrollController.hasClients) {
-      final double delta = _scrollSpeed / 60.0; // Approximate for 60fps
-      final currentScroll = _scrollController.offset;
-
-      if (_isReversed) {
-        if (currentScroll <= 0) {
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent / 2);
-        } else {
-          _scrollController.jumpTo(currentScroll - delta);
-        }
-      } else {
-        if (currentScroll >= _scrollController.position.maxScrollExtent) {
-          _scrollController.jumpTo(_scrollController.position.maxScrollExtent / 2);
-        } else {
-          _scrollController.jumpTo(currentScroll + delta);
-        }
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    _scrollController.dispose();
-    super.dispose();
-  }
+class _ProjectsSectionState extends State<ProjectsSection> {
+  int _activeIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
+    final bool isMobile = width < 820;
+    final double carouselHeight = width < 440
+        ? 560
+        : (isMobile ? 590 : 600);
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 120),
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        vertical: 130,
+        horizontal: isMobile ? 16 : 24,
+      ),
       child: Column(
         children: [
           const AnimatedSectionTitle(title: AppStrings.projectsTitle),
-          const SizedBox(height: 70),
-          SizedBox(
-            height: 520,
-            child: MouseRegion(
-              onEnter: (_) => setState(() => _scrollSpeed = 20.0),
-              onExit: (_) => setState(() => _scrollSpeed = 60.0),
-              child: ListView.builder(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                // Large number to simulate infinity
-                itemCount: 10000,
-                physics: const NeverScrollableScrollPhysics(),
-                itemBuilder: (context, index) {
-                  // Loop through projects
-                  final project = appProjects[index % appProjects.length];
-                  return ProjectCard(project: project);
-                },
+          const SizedBox(height: 28),
+          FadeInUp(
+            duration: const Duration(milliseconds: 700),
+            from: 20,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 760),
+              child: Text(
+                'A curated selection of production-minded Flutter builds focused on speed, scalability, and polished interaction design.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.72),
+                  fontSize: isMobile ? 16 : 18,
+                  height: 1.7,
+                ),
               ),
+            ),
+          ),
+          const SizedBox(height: 60),
+          ScrollReveal(
+            child: Column(
+              children: [
+                CarouselSlider.builder(
+                  itemCount: appProjects.length,
+                  itemBuilder: (context, index, realIndex) {
+                    final project = appProjects[index];
+                    return ProjectCard(project: project);
+                  },
+                  options: CarouselOptions(
+                    height: carouselHeight,
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(seconds: 4),
+                    autoPlayAnimationDuration: const Duration(milliseconds: 900),
+                    autoPlayCurve: Curves.easeOutCubic,
+                    viewportFraction: width < 720
+                        ? 0.9
+                        : (width < 1180 ? 0.62 : 0.38),
+                    enlargeCenterPage: true,
+                    enlargeStrategy: CenterPageEnlargeStrategy.height,
+                    onPageChanged: (index, reason) {
+                      if (_activeIndex != index) {
+                        setState(() => _activeIndex = index);
+                      }
+                    },
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
+                  children: List.generate(appProjects.length, (index) {
+                    final bool isActive = index == _activeIndex;
+                    return AnimatedContainer(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeOutCubic,
+                      width: isActive ? 34 : 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(999),
+                        color: isActive
+                            ? Colors.white
+                            : Colors.white.withOpacity(0.18),
+                      ),
+                    );
+                  }),
+                ),
+              ],
             ),
           ),
         ],

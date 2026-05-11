@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
 
 class SiteFooter extends StatelessWidget {
   final bool compactBrand;
@@ -72,9 +73,13 @@ class _FooterContactBlock extends StatelessWidget {
     return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _FooterInfoRow(label: "(EMAIL)", value: "hello@ashutosh.dev", accent: true),
+        _FooterInfoRow(
+          label: "(EMAIL)",
+          value: AppStrings.emailAddress,
+          accent: true,
+        ),
         SizedBox(height: 22),
-        _FooterInfoRow(label: "(PHONE)", value: "+91 12345678"),
+        _FooterInfoRow(label: "(GITHUB)", value: "Ashutoshpawar1"),
       ],
     );
   }

@@ -1,13 +1,19 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:marquee/marquee.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
 import '../../../utils/components/animated_section_title.dart';
-import '../../../utils/components/skill_progress_bar.dart';
 import '../../../utils/components/glass_container.dart';
+import '../../../utils/components/scroll_reveal.dart';
+import '../../../utils/components/skill_progress_bar.dart';
 
 class SkillsSection extends StatelessWidget {
   const SkillsSection({super.key});
+
+  static const String _technologyLine =
+      'Flutter   |   Dart   |   Firebase   |   Riverpod   |   GetX   |   REST API   |   MongoDB   |   Node.js   |   WebSockets   |   Material 3   |   Responsive UI   |   Animation Systems   |   Clean Architecture   |   Flutter   |   Dart   |   Firebase   |   Riverpod   |   GetX   |   REST API';
 
   @override
   Widget build(BuildContext context) {
@@ -17,87 +23,132 @@ class SkillsSection extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.symmetric(
-        vertical: 160,
+        vertical: 150,
         horizontal: width < 720 ? 18 : 40,
       ),
       decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.05),
-        image: DecorationImage(
-          image: const NetworkImage(
-            "https://www.transparenttextures.com/patterns/carbon-fibre.png", // Subtle noise/texture
-          ),
-          opacity: 0.03,
-          repeat: ImageRepeat.repeat,
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            Colors.white.withOpacity(0.015),
+            Colors.transparent,
+            Colors.white.withOpacity(0.01),
+          ],
         ),
       ),
       child: Column(
         children: [
           const AnimatedSectionTitle(title: AppStrings.skills),
-          const SizedBox(height: 90),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Wrap(
-                spacing: 40,
-                runSpacing: 40,
-                alignment: WrapAlignment.center,
-                children: [
-                  _SkillCategoryCard(
-                    title: "Mobile Stack",
-                    accentColor: const Color(0xFF6366F1), // Blue-Purple
-                    skills: const [
-                      _SkillData(
-                        "Flutter Architecture",
-                        0.95,
-                        Icons.flutter_dash,
-                      ),
-                      _SkillData(
-                        "Material 3 / UI Design",
-                        0.92,
-                        Icons.brush_rounded,
-                      ),
-                      _SkillData(
-                        "GetX / State Management",
-                        0.95,
-                        Icons.account_tree_outlined,
-                      ),
-                      _SkillData(
-                        "Native Integration",
-                        0.85,
-                        Icons.settings_cell_rounded,
-                      ),
-                    ],
-                    width: isMobile
-                        ? constraints.maxWidth
-                        : (constraints.maxWidth - 60) / 2,
-                  ),
-                  _SkillCategoryCard(
-                    title: "Services & Web",
-                    accentColor: const Color(0xFF10B981), // Emerald
-                    skills: const [
-                      _SkillData(
-                        "Firebase / Supabase",
-                        0.88,
-                        Icons.local_fire_department_rounded,
-                      ),
-                      _SkillData(
-                        "Node.js Backend",
-                        0.75,
-                        Icons.terminal_rounded,
-                      ),
-                      _SkillData("REST API Design", 0.82, Icons.api_rounded),
-                      _SkillData(
-                        "Cloud Infrastructure",
-                        0.78,
-                        Icons.cloud_queue_rounded,
-                      ),
-                    ],
-                    width: isMobile
-                        ? constraints.maxWidth
-                        : (constraints.maxWidth - 60) / 2,
-                  ),
-                ],
-              );
-            },
+          const SizedBox(height: 32),
+          FadeInUp(
+            duration: const Duration(milliseconds: 700),
+            from: 24,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 720),
+              child: Text(
+                'Performance-first frontend engineering with responsive UI systems, state management, and scalable service integration.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: AppColors.grey.withOpacity(0.92),
+                  fontSize: width < 720 ? 16 : 18,
+                  height: 1.7,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 70),
+          ScrollReveal(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return Wrap(
+                  spacing: 40,
+                  runSpacing: 40,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _SkillCategoryCard(
+                      title: "Mobile Stack",
+                      accentColor: const Color(0xFF6366F1),
+                      skills: const [
+                        _SkillData(
+                          "Flutter Architecture",
+                          0.95,
+                          Icons.flutter_dash,
+                        ),
+                        _SkillData(
+                          "Material 3 / UI Design",
+                          0.92,
+                          Icons.brush_rounded,
+                        ),
+                        _SkillData(
+                          "GetX / State Management",
+                          0.95,
+                          Icons.account_tree_outlined,
+                        ),
+                        _SkillData(
+                          "Native Integration",
+                          0.85,
+                          Icons.settings_cell_rounded,
+                        ),
+                      ],
+                      width: isMobile
+                          ? constraints.maxWidth
+                          : (constraints.maxWidth - 60) / 2,
+                    ),
+                    _SkillCategoryCard(
+                      title: "Services & Web",
+                      accentColor: const Color(0xFF10B981),
+                      skills: const [
+                        _SkillData(
+                          "Firebase / Supabase",
+                          0.88,
+                          Icons.local_fire_department_rounded,
+                        ),
+                        _SkillData(
+                          "Node.js Backend",
+                          0.75,
+                          Icons.terminal_rounded,
+                        ),
+                        _SkillData("REST API Design", 0.82, Icons.api_rounded),
+                        _SkillData(
+                          "Cloud Infrastructure",
+                          0.78,
+                          Icons.cloud_queue_rounded,
+                        ),
+                      ],
+                      width: isMobile
+                          ? constraints.maxWidth
+                          : (constraints.maxWidth - 60) / 2,
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+          const SizedBox(height: 52),
+          ScrollReveal(
+            beginOffset: const Offset(0, 0.05),
+            child: Container(
+              height: 62,
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: AppColors.divider),
+                color: Colors.white.withOpacity(0.03),
+              ),
+              child: Marquee(
+                text: _technologyLine,
+                velocity: 42,
+                blankSpace: 120,
+                pauseAfterRound: const Duration(milliseconds: 400),
+                style: const TextStyle(
+                  color: AppColors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -131,21 +182,21 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedScale(
-        scale: _isHovered ? 1.015 : 1.0,
-        duration: const Duration(milliseconds: 300),
+        scale: _isHovered ? 1.018 : 1.0,
+        duration: const Duration(milliseconds: 260),
         curve: Curves.easeOutBack,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 400),
-          width: widget.width.clamp(320, 620),
+          duration: const Duration(milliseconds: 360),
+          width: widget.width.clamp(320.0, 620.0).toDouble(),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: widget.accentColor.withOpacity(0.18),
-                  blurRadius: 40,
+                  color: widget.accentColor.withOpacity(0.2),
+                  blurRadius: 42,
                   spreadRadius: 2,
-                  offset: const Offset(0, 15),
+                  offset: const Offset(0, 18),
                 ),
             ],
           ),
@@ -158,8 +209,9 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
               children: [
                 Row(
                   children: [
-                    Container(
-                      width: 4,
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 260),
+                      width: _isHovered ? 40 : 4,
                       height: 32,
                       decoration: BoxDecoration(
                         color: widget.accentColor,
@@ -197,8 +249,8 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
                         ),
                       )
                       .animate()
-                      .fadeIn(delay: (200 + (index * 100)).ms, duration: 600.ms)
-                      .slideX(begin: 0.1, curve: Curves.easeOutCubic);
+                      .fadeIn(delay: (180 + (index * 90)).ms, duration: 560.ms)
+                      .slideX(begin: 0.08, curve: Curves.easeOutCubic);
                 }),
               ],
             ),

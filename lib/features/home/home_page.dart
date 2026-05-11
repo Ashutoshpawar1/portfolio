@@ -27,63 +27,74 @@ class HomePage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (context, constraints) {
           final double width = constraints.maxWidth;
+          final bool enableDesktopEffects = width >= 960;
 
           return MouseRegion(
-            cursor: SystemMouseCursors.none,
-            onHover: (event) => controller.updateParallax(
-              event.position,
-              MediaQuery.of(context).size,
-            ),
+            cursor: enableDesktopEffects
+                ? SystemMouseCursors.none
+                : MouseCursor.defer,
+            onHover: enableDesktopEffects
+                ? (event) => controller.updateParallax(
+                    event.position,
+                    MediaQuery.of(context).size,
+                  )
+                : null,
             onExit: (_) => controller.resetParallax(),
             child: Stack(
               children: [
-                const PageBackground(),
-                const FloatingCircles(),
+                PageBackground(enableMotion: enableDesktopEffects),
+                if (enableDesktopEffects) const FloatingCircles(),
                 NotificationListener<ScrollNotification>(
-                  onNotification: (notification) {
-                    controller.updateScroll(notification.metrics.pixels);
-                    return false;
-                  },
+                  onNotification: enableDesktopEffects
+                      ? (notification) {
+                          controller.updateScroll(notification.metrics.pixels);
+                          return false;
+                        }
+                      : (_) => false,
                   child: SingleChildScrollView(
                     controller: controller.scrollController,
-                    physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      children: [
-                        _sectionWrapper(
-                          key: controller.heroSectionKey,
-                          child: HeroSection(width: width),
-                        ),
-                        _sectionWrapper(
-                          key: controller.aboutSectionKey,
-                          color: AppColors.surface,
-                          child: const AboutMeSection(),
-                        ),
-                        _sectionWrapper(
-                          key: controller.projectsSectionKey,
-                          color: AppColors.black,
-                          child: const ProjectsSection(),
-                        ),
-                        _sectionWrapper(
-                          key: controller.skillsSectionKey,
-                          color: AppColors.surface,
-                          child: const SkillsSection(),
-                        ),
-                        _sectionWrapper(
-                          key: controller.experienceSectionKey,
-                          color: AppColors.black,
-                          child: const ExperienceSection(),
-                        ),
-                        _sectionWrapper(
-                          key: controller.toolsSectionKey,
-                          color: AppColors.surface,
-                          child: const ToolWaveSection(),
-                        ),
-                        const SiteFooter(),
-                      ],
+                    physics: const BouncingScrollPhysics(
+                      parent: AlwaysScrollableScrollPhysics(),
+                    ),
+                    child: RepaintBoundary(
+                      child: Column(
+                        children: [
+                          _sectionWrapper(
+                            key: controller.heroSectionKey,
+                            child: HeroSection(width: width),
+                          ),
+                          _sectionWrapper(
+                            key: controller.aboutSectionKey,
+                            color: AppColors.surface,
+                            child: const AboutMeSection(),
+                          ),
+                          _sectionWrapper(
+                            key: controller.projectsSectionKey,
+                            color: AppColors.black,
+                            child: const ProjectsSection(),
+                          ),
+                          _sectionWrapper(
+                            key: controller.skillsSectionKey,
+                            color: AppColors.surface,
+                            child: const SkillsSection(),
+                          ),
+                          _sectionWrapper(
+                            key: controller.experienceSectionKey,
+                            color: AppColors.black,
+                            child: const ExperienceSection(),
+                          ),
+                          _sectionWrapper(
+                            key: controller.toolsSectionKey,
+                            color: AppColors.surface,
+                            child: const ToolWaveSection(),
+                          ),
+                          const SiteFooter(),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                const CustomCursor(),
+                if (enableDesktopEffects) const CustomCursor(),
                 Obx(
                   () => controller.isMenuOpen
                       ? MenuOverlay(
@@ -112,16 +123,21 @@ class HomePage extends StatelessWidget {
   }
 
   Widget _sectionWrapper({Key? key, required Widget child, Color? color}) {
-    return Container(
-      key: key,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: color,
-        border: Border(
-          bottom: BorderSide(color: Colors.white.withOpacity(0.04), width: 1),
+    return RepaintBoundary(
+      child: Container(
+        key: key,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: color,
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.white.withOpacity(0.04),
+              width: 1,
+            ),
+          ),
         ),
+        child: child,
       ),
-      child: child,
     );
   }
 }

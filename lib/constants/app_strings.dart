@@ -2,10 +2,19 @@ class AppStrings {
   static const String appName = "Ashutosh Portfolio";
   static const String logoText = "ASHUTOSH";
   static const String devNameWithRole = "Ashutosh | Flutter Developer";
+  static const String linkedinUrl =
+      "https://www.linkedin.com/in/ashutosh-garge-3037a5240";
+  static const String githubUrl = "https://github.com/Ashutoshpawar1";
+  static const String emailAddress = "ashutoshgarge123@gmail.com";
+  static const String emailUrl = "mailto:ashutoshgarge123@gmail.com";
+  static const String resumeWebPath = "resume/ashutosh_resume.pdf";
+  static const String heroIdentityTitle =
+      "Ashutosh Garge\nCrafting seamless digital experiences with Flutter.";
   static const String devSubtitle =
-      "Building Scalable Mobile & Web Applications";
+      "State Management (Riverpod/GetX)\n\nReal-time Systems (Socket.io)\n\nPerformance Optimization\n\nClean Architecture (SOLID)";
   static const String devDescriptionLong =
-      "I am a Flutter Developer with experience in building scalable mobile and web applications with REST APIs, real-time sockets, and clean architecture.";
+      "I build high-performance, scalable mobile and web applications that combine clean architecture with fluid animations.";
+  static const String heroSpecialtiesTitle = "Specialties:";
 
   static const String skills = "SKILLS";
   static const String experience = "EXPERIENCE";
@@ -27,12 +36,12 @@ class AppStrings {
 
   static const String aboutTitle = "ABOUT ME";
   static const String aboutContent =
-      "I am a Flutter Developer with experience in building scalable mobile and web applications with REST APIs, real-time sockets, and clean architecture.";
+      "I'm a Flutter Developer with 2+ years of experience building scalable mobile and web applications. I specialize in responsive UI design, API integration, Firebase, state management, and real-time features. I focus on creating smooth user experiences with clean, maintainable, and efficient code architecture.\n\nI'm passionate about building modern, pixel-perfect applications that are both functional and user-friendly. Over the years, I've worked on projects ranging from simple applications to complex enterprise-level solutions, with experience in real-time communication, multilingual support (English, Arabic, and Urdu), and scalable backend integration using Firebase and MongoDB.";
 
   static const String projectsTitle = "PROJECTS";
 
   static const String contactTitle = "CONTACT";
-  static const String email = "ashutosh@example.com";
+  static const String email = emailAddress;
   static const String whatsapp = "WhatsApp";
 }
 

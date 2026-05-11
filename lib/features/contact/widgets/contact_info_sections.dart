@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_strings.dart';
+import '../../../utils/services/external_link_service.dart';
 import 'contact_form_card.dart';
 
 class ContactHeadlineBlock extends StatelessWidget {
@@ -71,12 +73,15 @@ class ContactFormAndInfo extends StatelessWidget {
                 fontWeight: FontWeight.w600,
               ),
             ),
-            const Text(
-              "Book a call",
-              style: TextStyle(
-                color: Color(0xFFFF5A36),
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
+            GestureDetector(
+              onTap: () => openExternalUrl(AppStrings.emailUrl),
+              child: const Text(
+                "Email me",
+                style: TextStyle(
+                  color: Color(0xFFFF5A36),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             Text(
@@ -93,7 +98,7 @@ class ContactFormAndInfo extends StatelessWidget {
         Container(height: 1, color: AppColors.divider),
         const SizedBox(height: 30),
         const Text(
-          "Visit Us",
+          "Contact",
           style: TextStyle(
             color: AppColors.white,
             fontSize: 34,
@@ -102,35 +107,41 @@ class ContactFormAndInfo extends StatelessWidget {
         ),
         const SizedBox(height: 28),
         isCompact
-            ? const Column(
+            ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   InfoColumn(
-                    label: "(ADDRESS)",
-                    value: "123 Market Street,\nSuite 400\nLos Angeles, CA 90001",
+                    label: "(EMAIL)",
+                    value: AppStrings.emailAddress,
                   ),
                   SizedBox(height: 24),
                   InfoColumn(
-                    label: "(OFFICE HOURS)",
-                    value: "Monday - Friday\n9:00 AM - 6:00 PM (GMT+7)",
+                    label: "(LINKEDIN)",
+                    value: "ashutosh-garge-3037a5240",
                   ),
+                  SizedBox(height: 24),
+                  InfoColumn(label: "(GITHUB)", value: "Ashutoshpawar1"),
                 ],
               )
-            : const Row(
+            : Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: InfoColumn(
-                      label: "(ADDRESS)",
-                      value: "123 Market Street,\nSuite 400\nLos Angeles, CA 90001",
+                      label: "(EMAIL)",
+                      value: AppStrings.emailAddress,
                     ),
                   ),
-                  SizedBox(width: 30),
+                  const SizedBox(width: 30),
                   Expanded(
                     child: InfoColumn(
-                      label: "(OFFICE HOURS)",
-                      value: "Monday - Friday\n9:00 AM - 6:00 PM (GMT+7)",
+                      label: "(LINKEDIN)",
+                      value: "ashutosh-garge-3037a5240",
                     ),
+                  ),
+                  const SizedBox(width: 30),
+                  const Expanded(
+                    child: InfoColumn(label: "(GITHUB)", value: "Ashutoshpawar1"),
                   ),
                 ],
               ),

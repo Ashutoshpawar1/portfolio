@@ -158,15 +158,23 @@ class _BackdropTitle extends StatelessWidget {
     final double width = MediaQuery.of(context).size.width;
     final double fontSize = width < 700 ? 64 : (width < 1100 ? 96 : 126);
 
-    return Center(
-      child: Text(
-        title,
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-          color: AppColors.white.withValues(alpha: 0.08),
-          fontSize: fontSize,
-          letterSpacing: -3,
-          height: 0.92,
+    return SizedBox(
+      width: double.infinity,
+      child: Center(
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.center,
+          child: Text(
+            title,
+            maxLines: 1,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.displayLarge?.copyWith(
+              color: AppColors.white.withValues(alpha: 0.08),
+              fontSize: fontSize,
+              letterSpacing: 0,
+              height: 0.92,
+            ),
+          ),
         ),
       ),
     );
@@ -409,6 +417,7 @@ class _PhoneShowcase extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final double phoneHeight = width * 1.72;
+    final bool tightCompact = compact && width <= 272;
     final List<_ToolBadgeData> orbitBadges = [
       _toolBadges[0],
       _toolBadges[8],
@@ -459,7 +468,7 @@ class _PhoneShowcase extends StatelessWidget {
             child: Container(
               width: width,
               height: phoneHeight,
-              padding: const EdgeInsets.all(8),
+              padding: EdgeInsets.all(tightCompact ? 6 : 8),
               decoration: BoxDecoration(
                 color: const Color(0xFF121212),
                 borderRadius: BorderRadius.circular(36),
@@ -479,9 +488,14 @@ class _PhoneShowcase extends StatelessWidget {
                 child: Column(
                   children: [
                     Expanded(
-                      flex: 62,
+                      flex: tightCompact ? 60 : 62,
                       child: Container(
-                        padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+                        padding: EdgeInsets.fromLTRB(
+                          tightCompact ? 12 : 14,
+                          tightCompact ? 12 : 14,
+                          tightCompact ? 12 : 14,
+                          tightCompact ? 10 : 12,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF1A1A1A),
                           borderRadius: BorderRadius.circular(28),
@@ -489,11 +503,16 @@ class _PhoneShowcase extends StatelessWidget {
                         child: _PhoneChatPane(compact: compact),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    SizedBox(height: tightCompact ? 6 : 8),
                     Expanded(
-                      flex: 38,
+                      flex: tightCompact ? 40 : 38,
                       child: Container(
-                        padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+                        padding: EdgeInsets.fromLTRB(
+                          tightCompact ? 14 : 18,
+                          tightCompact ? 12 : 16,
+                          tightCompact ? 14 : 18,
+                          tightCompact ? 10 : 14,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF161616),
                           borderRadius: BorderRadius.circular(28),
@@ -538,7 +557,7 @@ class _PhoneChatPane extends StatelessWidget {
       builder: (context, constraints) {
         final bool dense = compact || constraints.maxHeight < 330;
         final bool ultraDense = constraints.maxHeight < 296;
-        final double gap = ultraDense ? 7 : (dense ? 8 : 10);
+        final double gap = ultraDense ? 5 : (dense ? 7 : 10);
         final double maxBubbleWidth =
             constraints.maxWidth * (dense ? 0.72 : 0.76);
 
@@ -546,7 +565,7 @@ class _PhoneChatPane extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _PhoneProfileRow(dense: dense),
-            SizedBox(height: dense ? 10 : 12),
+            SizedBox(height: ultraDense ? 8 : (dense ? 10 : 12)),
             _ChatBubble(
               text: "Cool, extra cream.",
               isReply: false,
@@ -575,6 +594,7 @@ class _PhoneChatPane extends StatelessWidget {
               dense: dense,
               maxWidth: maxBubbleWidth,
             ),
+            SizedBox(height: ultraDense ? 6 : 8),
             const Spacer(),
             _MessageField(dense: dense),
           ],
@@ -676,11 +696,12 @@ class _PhoneProfileRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool extraDense = dense;
     return Row(
       children: [
         Container(
-          width: dense ? 30 : 32,
-          height: dense ? 30 : 32,
+          width: extraDense ? 28 : 32,
+          height: extraDense ? 28 : 32,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             gradient: LinearGradient(
@@ -690,15 +711,15 @@ class _PhoneProfileRow extends StatelessWidget {
           child: Icon(
             Icons.person,
             color: AppColors.orange,
-            size: dense ? 16 : 18,
+            size: extraDense ? 15 : 18,
           ),
         ),
-        const SizedBox(width: 10),
+        SizedBox(width: extraDense ? 8 : 10),
         Text(
           "Jordan",
           style: TextStyle(
             color: AppColors.orange,
-            fontSize: dense ? 14 : 15,
+            fontSize: extraDense ? 13 : 15,
             fontWeight: FontWeight.w700,
           ),
         ),
@@ -736,15 +757,15 @@ class _ChatBubble extends StatelessWidget {
           color: isReply ? const Color(0xFF37352E) : const Color(0xFF292929),
           borderRadius: BorderRadius.circular(16),
         ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.86),
-            fontSize: dense ? 12 : (small ? 12 : 13.5),
-            height: 1.16,
-            fontWeight: FontWeight.w600,
-          ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: Colors.white.withValues(alpha: 0.86),
+          fontSize: dense ? 11.5 : (small ? 12 : 13.5),
+          height: dense ? 1.12 : 1.16,
+          fontWeight: FontWeight.w600,
         ),
+      ),
       ),
     );
   }
@@ -758,7 +779,7 @@ class _MessageField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: dense ? 36 : 38,
+      height: dense ? 34 : 38,
       decoration: BoxDecoration(
         color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(18),
@@ -769,7 +790,7 @@ class _MessageField extends StatelessWidget {
         "|",
         style: TextStyle(
           color: Colors.white.withValues(alpha: 0.35),
-          fontSize: dense ? 16 : 18,
+          fontSize: dense ? 15 : 18,
         ),
       ),
     );
@@ -784,23 +805,23 @@ class _PhoneActionRow extends StatelessWidget {
     return Row(
       children: [
         Container(
-          width: 34,
-          height: 34,
+          width: 32,
+          height: 32,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: Color(0xFF2E2E2E),
           ),
-          child: const Icon(Icons.close, color: AppColors.orange, size: 18),
+          child: const Icon(Icons.close, color: AppColors.orange, size: 17),
         ),
         const Spacer(),
         Container(
-          width: 34,
-          height: 34,
+          width: 32,
+          height: 32,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
             color: AppColors.orange,
           ),
-          child: const Icon(Icons.check, color: Colors.black, size: 18),
+          child: const Icon(Icons.check, color: Colors.black, size: 17),
         ),
       ],
     );

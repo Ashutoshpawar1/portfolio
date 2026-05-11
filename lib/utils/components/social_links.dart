@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../../constants/app_strings.dart';
+import '../services/external_link_service.dart';
 
 class SocialLinks extends StatelessWidget {
   const SocialLinks({super.key});
@@ -9,28 +11,31 @@ class SocialLinks extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildSocialIcon(Icons.link, 'LinkedIn'),
+        _buildSocialIcon(Icons.link, 'LinkedIn', AppStrings.linkedinUrl),
         const SizedBox(width: 20),
-        _buildSocialIcon(Icons.terminal, 'GitHub'),
+        _buildSocialIcon(Icons.terminal, 'GitHub', AppStrings.githubUrl),
         const SizedBox(width: 20),
-        _buildSocialIcon(Icons.alternate_email, 'Email'),
+        _buildSocialIcon(Icons.alternate_email, 'Email', AppStrings.emailUrl),
       ],
     );
   }
 
-  Widget _buildSocialIcon(IconData icon, String tooltip) {
+  Widget _buildSocialIcon(IconData icon, String tooltip, String url) {
     return Tooltip(
       message: tooltip,
       child: MouseRegion(
         cursor: SystemMouseCursors.click,
-        child: Container(
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.white.withOpacity(0.03),
-            border: Border.all(color: AppColors.divider),
+        child: GestureDetector(
+          onTap: () => openExternalUrl(url),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.white.withValues(alpha: 0.03),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Icon(icon, color: AppColors.white, size: 24),
           ),
-          child: Icon(icon, color: AppColors.white, size: 24),
         ),
       ),
     );

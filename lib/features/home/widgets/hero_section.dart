@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:animated_text_kit/animated_text_kit.dart';
+import 'package:animate_do/animate_do.dart';
 import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -7,6 +9,7 @@ import '../../../constants/app_strings.dart';
 import '../../../routes/app_router.dart';
 import '../../../controllers/home_controller.dart';
 import '../../../utils/components/premium_button.dart';
+import '../../../utils/components/resume_preview_dialog.dart';
 import '../../../utils/components/top_menu_button.dart';
 import '../../../utils/components/social_links.dart';
 
@@ -49,7 +52,7 @@ class _DesktopHeroLayout extends StatelessWidget {
     final double contentGap = tightDesktop ? 28 : 40;
 
     return SizedBox(
-      height: MediaQuery.of(context).size.height.clamp(760.0, 980.0),
+      height: MediaQuery.of(context).size.height.clamp(760.0, 980.0).toDouble(),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
@@ -345,48 +348,86 @@ class _HeroIntroBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: centered
-          ? CrossAxisAlignment.center
-          : CrossAxisAlignment.start,
-      children: [
-        Text(
-          "Flutter developer focused on polished mobile and web products.",
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            fontSize: headlineFontSize ?? (isCompact ? 24 : 36),
-            fontWeight: FontWeight.w700,
+    final controller = Get.find<HomeController>();
+    final List<String> lines = AppStrings.heroIdentityTitle.split('\n');
+    final String primaryLine = lines.isNotEmpty ? lines.first : AppStrings.heroIdentityTitle;
+    final String animatedLine = lines.length > 1 ? lines.sublist(1).join(' ') : '';
+    final TextAlign textAlign = centered ? TextAlign.center : TextAlign.start;
+    final CrossAxisAlignment crossAxisAlignment = centered
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.start;
+
+    return FadeInLeft(
+      duration: 700.ms,
+      from: 36,
+      child: Column(
+        crossAxisAlignment: crossAxisAlignment,
+        children: [
+          Text(
+            primaryLine,
+            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+              fontSize: headlineFontSize ?? (isCompact ? 24 : 36),
+              fontWeight: FontWeight.w700,
+            ),
+            textAlign: textAlign,
           ),
-          textAlign: centered ? TextAlign.center : TextAlign.start,
-        ),
-        SizedBox(height: contentSpacing),
-        Text(
-          AppStrings.devDescriptionLong,
-          style: TextStyle(
-            fontSize: bodyFontSize ?? (isCompact ? 16 : 18),
-            color: AppColors.grey,
-            height: 1.7,
-          ),
-          textAlign: centered ? TextAlign.center : TextAlign.start,
-        ),
-        SizedBox(height: actionSpacing),
-        Wrap(
-          spacing: 16,
-          runSpacing: 16,
-          alignment: centered ? WrapAlignment.center : WrapAlignment.start,
-          children: [
-            PremiumButton(label: AppStrings.viewProjects, onTap: () {}),
-            PremiumButton(
-              label: AppStrings.downloadResume,
-              onTap: () {},
-              isPrimary: false,
-              icon: Icons.download,
+          if (animatedLine.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            DefaultTextStyle(
+              style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                color: AppColors.white.withOpacity(0.9),
+                fontSize: isCompact ? 18 : 22,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+              ),
+              child: AnimatedTextKit(
+                totalRepeatCount: 1,
+                isRepeatingAnimation: false,
+                displayFullTextOnTap: true,
+                animatedTexts: [
+                  TypewriterAnimatedText(
+                    animatedLine,
+                    speed: const Duration(milliseconds: 40),
+                    textAlign: textAlign,
+                    cursor: ' _',
+                  ),
+                ],
+              ),
             ),
           ],
-        ),
-        SizedBox(height: socialSpacing),
-        const SocialLinks(),
-      ],
-    ).animate().fadeIn(delay: 250.ms, duration: 700.ms).slideY(begin: 0.08);
+          SizedBox(height: contentSpacing),
+          Text(
+            AppStrings.devDescriptionLong,
+            style: TextStyle(
+              fontSize: bodyFontSize ?? (isCompact ? 16 : 18),
+              color: AppColors.grey,
+              height: 1.7,
+            ),
+            textAlign: textAlign,
+          ),
+          SizedBox(height: actionSpacing),
+          Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: centered ? WrapAlignment.center : WrapAlignment.start,
+            children: [
+              PremiumButton(
+                label: AppStrings.viewProjects,
+                onTap: () => controller.navigateToSection(HomeSection.projects),
+              ),
+              PremiumButton(
+                label: AppStrings.downloadResume,
+                onTap: () => ResumePreviewDialog.show(context),
+                isPrimary: false,
+                icon: Icons.download,
+              ),
+            ],
+          ),
+          SizedBox(height: socialSpacing),
+          const SocialLinks(),
+        ],
+      ),
+    );
   }
 }
 
@@ -403,33 +444,38 @@ class _HeroSidePitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: centerAligned
-          ? CrossAxisAlignment.center
-          : (isCompact ? CrossAxisAlignment.start : CrossAxisAlignment.end),
-      children: [
-        Text(
-          "Beyond Flutter.\nBuilt with Vision.",
-          textAlign: centerAligned
-              ? TextAlign.center
-              : (isCompact ? TextAlign.start : TextAlign.right),
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            fontSize: titleFontSize ?? (isCompact ? 52 : 74),
-            color: Colors.white.withOpacity(0.78),
+    final TextAlign align = centerAligned
+        ? TextAlign.center
+        : (isCompact ? TextAlign.start : TextAlign.right);
+    final CrossAxisAlignment crossAxisAlignment = centerAligned
+        ? CrossAxisAlignment.center
+        : (isCompact ? CrossAxisAlignment.start : CrossAxisAlignment.end);
+
+    return FadeInRight(
+      duration: 800.ms,
+      from: 42,
+      child: Column(
+        crossAxisAlignment: crossAxisAlignment,
+        children: [
+          Text(
+            AppStrings.heroSpecialtiesTitle,
+            textAlign: align,
+            style: Theme.of(context).textTheme.displayMedium?.copyWith(
+              fontSize: titleFontSize ?? (isCompact ? 52 : 74),
+              color: Colors.white.withOpacity(0.78),
+            ),
           ),
-        ),
-        const SizedBox(height: 14),
-        Text(
-          AppStrings.devSubtitle,
-          textAlign: centerAligned
-              ? TextAlign.center
-              : (isCompact ? TextAlign.start : TextAlign.right),
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.grey),
-        ),
-      ],
-    ).animate().fadeIn(delay: 350.ms).slideX(begin: isCompact ? 0 : 0.08);
+          const SizedBox(height: 14),
+          Text(
+            AppStrings.devSubtitle,
+            textAlign: align,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.grey),
+          ),
+        ],
+      ),
+    );
   }
 }
 
@@ -472,51 +518,56 @@ class _HeroVisualContent extends StatelessWidget {
           ..rotateX(-controller.parallaxY * 0.05)
           ..translate(controller.parallaxX * 24, controller.parallaxY * 18),
         alignment: Alignment.center,
-        child: RepaintBoundary(
-          child: Container(
-            width: size,
-            height: size * 1.2,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(32),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.42),
-                  blurRadius: 60,
-                  offset: const Offset(0, 24),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(
-                    'lib/assets/images/ashu_profile.png',
-                    fit: BoxFit.cover,
-                  ),
-                  DecoratedBox(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [
-                          Colors.black.withOpacity(0.4),
-                          Colors.transparent,
-                          Colors.black.withOpacity(0.3),
-                        ],
-                        stops: const [0.05, 0.45, 1],
+        child: FadeInUp(
+          duration: 850.ms,
+          from: 34,
+          child: RepaintBoundary(
+                child: Container(
+                  width: size,
+                  height: size * 1.2,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(32),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.42),
+                        blurRadius: 60,
+                        offset: const Offset(0, 24),
                       ),
+                    ],
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(32),
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          'lib/assets/images/ashu_profile.png',
+                          fit: BoxFit.cover,
+                        ),
+                        DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Colors.black.withOpacity(0.4),
+                                Colors.transparent,
+                                Colors.black.withOpacity(0.3),
+                              ],
+                              stops: const [0.05, 0.45, 1],
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        )
-        .animate()
-        .fadeIn(duration: 900.ms)
-        .scale(begin: const Offset(0.96, 0.96)),
+                ),
+              )
+              .animate(onPlay: (controller) => controller.repeat(reverse: true))
+              .moveY(begin: -8, end: 8, duration: 3000.ms, curve: Curves.easeInOut)
+              .then()
+              .moveY(begin: 8, end: -8, duration: 3000.ms, curve: Curves.easeInOut),
+        ),
       ),
     );
   }

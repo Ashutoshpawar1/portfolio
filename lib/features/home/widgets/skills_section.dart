@@ -13,7 +13,7 @@ class SkillsSection extends StatelessWidget {
   const SkillsSection({super.key});
 
   static const String _technologyLine =
-      'Flutter   |   Dart   |   Firebase   |   Riverpod   |   GetX   |   REST API   |   MongoDB   |   Node.js   |   WebSockets   |   Material 3   |   Responsive UI   |   Animation Systems   |   Clean Architecture   |   Flutter   |   Dart   |   Firebase   |   Riverpod   |   GetX   |   REST API';
+      'Flutter   |   Dart   |   Flutter Web   |   Responsive UI   |   GetX   |   Riverpod   |   Bloc   |   REST APIs   |   Node.js   |   Express.js   |   MongoDB   |   Socket.io   |   Jitsi Meet   |   Twilio   |   ChatGPT   |   Claude   |   Gemini   |   Ollama   |   Gamma AI';
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +47,7 @@ class SkillsSection extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 720),
               child: Text(
-                'Performance-first frontend engineering with responsive UI systems, state management, and scalable service integration.',
+                'Performance-first frontend engineering with responsive UI systems, state management, scalable architecture, and real-time service integration.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.grey.withOpacity(0.92),
@@ -70,25 +70,26 @@ class SkillsSection extends StatelessWidget {
                       title: "Mobile Stack",
                       accentColor: const Color(0xFF6366F1),
                       skills: const [
+                        _SkillData("Flutter", 0.95, Icons.flutter_dash),
                         _SkillData(
-                          "Flutter Architecture",
-                          0.95,
-                          Icons.flutter_dash,
-                        ),
-                        _SkillData(
-                          "Material 3 / UI Design",
+                          "Flutter Web / Responsive UI",
                           0.92,
                           Icons.brush_rounded,
                         ),
                         _SkillData(
-                          "GetX / State Management",
-                          0.95,
-                          Icons.account_tree_outlined,
+                          "Pixel-perfect UI",
+                          0.93,
+                          Icons.crop_free_rounded,
                         ),
                         _SkillData(
-                          "Native Integration",
-                          0.85,
-                          Icons.settings_cell_rounded,
+                          "Animation Integration",
+                          0.88,
+                          Icons.animation_rounded,
+                        ),
+                        _SkillData(
+                          "Production Architecture",
+                          0.90,
+                          Icons.account_tree_outlined,
                         ),
                       ],
                       width: isMobile
@@ -96,24 +97,58 @@ class SkillsSection extends StatelessWidget {
                           : (constraints.maxWidth - 60) / 2,
                     ),
                     _SkillCategoryCard(
-                      title: "Services & Web",
+                      title: "State & APIs",
                       accentColor: const Color(0xFF10B981),
                       skills: const [
                         _SkillData(
-                          "Firebase / Supabase",
-                          0.88,
-                          Icons.local_fire_department_rounded,
+                          "GetX (Advanced)",
+                          0.95,
+                          Icons.account_tree_outlined,
                         ),
                         _SkillData(
-                          "Node.js Backend",
-                          0.75,
-                          Icons.terminal_rounded,
+                          "Riverpod / Bloc",
+                          0.76,
+                          Icons.layers_rounded,
                         ),
-                        _SkillData("REST API Design", 0.82, Icons.api_rounded),
+                        _SkillData("REST APIs", 0.88, Icons.api_rounded),
                         _SkillData(
-                          "Cloud Infrastructure",
+                          "Authentication & CRUD",
+                          0.85,
+                          Icons.verified_user_rounded,
+                        ),
+                        _SkillData(
+                          "Third-party Integrations",
+                          0.86,
+                          Icons.extension_rounded,
+                        ),
+                      ],
+                      width: isMobile
+                          ? constraints.maxWidth
+                          : (constraints.maxWidth - 60) / 2,
+                    ),
+                    _SkillCategoryCard(
+                      title: "Realtime & Tools",
+                      accentColor: const Color(0xFFF97316),
+                      skills: const [
+                        _SkillData(
+                          "Socket.io / Twilio / Jitsi",
                           0.78,
-                          Icons.cloud_queue_rounded,
+                          Icons.hub_rounded,
+                        ),
+                        _SkillData(
+                          "Notifications / WhatsApp",
+                          0.74,
+                          Icons.notifications_active_rounded,
+                        ),
+                        _SkillData(
+                          "Node.js / Express / MongoDB",
+                          0.76,
+                          Icons.storage_rounded,
+                        ),
+                        _SkillData(
+                          "ChatGPT / Claude / Gemini",
+                          0.86,
+                          Icons.auto_awesome_rounded,
                         ),
                       ],
                       width: isMobile

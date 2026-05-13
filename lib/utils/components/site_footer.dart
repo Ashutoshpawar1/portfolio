@@ -381,23 +381,33 @@ class _FooterBrandBand extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "ASHUTOSH",
+                  "ASHUTOSH\nGARGE",
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontSize: 110,
+                    fontSize: 94,
                     color: Colors.black,
                     height: 0.88,
                   ),
                 ),
-                const SizedBox(height: 22),
-                Align(
-                  alignment: Alignment.centerRight,
+                const SizedBox(height: 18),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 520),
                   child: Text(
-                    "Beyond\nVisuals.\nBuilt with\nVision.",
-                    textAlign: TextAlign.right,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Colors.black,
-                      fontSize: 46,
+                    "Flutter Developer focused on scalable applications, real-time communication systems, and AI-powered digital experiences.",
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Colors.black.withOpacity(0.82),
+                      fontSize: 22,
+                      height: 1.35,
+                      fontWeight: FontWeight.w600,
                     ),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "© 2026 Ashutosh. All rights reserved.",
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
               ],
@@ -405,14 +415,14 @@ class _FooterBrandBand extends StatelessWidget {
           }
 
           return Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                flex: 7,
+                flex: 6,
                 child: Text(
-                  "ASHUTOSH",
+                  "ASHUTOSH\nGARGE",
                   style: Theme.of(context).textTheme.displayLarge?.copyWith(
-                    fontSize: 190,
+                    fontSize: 156,
                     color: Colors.black,
                     height: 0.84,
                   ),
@@ -420,16 +430,31 @@ class _FooterBrandBand extends StatelessWidget {
               ),
               const SizedBox(width: 24),
               Expanded(
-                flex: 3,
-                child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Text(
-                    "Beyond\nVisuals.\nBuilt with\nVision.",
-                    textAlign: TextAlign.right,
-                    style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                      color: Colors.black,
-                      fontSize: 54,
-                    ),
+                flex: 4,
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Flutter Developer focused on scalable applications, real-time communication systems, and AI-powered digital experiences.",
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.black.withOpacity(0.82),
+                          fontSize: 24,
+                          height: 1.4,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      const Text(
+                        "© 2026 Ashutosh. All rights reserved.",
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),

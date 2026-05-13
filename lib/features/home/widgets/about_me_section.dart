@@ -111,6 +111,11 @@ class AboutMeSection extends StatelessWidget {
                           label: 'Years of Flutter Experience',
                         ),
                         _AboutMetric(
+                          endValue: 5,
+                          suffix: '+',
+                          label: 'Production Applications',
+                        ),
+                        _AboutMetric(
                           endValue: 3,
                           suffix: '',
                           label: 'Languages Supported',

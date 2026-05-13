@@ -295,7 +295,7 @@ class _StatusChip extends StatelessWidget {
           Icon(Icons.circle, size: 10, color: AppColors.emerald),
           SizedBox(width: 8),
           Text(
-            "Available for project",
+            AppStrings.heroAvailability,
             style: TextStyle(
               color: AppColors.white,
               fontSize: 12,
@@ -349,9 +349,6 @@ class _HeroIntroBlock extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    final List<String> lines = AppStrings.heroIdentityTitle.split('\n');
-    final String primaryLine = lines.isNotEmpty ? lines.first : AppStrings.heroIdentityTitle;
-    final String animatedLine = lines.length > 1 ? lines.sublist(1).join(' ') : '';
     final TextAlign textAlign = centered ? TextAlign.center : TextAlign.start;
     final CrossAxisAlignment crossAxisAlignment = centered
         ? CrossAxisAlignment.center
@@ -364,37 +361,36 @@ class _HeroIntroBlock extends StatelessWidget {
         crossAxisAlignment: crossAxisAlignment,
         children: [
           Text(
-            primaryLine,
+            AppStrings.heroIdentityTitle,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-              fontSize: headlineFontSize ?? (isCompact ? 24 : 36),
+              fontSize: headlineFontSize ?? (isCompact ? 30 : 40),
               fontWeight: FontWeight.w700,
+              height: 0.94,
             ),
             textAlign: textAlign,
           ),
-          if (animatedLine.isNotEmpty) ...[
-            const SizedBox(height: 10),
-            DefaultTextStyle(
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: AppColors.white.withOpacity(0.9),
-                fontSize: isCompact ? 18 : 22,
-                fontWeight: FontWeight.w500,
-                height: 1.35,
-              ),
-              child: AnimatedTextKit(
-                totalRepeatCount: 1,
-                isRepeatingAnimation: false,
-                displayFullTextOnTap: true,
-                animatedTexts: [
-                  TypewriterAnimatedText(
-                    animatedLine,
-                    speed: const Duration(milliseconds: 40),
-                    textAlign: textAlign,
-                    cursor: ' _',
-                  ),
-                ],
-              ),
+          const SizedBox(height: 12),
+          DefaultTextStyle(
+            style: Theme.of(context).textTheme.titleLarge!.copyWith(
+              color: AppColors.white.withOpacity(0.9),
+              fontSize: isCompact ? 18 : 22,
+              fontWeight: FontWeight.w500,
+              height: 1.35,
             ),
-          ],
+            child: AnimatedTextKit(
+              totalRepeatCount: 1,
+              isRepeatingAnimation: false,
+              displayFullTextOnTap: true,
+              animatedTexts: [
+                TypewriterAnimatedText(
+                  AppStrings.heroRoleSubtitle,
+                  speed: const Duration(milliseconds: 32),
+                  textAlign: textAlign,
+                  cursor: ' _',
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: contentSpacing),
           Text(
             AppStrings.devDescriptionLong,
@@ -461,8 +457,9 @@ class _HeroSidePitch extends StatelessWidget {
             AppStrings.heroSpecialtiesTitle,
             textAlign: align,
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-              fontSize: titleFontSize ?? (isCompact ? 52 : 74),
+              fontSize: titleFontSize ?? (isCompact ? 50 : 70),
               color: Colors.white.withOpacity(0.78),
+              height: 0.92,
             ),
           ),
           const SizedBox(height: 14),
@@ -521,52 +518,65 @@ class _HeroVisualContent extends StatelessWidget {
         child: FadeInUp(
           duration: 850.ms,
           from: 34,
-          child: RepaintBoundary(
-                child: Container(
-                  width: size,
-                  height: size * 1.2,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(32),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.42),
-                        blurRadius: 60,
-                        offset: const Offset(0, 24),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(32),
-                    child: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Image.asset(
-                          'lib/assets/images/ashu_profile.png',
-                          fit: BoxFit.cover,
-                        ),
-                        DecoratedBox(
-                          decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [
-                                Colors.black.withOpacity(0.4),
-                                Colors.transparent,
-                                Colors.black.withOpacity(0.3),
-                              ],
-                              stops: const [0.05, 0.45, 1],
-                            ),
+          child:
+              RepaintBoundary(
+                    child: Container(
+                      width: size,
+                      height: size * 1.2,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(32),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.42),
+                            blurRadius: 60,
+                            offset: const Offset(0, 24),
                           ),
+                        ],
+                      ),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(32),
+                        child: Stack(
+                          fit: StackFit.expand,
+                          children: [
+                            Image.asset(
+                              'lib/assets/images/ashu_profile.png',
+                              fit: BoxFit.cover,
+                            ),
+                            DecoratedBox(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  begin: Alignment.topLeft,
+                                  end: Alignment.bottomRight,
+                                  colors: [
+                                    Colors.black.withOpacity(0.4),
+                                    Colors.transparent,
+                                    Colors.black.withOpacity(0.3),
+                                  ],
+                                  stops: const [0.05, 0.45, 1],
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
+                  )
+                  .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true),
+                  )
+                  .moveY(
+                    begin: -8,
+                    end: 8,
+                    duration: 3000.ms,
+                    curve: Curves.easeInOut,
+                  )
+                  .then()
+                  .moveY(
+                    begin: 8,
+                    end: -8,
+                    duration: 3000.ms,
+                    curve: Curves.easeInOut,
                   ),
-                ),
-              )
-              .animate(onPlay: (controller) => controller.repeat(reverse: true))
-              .moveY(begin: -8, end: 8, duration: 3000.ms, curve: Curves.easeInOut)
-              .then()
-              .moveY(begin: 8, end: -8, duration: 3000.ms, curve: Curves.easeInOut),
         ),
       ),
     );

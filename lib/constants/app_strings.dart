@@ -7,14 +7,19 @@ class AppStrings {
   static const String githubUrl = "https://github.com/Ashutoshpawar1";
   static const String emailAddress = "ashutoshgarge123@gmail.com";
   static const String emailUrl = "mailto:ashutoshgarge123@gmail.com";
+  static const String twitterUrl = "";
   static const String resumeWebPath = "resume/ashutosh_resume.pdf";
-  static const String heroIdentityTitle =
-      "Ashutosh Garge\nCrafting seamless digital experiences with Flutter.";
+  static const String heroAvailability =
+      "Available for Freelance & Full-Time Projects";
+  static const String heroIdentityTitle = "ASHUTOSH\nGARGE";
+  static const String heroRoleSubtitle =
+      "Flutter Developer &\nAI-focused App Engineer";
   static const String devSubtitle =
-      "State Management (Riverpod/GetX)\n\nReal-time Systems (Socket.io)\n\nPerformance Optimization\n\nClean Architecture (SOLID)";
+      "State Management (GetX / Riverpod / Bloc)\n\nReal-time Systems (Socket.io)\n\nScalable Flutter Architecture\n\nPerformance Optimization\n\nResponsive UI Engineering\n\nClean Architecture (SOLID)";
   static const String devDescriptionLong =
-      "I build high-performance, scalable mobile and web applications that combine clean architecture with fluid animations.";
-  static const String heroSpecialtiesTitle = "Specialties:";
+      "Flutter Developer with 2+ years of experience building production-level mobile and web applications.\n\nFocused on responsive UI systems, API integrations, real-time communication, scalable architecture, and AI-powered application experiences.";
+  static const String heroSpecialtiesTitle =
+      "Beyond Visuals.\nBuilt with\nVision.";
 
   static const String skills = "SKILLS";
   static const String experience = "EXPERIENCE";
@@ -36,7 +41,7 @@ class AppStrings {
 
   static const String aboutTitle = "ABOUT ME";
   static const String aboutContent =
-      "I'm a Flutter Developer with 2+ years of experience building scalable mobile and web applications. I specialize in responsive UI design, API integration, Firebase, state management, and real-time features. I focus on creating smooth user experiences with clean, maintainable, and efficient code architecture.\n\nI'm passionate about building modern, pixel-perfect applications that are both functional and user-friendly. Over the years, I've worked on projects ranging from simple applications to complex enterprise-level solutions, with experience in real-time communication, multilingual support (English, Arabic, and Urdu), and scalable backend integration using Firebase and MongoDB.";
+      "I'm a Flutter Developer with 2+ years of practical experience building scalable mobile and web applications.\n\nI specialize in responsive UI systems, API integration, Firebase services, state management, and real-time features. My development approach focuses on creating smooth user experiences with clean, maintainable, and production-ready architecture.\n\nOver the years, I've worked on real-world applications including e-commerce systems, meeting platforms, health & wellness apps, employee management systems, and wildlife shelter management solutions.\n\nCurrently, I'm exploring AI-integrated applications, local LLM systems, voice AI, and intelligent automation workflows.";
 
   static const String projectsTitle = "PROJECTS";
 
@@ -51,6 +56,8 @@ class ProjectModel {
   final List<String> tech;
   final String imageUrl;
   final String githubUrl;
+  final String playStoreUrl;
+  final String appStoreUrl;
 
   ProjectModel({
     required this.title,
@@ -58,40 +65,60 @@ class ProjectModel {
     required this.tech,
     required this.imageUrl,
     required this.githubUrl,
+    this.playStoreUrl = '',
+    this.appStoreUrl = '',
   });
 }
 
 final List<ProjectModel> appProjects = [
   ProjectModel(
-    title: "Meeting App",
+    title: "JayHyzmat",
     description:
-        "VC application with Jitsi integration, high-quality streaming and real-time chat.",
-    tech: ["Flutter", "Jitsi SDK", "Firebase"],
-    imageUrl: "https://images.unsplash.com/photo-1611605698335-8b1569810432",
+        "Industrial e-commerce platform for procurement workflows with product listings, authentication, and responsive ordering journeys.",
+    tech: ["Flutter", "REST APIs", "Firebase", "Responsive UI"],
+    imageUrl: "https://images.unsplash.com/photo-1494412651409-8963ce7935a7",
+    githubUrl: "#",
+    playStoreUrl:
+        "https://play.google.com/store/apps/details?id=com.jayhyzmat.app&pcampaignid=web_share&utm_source=chatgpt.com",
+    appStoreUrl: "https://apps.apple.com/in/app/jayhyzmat/id6743439907",
+  ),
+  ProjectModel(
+    title: "Intercessory Army",
+    description:
+        "Faith-based community platform enabling prayer meetings and real-time engagement systems.",
+    tech: ["Flutter", "Firebase", "Jitsi Meet", "Notifications"],
+    imageUrl: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65",
+    githubUrl: "#",
+    playStoreUrl:
+        "https://play.google.com/store/apps/details?id=com.intercessory.army",
+    appStoreUrl:
+        "https://apps.apple.com/in/app/intercessory-army/id6760646458",
+  ),
+  ProjectModel(
+    title: "LifeVibe",
+    description:
+        "AI-powered wellness application focused on nutrition tracking, habit monitoring, and analytics visualization.",
+    tech: ["Flutter", "AI Concepts", "Charts", "Firebase"],
+    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+    githubUrl: "#",
+    playStoreUrl:
+        "https://play.google.com/store/apps/details?id=com.laon.laon_app&pcampaignid=web_share",
+    appStoreUrl: "https://apps.apple.com/us/app/lifevibe/id6756407133",
+  ),
+  ProjectModel(
+    title: "MakeItHappn",
+    description:
+        "Smart event scheduling platform using availability voting and automated date coordination.",
+    tech: ["Flutter", "Scheduling Systems", "REST APIs"],
+    imageUrl: "https://images.unsplash.com/photo-1511578314322-379afb476865",
     githubUrl: "#",
   ),
   ProjectModel(
-    title: "Employee Service App",
+    title: "Wildlife Shelter Management System",
     description:
-        "Internal management tool for attendance, leaves, and payroll tracking.",
-    tech: ["Flutter", "REST API", "State Management"],
-    imageUrl: "https://images.unsplash.com/photo-1454165833767-027ffea9e77b",
-    githubUrl: "#",
-  ),
-  ProjectModel(
-    title: "Animal Management App",
-    description:
-        "Tracking livestock health, nutrition, and genealogy records with real-time sync.",
-    tech: ["Flutter", "SQLite", "Firebase"],
-    imageUrl: "https://images.unsplash.com/photo-1516733725897-1aa38917d3d7",
-    githubUrl: "#",
-  ),
-  ProjectModel(
-    title: "Marketplace App",
-    description:
-        "Full e-commerce experience with advanced filtering and seamless checkout flow.",
-    tech: ["Flutter", "Stripe", "PostgreSQL"],
-    imageUrl: "https://images.unsplash.com/photo-1472851294608-062f824d29cc",
+        "Large-scale wildlife shelter management system with multi-role workflows, analytics, geolocation, and medical tracking.",
+    tech: ["Flutter", "GetX", "REST APIs", "Firebase", "Geolocation"],
+    imageUrl: "https://images.unsplash.com/photo-1501706362039-c6e80948f11f",
     githubUrl: "#",
   ),
 ];

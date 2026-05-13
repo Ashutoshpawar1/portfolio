@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
+import '../services/external_link_service.dart';
 import 'glass_container.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -177,6 +178,26 @@ class _ProjectCardState extends State<ProjectCard> {
   }
 
   Widget _buildContent(BuildContext context, {required bool isCompactCard}) {
+    final List<Widget> actionButtons = [
+      if (widget.project.playStoreUrl.isNotEmpty)
+        _buildActionButton(
+          Icons.android_rounded,
+          "Google Play",
+          widget.project.playStoreUrl,
+        ),
+      if (widget.project.appStoreUrl.isNotEmpty)
+        _buildActionButton(
+          Icons.apple_rounded,
+          "App Store",
+          widget.project.appStoreUrl,
+        ),
+      if (widget.project.playStoreUrl.isEmpty &&
+          widget.project.appStoreUrl.isEmpty) ...[
+        _buildActionButton(Icons.lock_outline_rounded, "Private Project"),
+        _buildActionButton(Icons.article_outlined, "Case Study"),
+      ],
+    ];
+
     return Padding(
       padding: EdgeInsets.all(isCompactCard ? 20 : 25),
       child: Column(
@@ -218,10 +239,7 @@ class _ProjectCardState extends State<ProjectCard> {
               child: Wrap(
                 spacing: 12,
                 runSpacing: 12,
-                children: [
-                  _buildActionButton(Icons.link, "View Demo"),
-                  _buildActionButton(Icons.code, "Source"),
-                ],
+                children: actionButtons,
               ),
             ),
           ),
@@ -249,33 +267,53 @@ class _ProjectCardState extends State<ProjectCard> {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
+  Widget _buildActionButton(IconData icon, String label, [String? url]) {
+    final bool enabled = url != null && url.isNotEmpty;
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 240),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-        decoration: BoxDecoration(
-          color: _isHovered
-              ? AppColors.white.withOpacity(0.06)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: AppColors.divider),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 18, color: AppColors.grey),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                color: AppColors.grey,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+      child: GestureDetector(
+        onTap: enabled ? () => openExternalUrl(url) : null,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: _isHovered
+                ? Colors.white.withOpacity(enabled ? 0.08 : 0.05)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: enabled
+                  ? Colors.white.withOpacity(0.18)
+                  : AppColors.divider,
             ),
-          ],
+            boxShadow: [
+              if (_isHovered && enabled)
+                BoxShadow(
+                  color: const Color(0x33FF7A36),
+                  blurRadius: 18,
+                  offset: const Offset(0, 8),
+                ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 18,
+                color: enabled ? AppColors.white : AppColors.grey,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: TextStyle(
+                  color: enabled ? AppColors.white : AppColors.grey,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

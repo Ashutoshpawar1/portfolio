@@ -757,15 +757,15 @@ class _ChatBubble extends StatelessWidget {
           color: isReply ? const Color(0xFF37352E) : const Color(0xFF292929),
           borderRadius: BorderRadius.circular(16),
         ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.86),
-          fontSize: dense ? 11.5 : (small ? 12 : 13.5),
-          height: dense ? 1.12 : 1.16,
-          fontWeight: FontWeight.w600,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.86),
+            fontSize: dense ? 11.5 : (small ? 12 : 13.5),
+            height: dense ? 1.12 : 1.16,
+            fontWeight: FontWeight.w600,
+          ),
         ),
-      ),
       ),
     );
   }

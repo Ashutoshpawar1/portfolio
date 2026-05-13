@@ -20,9 +20,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final bool isMobile = width < 820;
-    final double carouselHeight = width < 440
-        ? 560
-        : (isMobile ? 590 : 600);
+    final double carouselHeight = width < 440 ? 560 : (isMobile ? 590 : 600);
 
     return Container(
       width: double.infinity,
@@ -40,7 +38,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 760),
               child: Text(
-                'A curated selection of production-minded Flutter builds focused on speed, scalability, and polished interaction design.',
+                'A curated collection of production-level Flutter applications focused on scalability, architecture, performance, and polished user experiences.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.72),
@@ -64,7 +62,9 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                     height: carouselHeight,
                     autoPlay: true,
                     autoPlayInterval: const Duration(seconds: 4),
-                    autoPlayAnimationDuration: const Duration(milliseconds: 900),
+                    autoPlayAnimationDuration: const Duration(
+                      milliseconds: 900,
+                    ),
                     autoPlayCurve: Curves.easeOutCubic,
                     viewportFraction: width < 720
                         ? 0.9

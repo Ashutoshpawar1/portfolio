@@ -11,18 +11,18 @@ class ExperienceSection extends StatelessWidget {
 
   static const List<_ExperienceEntry> _entries = [
     _ExperienceEntry(
-      role: "Senior Flutter Architect",
-      company: "High-Tech Innovations",
-      duration: "2022 - Present",
+      role: "Flutter Developer",
+      company: "Developer Bazar Technologies",
+      duration: "Nov 2024 - Present",
       description:
-          "Engineering scalable mobile architectures for complex enterprise systems. Specializing in real-time communication and custom UI ecosystems.",
+          "Working on scalable Flutter applications involving real-time systems, API integrations, responsive UI engineering, and production deployment workflows.",
     ),
     _ExperienceEntry(
-      role: "Flutter Developer",
-      company: "Creative Labs",
-      duration: "2020 - 2022",
+      role: "Trainee Flutter Developer",
+      company: "Young Decade Arch",
+      duration: "2024 - Aug 2024",
       description:
-          "Built interactive educational and service-based applications with focus on animations, performance tuning, and user experience.",
+          "Worked on Flutter UI implementation, API integrations, reusable component systems, and responsive application development.",
     ),
   ];
 
@@ -45,7 +45,7 @@ class ExperienceSection extends StatelessWidget {
             duration: const Duration(milliseconds: 700),
             from: 18,
             child: Text(
-              'A progression through product engineering, architecture decisions, and scalable Flutter systems.',
+              'A progression through product engineering, frontend architecture, and scalable Flutter systems.',
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: AppColors.grey.withOpacity(0.92),

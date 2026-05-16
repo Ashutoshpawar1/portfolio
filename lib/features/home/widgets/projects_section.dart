@@ -20,7 +20,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final bool isMobile = width < 820;
-    final double carouselHeight = width < 440 ? 560 : (isMobile ? 590 : 600);
+    final double carouselHeight = width < 440 ? 680 : 660;
 
     return Container(
       width: double.infinity,

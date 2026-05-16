@@ -51,8 +51,11 @@ class _DesktopHeroLayout extends StatelessWidget {
     final double sideWidth = width >= 1600 ? 280 : (tightDesktop ? 210 : 230);
     final double contentGap = tightDesktop ? 28 : 40;
 
-    return SizedBox(
-      height: MediaQuery.of(context).size.height.clamp(760.0, 980.0).toDouble(),
+    return Container(
+      width: double.infinity,
+      constraints: BoxConstraints(
+        minHeight: MediaQuery.of(context).size.height,
+      ),
       child: Padding(
         padding: EdgeInsets.fromLTRB(
           horizontalPadding,
@@ -64,70 +67,62 @@ class _DesktopHeroLayout extends StatelessWidget {
           children: [
             const _HeroTopBar(),
             const SizedBox(height: 18),
-            Expanded(
-              child: Stack(
-                children: [
-                  Positioned.fill(
-                    child: _HeroFrameLines(
-                      horizontalPadding: width >= 1600 ? 94 : 86,
-                    ),
+            Stack(
+              children: [
+                Positioned.fill(
+                  child: _HeroFrameLines(
+                    horizontalPadding: width >= 1600 ? 94 : 86,
                   ),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _HeroWatermark(fontSize: watermarkSize),
-                        const SizedBox(height: 22),
-                        Expanded(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: introWidth,
-                                ),
-                                child: _HeroIntroBlock(
-                                  headlineFontSize: tightDesktop ? 30 : 36,
-                                  bodyFontSize: tightDesktop ? 16 : 18,
-                                  contentSpacing: tightDesktop ? 12 : 16,
-                                  actionSpacing: tightDesktop ? 22 : 28,
-                                  socialSpacing: tightDesktop ? 22 : 28,
-                                ),
-                              ),
-                              SizedBox(width: contentGap),
-                              Expanded(
-                                flex: 6,
-                                child: Align(
-                                  alignment: Alignment.center,
-                                  child: _HeroVisualContent(
-                                    size: heroImageSize,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: contentGap),
-                              Expanded(
-                                flex: 4,
-                                child: Align(
-                                  alignment: Alignment.centerRight,
-                                  child: ConstrainedBox(
-                                    constraints: BoxConstraints(
-                                      maxWidth: sideWidth,
-                                    ),
-                                    child: _HeroSidePitch(
-                                      titleFontSize: tightDesktop ? 62 : 74,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 8, 12, 24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _HeroWatermark(fontSize: watermarkSize),
+                      const SizedBox(height: 22),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          ConstrainedBox(
+                            constraints: BoxConstraints(maxWidth: introWidth),
+                            child: _HeroIntroBlock(
+                              headlineFontSize: tightDesktop ? 30 : 36,
+                              bodyFontSize: tightDesktop ? 16 : 18,
+                              contentSpacing: tightDesktop ? 12 : 16,
+                              actionSpacing: tightDesktop ? 22 : 28,
+                              socialSpacing: tightDesktop ? 22 : 28,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                          SizedBox(width: contentGap),
+                          Expanded(
+                            flex: 6,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: _HeroVisualContent(size: heroImageSize),
+                            ),
+                          ),
+                          SizedBox(width: contentGap),
+                          Expanded(
+                            flex: 4,
+                            child: Align(
+                              alignment: Alignment.centerRight,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: sideWidth,
+                                ),
+                                child: _HeroSidePitch(
+                                  titleFontSize: tightDesktop ? 62 : 74,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -294,12 +289,15 @@ class _StatusChip extends StatelessWidget {
         children: [
           Icon(Icons.circle, size: 10, color: AppColors.emerald),
           SizedBox(width: 8),
-          Text(
-            AppStrings.heroAvailability,
-            style: TextStyle(
-              color: AppColors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w700,
+          Flexible(
+            child: Text(
+              AppStrings.heroAvailability,
+              style: TextStyle(
+                color: AppColors.white,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],

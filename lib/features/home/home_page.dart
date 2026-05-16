@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
 
           return MouseRegion(
             cursor: enableDesktopEffects
-                ? SystemMouseCursors.none
+                ? SystemMouseCursors.progress
                 : MouseCursor.defer,
             onHover: enableDesktopEffects
                 ? (event) => controller.updateParallax(
@@ -130,10 +130,7 @@ class HomePage extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           border: Border(
-            bottom: BorderSide(
-              color: Colors.white.withOpacity(0.04),
-              width: 1,
-            ),
+            bottom: BorderSide(color: Colors.white.withOpacity(0.04), width: 1),
           ),
         ),
         child: child,

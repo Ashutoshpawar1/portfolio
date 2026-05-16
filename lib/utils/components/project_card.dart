@@ -25,9 +25,7 @@ class _ProjectCardState extends State<ProjectCard> {
     final double cardWidth = screenWidth < 440
         ? screenWidth - 40
         : (screenWidth < 720 ? 320.0 : 350.0);
-    final double cardHeight = screenWidth < 440
-        ? 490.0
-        : (screenWidth < 900 ? 500.0 : 490.0);
+    final double cardHeight = screenWidth < 440 ? 640.0 : 600.0;
     final double imageHeight = screenWidth < 440
         ? 180.0
         : (screenWidth < 900 ? 200.0 : 220.0);
@@ -213,14 +211,16 @@ class _ProjectCardState extends State<ProjectCard> {
             ),
           ),
           const SizedBox(height: 12),
-          Text(
-            widget.project.description,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.grey,
-              height: 1.5,
+          Flexible(
+            child: Text(
+              widget.project.description,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.grey,
+                height: 1.5,
+              ),
+              maxLines: isCompactCard ? 3 : 2,
+              overflow: TextOverflow.ellipsis,
             ),
-            maxLines: isCompactCard ? 3 : 2,
-            overflow: TextOverflow.ellipsis,
           ),
           SizedBox(height: isCompactCard ? 16 : 20),
           Wrap(
@@ -236,11 +236,7 @@ class _ProjectCardState extends State<ProjectCard> {
             child: AnimatedOpacity(
               duration: const Duration(milliseconds: 260),
               opacity: _isHovered ? 1 : 0.82,
-              child: Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: actionButtons,
-              ),
+              child: Wrap(spacing: 12, runSpacing: 12, children: actionButtons),
             ),
           ),
         ],

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/animated/custom_cursor.dart';
 import '../../utils/animated/floating_circles.dart';
 import '../../utils/components/brand_transition_panels.dart';
 import '../../utils/components/menu_overlay.dart';
+import '../../utils/components/scroll_reveal.dart';
 import '../../utils/components/site_footer.dart';
 import '../../controllers/home_controller.dart';
 import 'widgets/tool_wave_section.dart';
@@ -44,51 +46,78 @@ class HomePage extends StatelessWidget {
               children: [
                 PageBackground(enableMotion: enableDesktopEffects),
                 if (enableDesktopEffects) const FloatingCircles(),
-                NotificationListener<ScrollNotification>(
-                  onNotification: enableDesktopEffects
-                      ? (notification) {
-                          controller.updateScroll(notification.metrics.pixels);
-                          return false;
-                        }
-                      : (_) => false,
-                  child: SingleChildScrollView(
-                    controller: controller.scrollController,
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
-                    ),
-                    child: RepaintBoundary(
-                      child: Column(
-                        children: [
-                          _sectionWrapper(
-                            key: controller.heroSectionKey,
-                            child: HeroSection(width: width),
+                Positioned.fill(
+                  child: Listener(
+                    onPointerSignal: enableDesktopEffects
+                        ? (event) {
+                            if (event is PointerScrollEvent) {
+                              GestureBinding.instance.pointerSignalResolver
+                                  .register(event, (_) {
+                                    controller.smoothScrollBy(
+                                      event.scrollDelta.dy,
+                                    );
+                                  });
+                            }
+                          }
+                        : null,
+                    child: NotificationListener<ScrollNotification>(
+                      onNotification: enableDesktopEffects
+                          ? (notification) {
+                              controller.updateScroll(
+                                notification.metrics.pixels,
+                              );
+                              return false;
+                            }
+                          : (_) => false,
+                      child: CustomScrollView(
+                        controller: controller.scrollController,
+                        physics: const BouncingScrollPhysics(
+                          parent: AlwaysScrollableScrollPhysics(),
+                        ),
+                        slivers: [
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.heroSectionKey,
+                              reveal: false,
+                              child: HeroSection(width: width),
+                            ),
                           ),
-                          _sectionWrapper(
-                            key: controller.aboutSectionKey,
-                            color: AppColors.surface,
-                            child: const AboutMeSection(),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.aboutSectionKey,
+                              color: AppColors.surface,
+                              child: const AboutMeSection(),
+                            ),
                           ),
-                          _sectionWrapper(
-                            key: controller.projectsSectionKey,
-                            color: AppColors.black,
-                            child: const ProjectsSection(),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.projectsSectionKey,
+                              color: AppColors.black,
+                              child: const ProjectsSection(),
+                            ),
                           ),
-                          _sectionWrapper(
-                            key: controller.skillsSectionKey,
-                            color: AppColors.surface,
-                            child: const SkillsSection(),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.skillsSectionKey,
+                              color: AppColors.surface,
+                              child: const SkillsSection(),
+                            ),
                           ),
-                          _sectionWrapper(
-                            key: controller.experienceSectionKey,
-                            color: AppColors.black,
-                            child: const ExperienceSection(),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.experienceSectionKey,
+                              color: AppColors.black,
+                              child: const ExperienceSection(),
+                            ),
                           ),
-                          _sectionWrapper(
-                            key: controller.toolsSectionKey,
-                            color: AppColors.surface,
-                            child: const ToolWaveSection(),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.toolsSectionKey,
+                              color: AppColors.surface,
+                              child: const ToolWaveSection(),
+                            ),
                           ),
-                          const SiteFooter(),
+                          const SliverToBoxAdapter(child: SiteFooter()),
                         ],
                       ),
                     ),
@@ -122,7 +151,21 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _sectionWrapper({Key? key, required Widget child, Color? color}) {
+  Widget _sectionWrapper({
+    Key? key,
+    required Widget child,
+    Color? color,
+    bool reveal = true,
+  }) {
+    final Widget sectionChild = reveal
+        ? ScrollReveal(
+            beginOffset: const Offset(0, 0.045),
+            duration: const Duration(milliseconds: 850),
+            visibleFraction: 0.03,
+            child: child,
+          )
+        : child;
+
     return RepaintBoundary(
       child: Container(
         key: key,
@@ -131,12 +174,12 @@ class HomePage extends StatelessWidget {
           color: color,
           border: Border(
             bottom: BorderSide(
-              color: Colors.white.withOpacity(0.04),
+              color: Colors.white.withValues(alpha: 0.04),
               width: 1,
             ),
           ),
         ),
-        child: child,
+        child: sectionChild,
       ),
     );
   }

@@ -20,7 +20,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
   Widget build(BuildContext context) {
     final double width = MediaQuery.of(context).size.width;
     final bool isMobile = width < 820;
-    final double carouselHeight = width < 440 ? 560 : (isMobile ? 590 : 600);
+    final double carouselHeight = width < 440 ? 580 : (isMobile ? 600 : 620);
 
     return Container(
       width: double.infinity,
@@ -41,7 +41,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                 'A curated collection of production-level Flutter applications focused on scalability, architecture, performance, and polished user experiences.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.72),
+                  color: Colors.white.withValues(alpha: 0.72),
                   fontSize: isMobile ? 16 : 18,
                   height: 1.7,
                 ),
@@ -94,7 +94,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
                         borderRadius: BorderRadius.circular(999),
                         color: isActive
                             ? Colors.white
-                            : Colors.white.withOpacity(0.18),
+                            : Colors.white.withValues(alpha: 0.18),
                       ),
                     );
                   }),

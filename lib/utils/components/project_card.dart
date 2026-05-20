@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
@@ -16,7 +17,6 @@ class ProjectCard extends StatefulWidget {
 
 class _ProjectCardState extends State<ProjectCard> {
   bool _isHovered = false;
-  Offset _mousePos = Offset.zero;
 
   @override
   Widget build(BuildContext context) {
@@ -33,25 +33,16 @@ class _ProjectCardState extends State<ProjectCard> {
         : (screenWidth < 900 ? 200.0 : 220.0);
 
     return MouseRegion(
-      onEnter: (event) => setState(() {
-        _isHovered = true;
-        _mousePos = event.localPosition;
-      }),
+      onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      onHover: (event) => setState(() => _mousePos = event.localPosition),
       child: TweenAnimationBuilder<double>(
         duration: const Duration(milliseconds: 200),
         tween: Tween(begin: 0.0, end: _isHovered ? 1.0 : 0.0),
         builder: (context, value, child) {
-          final centerX = cardWidth / 2;
-          final centerY = cardHeight / 2;
-          final dx = (_mousePos.dx - centerX) / centerX;
-          final dy = (_mousePos.dy - centerY) / centerY;
-
           final matrix = Matrix4.identity()
             ..setEntry(3, 2, 0.001)
-            ..rotateX(dy * 0.12 * value)
-            ..rotateY(-dx * 0.12 * value);
+            ..translate(0.0, -8.0 * value, 0.0)
+            ..scale(1.0 + (0.012 * value));
 
           return Transform(
             transform: matrix,
@@ -68,7 +59,7 @@ class _ProjectCardState extends State<ProjectCard> {
                 boxShadow: [
                   if (_isHovered)
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.4),
+                      color: Colors.black.withValues(alpha: 0.4),
                       blurRadius: 44,
                       offset: const Offset(0, 24),
                     ),
@@ -105,14 +96,16 @@ class _ProjectCardState extends State<ProjectCard> {
             scale: _isHovered ? 1.06 : 1,
             duration: const Duration(milliseconds: 700),
             curve: Curves.easeOutCubic,
-            child: Image.network(
-              widget.project.imageUrl.isNotEmpty
+            child: CachedNetworkImage(
+              imageUrl: widget.project.imageUrl.isNotEmpty
                   ? widget.project.imageUrl
                   : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
               height: imageHeight,
               width: double.infinity,
               fit: BoxFit.cover,
-              errorBuilder: (context, error, stackTrace) {
+              fadeInDuration: const Duration(milliseconds: 180),
+              fadeOutDuration: const Duration(milliseconds: 100),
+              errorWidget: (context, url, error) {
                 return Container(
                   height: imageHeight,
                   width: double.infinity,
@@ -126,19 +119,19 @@ class _ProjectCardState extends State<ProjectCard> {
                   ),
                 );
               },
-              loadingBuilder: (context, child, loadingProgress) {
-                if (loadingProgress == null) return child;
+              placeholder: (context, url) {
                 return Container(
                   height: imageHeight,
                   width: double.infinity,
                   color: AppColors.surfaceElevated,
                   child: Center(
-                    child: CircularProgressIndicator(
-                      value: loadingProgress.expectedTotalBytes != null
-                          ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
-                          : null,
-                      color: AppColors.white.withOpacity(0.2),
+                    child: SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.white.withValues(alpha: 0.2),
+                      ),
                     ),
                   ),
                 );
@@ -152,8 +145,8 @@ class _ProjectCardState extends State<ProjectCard> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Colors.black.withOpacity(0.08),
-                    Colors.black.withOpacity(0.44),
+                    Colors.black.withValues(alpha: 0.08),
+                    Colors.black.withValues(alpha: 0.44),
                   ],
                 ),
               ),
@@ -162,7 +155,7 @@ class _ProjectCardState extends State<ProjectCard> {
           if (_isHovered)
             Positioned.fill(
               child: Container(
-                color: Colors.black.withOpacity(0.32),
+                color: Colors.black.withValues(alpha: 0.32),
                 child: Center(
                   child: Icon(
                     Icons.open_in_new,
@@ -197,9 +190,13 @@ class _ProjectCardState extends State<ProjectCard> {
         _buildActionButton(Icons.article_outlined, "Case Study"),
       ],
     ];
+    final int maxTechBadges = isCompactCard ? 3 : 4;
+    final List<String> visibleTech = widget.project.tech
+        .take(maxTechBadges)
+        .toList(growable: false);
 
     return Padding(
-      padding: EdgeInsets.all(isCompactCard ? 20 : 25),
+      padding: EdgeInsets.all(isCompactCard ? 18 : 22),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.max,
@@ -209,26 +206,28 @@ class _ProjectCardState extends State<ProjectCard> {
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
               color: AppColors.white,
               fontWeight: FontWeight.w700,
-              fontSize: isCompactCard ? 20 : 22,
+              fontSize: isCompactCard ? 19 : 21,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Text(
             widget.project.description,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
               color: AppColors.grey,
               height: 1.5,
             ),
-            maxLines: isCompactCard ? 3 : 2,
+            maxLines: isCompactCard ? 2 : 2,
             overflow: TextOverflow.ellipsis,
           ),
-          SizedBox(height: isCompactCard ? 16 : 20),
+          SizedBox(height: isCompactCard ? 12 : 16),
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: widget.project.tech.map(_buildTechBadge).toList(),
+            children: visibleTech.map(_buildTechBadge).toList(),
           ),
-          const Spacer(),
+          const SizedBox(height: 16),
           AnimatedSlide(
             duration: const Duration(milliseconds: 260),
             curve: Curves.easeOutCubic,
@@ -252,7 +251,7 @@ class _ProjectCardState extends State<ProjectCard> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: AppColors.white.withOpacity(0.06),
+        color: AppColors.white.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: AppColors.divider),
       ),
@@ -278,12 +277,12 @@ class _ProjectCardState extends State<ProjectCard> {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
           decoration: BoxDecoration(
             color: _isHovered
-                ? Colors.white.withOpacity(enabled ? 0.08 : 0.05)
+                ? Colors.white.withValues(alpha: enabled ? 0.08 : 0.05)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(999),
             border: Border.all(
               color: enabled
-                  ? Colors.white.withOpacity(0.18)
+                  ? Colors.white.withValues(alpha: 0.18)
                   : AppColors.divider,
             ),
             boxShadow: [

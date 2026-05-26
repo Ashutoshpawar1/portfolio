@@ -33,6 +33,9 @@ class HomeController extends GetxController {
   final _scrollOffset = 0.0.obs;
   double get scrollOffset => _scrollOffset.value;
   Size? _lastViewportSize;
+  int _lastParallaxUpdateMicros = 0;
+  double? _smoothScrollTarget;
+  int _smoothScrollToken = 0;
 
   HomeSection? _pendingSection;
 
@@ -52,7 +55,7 @@ class HomeController extends GetxController {
 
   void updateMousePos(Offset pos) {
     final Offset current = mousePos.value;
-    if ((current - pos).distanceSquared > 1) {
+    if ((current - pos).distanceSquared > 9) {
       mousePos.value = pos;
     }
   }
@@ -65,6 +68,14 @@ class HomeController extends GetxController {
 
   void updateParallax(Offset position, Size size) {
     _lastViewportSize = size;
+    updateMousePos(position);
+
+    final int now = DateTime.now().microsecondsSinceEpoch;
+    if (now - _lastParallaxUpdateMicros < 32000) {
+      return;
+    }
+    _lastParallaxUpdateMicros = now;
+
     final double nextParallaxX =
         (position.dx - size.width / 2) / (size.width / 2);
     final double nextParallaxY =
@@ -76,7 +87,6 @@ class HomeController extends GetxController {
     if ((_parallaxY.value - nextParallaxY).abs() > 0.012) {
       _parallaxY.value = nextParallaxY;
     }
-    updateMousePos(position);
   }
 
   void resetParallax() {
@@ -93,18 +103,35 @@ class HomeController extends GetxController {
     }
   }
 
-  Future<void> navigateToSection(HomeSection section) async {
-    if (section == HomeSection.home) {
-      if (scrollController.hasClients) {
-        await scrollController.animateTo(
-          0,
-          duration: const Duration(milliseconds: 900),
-          curve: Curves.easeInOutCubicEmphasized,
-        );
-      }
+  void smoothScrollBy(double delta) {
+    if (!scrollController.hasClients) {
       return;
     }
 
+    final ScrollPosition position = scrollController.position;
+    final double currentTarget = _smoothScrollTarget ?? position.pixels;
+    final double nextTarget = (currentTarget + (delta * 1.15)).clamp(
+      position.minScrollExtent,
+      position.maxScrollExtent,
+    );
+
+    _smoothScrollTarget = nextTarget;
+    final int token = ++_smoothScrollToken;
+
+    scrollController
+        .animateTo(
+          nextTarget,
+          duration: const Duration(milliseconds: 420),
+          curve: Curves.easeOutCubic,
+        )
+        .whenComplete(() {
+          if (_smoothScrollToken == token) {
+            _smoothScrollTarget = null;
+          }
+        });
+  }
+
+  Future<void> navigateToSection(HomeSection section) async {
     final GlobalKey targetKey = switch (section) {
       HomeSection.about => aboutSectionKey,
       HomeSection.projects => projectsSectionKey,

@@ -50,6 +50,7 @@ class _ExperienceSectionState extends State<ExperienceSection> {
   double _scrollFraction = 0.0;
   Offset _mousePosition = Offset.zero;
   bool _isHovered = false;
+  bool _isSectionVisible = false;
 
   // Chronological order: Trainee (first) -> Developer (second)
   static const List<RedesignedExperienceEntry> _entries = [
@@ -138,7 +139,7 @@ class _ExperienceSectionState extends State<ExperienceSection> {
   }
 
   void _onScroll() {
-    if (!mounted) return;
+    if (!mounted || !_isSectionVisible) return;
     final context = _sectionKey.currentContext;
     if (context != null) {
       final RenderBox box = context.findRenderObject() as RenderBox;
@@ -182,11 +183,16 @@ class _ExperienceSectionState extends State<ExperienceSection> {
     final bool isMobile = width < 760;
 
     return RepaintBoundary(
-      child: MouseRegion(
-        onHover: _handleHover,
-        onExit: (_) => _handleHoverExit(),
-        child: Stack(
-          key: _sectionKey,
+      child: VisibilityDetector(
+        key: const Key('experience-section-visibility'),
+        onVisibilityChanged: (info) {
+          _isSectionVisible = info.visibleFraction > 0.0;
+        },
+        child: MouseRegion(
+          onHover: _handleHover,
+          onExit: (_) => _handleHoverExit(),
+          child: Stack(
+            key: _sectionKey,
           clipBehavior: Clip.none,
           children: [
             // Background grid overlay
@@ -377,6 +383,7 @@ class _ExperienceSectionState extends State<ExperienceSection> {
           ],
         ),
       ),
+    ),
     );
   }
 }

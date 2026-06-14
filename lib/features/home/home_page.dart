@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/animated/custom_cursor.dart';
@@ -48,7 +49,7 @@ class HomePage extends StatelessWidget {
                 if (enableDesktopEffects) const FloatingCircles(),
                 Positioned.fill(
                   child: Listener(
-                    onPointerSignal: enableDesktopEffects
+                    onPointerSignal: (enableDesktopEffects && !kIsWeb)
                         ? (event) {
                             if (event is PointerScrollEvent) {
                               GestureBinding.instance.pointerSignalResolver

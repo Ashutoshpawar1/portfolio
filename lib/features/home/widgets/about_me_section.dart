@@ -285,14 +285,16 @@ class _AboutParticlesState extends State<_AboutParticles>
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        for (var p in _particles) {
-          p.update();
-        }
-        return CustomPaint(painter: _ParticlesPainter(particles: _particles));
-      },
+    return RepaintBoundary(
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (context, child) {
+          for (var p in _particles) {
+            p.update();
+          }
+          return CustomPaint(painter: _ParticlesPainter(particles: _particles));
+        },
+      ),
     );
   }
 }

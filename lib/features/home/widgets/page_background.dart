@@ -60,10 +60,7 @@ class PageBackground extends StatelessWidget {
             Positioned(
               right: -90,
               bottom: 140 + parallaxY,
-              child: _GlowOrb(
-                size: 300,
-                color: Colors.white.withOpacity(0.02),
-              ),
+              child: _GlowOrb(size: 300, color: Colors.white.withOpacity(0.02)),
             ),
             Positioned.fill(
               child: DecoratedBox(
@@ -165,12 +162,12 @@ class _GlowOrb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IgnorePointer(
-      child: ImageFiltered(
-        imageFilter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
-        child: Container(
-          width: size,
-          height: size,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: RadialGradient(colors: [color, color.withOpacity(0)]),
         ),
       ),
     );

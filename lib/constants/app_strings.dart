@@ -7,6 +7,8 @@ class AppStrings {
   static const String githubUrl = "https://github.com/Ashutoshpawar1";
   static const String emailAddress = "ashutoshgarge123@gmail.com";
   static const String emailUrl = "mailto:ashutoshgarge123@gmail.com";
+  static const String whatsappUrl = "https://wa.me/919131246012";
+  static const String scheduleCallUrl = "https://calendly.com/ashutosh-garge";
   static const String twitterUrl = "";
   static const String resumeWebPath = "resume/ashutosh_resume.pdf";
   static const String heroAvailability =
@@ -91,8 +93,7 @@ final List<ProjectModel> appProjects = [
     githubUrl: "#",
     playStoreUrl:
         "https://play.google.com/store/apps/details?id=com.intercessory.army",
-    appStoreUrl:
-        "https://apps.apple.com/in/app/intercessory-army/id6760646458",
+    appStoreUrl: "https://apps.apple.com/in/app/intercessory-army/id6760646458",
   ),
   ProjectModel(
     title: "LifeVibe",

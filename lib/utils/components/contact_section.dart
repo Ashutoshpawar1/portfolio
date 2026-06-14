@@ -89,29 +89,26 @@ class ContactSection extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            color: AppColors.white,
-            fontWeight: FontWeight.w500,
-          ),
+          style: TextStyle(color: AppColors.white, fontWeight: FontWeight.w500),
         ),
         const SizedBox(height: 10),
         TextField(
           maxLines: maxLines,
-          style: const TextStyle(color: AppColors.white),
+          style: TextStyle(color: AppColors.white),
           decoration: InputDecoration(
             filled: true,
             fillColor: AppColors.white.withOpacity(0.04),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: AppColors.divider),
+              borderSide: BorderSide(color: AppColors.divider),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: AppColors.divider),
+              borderSide: BorderSide(color: AppColors.divider),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(18),
-              borderSide: const BorderSide(color: AppColors.white),
+              borderSide: BorderSide(color: AppColors.white),
             ),
           ),
         ),
@@ -141,7 +138,7 @@ class ContactSection extends StatelessWidget {
             ),
             Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 color: AppColors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,

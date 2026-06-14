@@ -38,7 +38,7 @@ class SkillProgressBar extends StatelessWidget {
             Expanded(
               child: Text(
                 skill,
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,

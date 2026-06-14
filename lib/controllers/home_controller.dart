@@ -121,8 +121,8 @@ class HomeController extends GetxController {
     scrollController
         .animateTo(
           nextTarget,
-          duration: const Duration(milliseconds: 420),
-          curve: Curves.easeOutCubic,
+          duration: const Duration(milliseconds: 120),
+          curve: Curves.easeOutQuart,
         )
         .whenComplete(() {
           if (_smoothScrollToken == token) {

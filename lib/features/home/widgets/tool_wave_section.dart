@@ -1,10 +1,28 @@
+import 'dart:async';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_strings.dart';
+import '../../../utils/components/glass_container.dart';
+import '../../../utils/components/scroll_reveal.dart';
+
+class RedesignedTool {
+  final String name;
+  final String logoSlug; // simpleicons slug
+  final IconData fallbackIcon;
+  final Color brandColor;
+
+  const RedesignedTool({
+    required this.name,
+    required this.logoSlug,
+    required this.fallbackIcon,
+    required this.brandColor,
+  });
+}
 
 class ToolWaveSection extends StatefulWidget {
   const ToolWaveSection({super.key});
@@ -14,64 +32,265 @@ class ToolWaveSection extends StatefulWidget {
 }
 
 class _ToolWaveSectionState extends State<ToolWaveSection>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _loopController = AnimationController(
-    vsync: this,
-    duration: const Duration(seconds: 32),
-  )..repeat();
+    with TickerProviderStateMixin {
+  late final AnimationController _loopController;
+  late final AnimationController _floatController;
+  late final AnimationController _pulseController;
+
+  int _activeScreenIndex = 0;
+  Timer? _screenTimer;
+
+  // Mouse tilt variables for the centerpiece phone
+  Offset _mousePosition = Offset.zero;
+  bool _isHovered = false;
+  double _tiltX = 0.0;
+  double _tiltY = 0.0;
+
+  static const List<RedesignedTool> _tools = [
+    RedesignedTool(
+      name: "Flutter",
+      logoSlug: "flutter",
+      fallbackIcon: Icons.flutter_dash,
+      brandColor: Color(0xFF02569B),
+    ),
+    RedesignedTool(
+      name: "Dart",
+      logoSlug: "dart",
+      fallbackIcon: Icons.code,
+      brandColor: Color(0xFF0175C2),
+    ),
+    RedesignedTool(
+      name: "Firebase",
+      logoSlug: "firebase",
+      fallbackIcon: Icons.local_fire_department,
+      brandColor: Color(0xFFFFCA28),
+    ),
+    RedesignedTool(
+      name: "GetX",
+      logoSlug: "getx",
+      fallbackIcon: Icons.route,
+      brandColor: Color(0xFFD32F2F),
+    ),
+    RedesignedTool(
+      name: "Riverpod",
+      logoSlug: "riverpod",
+      fallbackIcon: Icons.water_drop,
+      brandColor: Color(0xFF00E676),
+    ),
+    RedesignedTool(
+      name: "BLoC",
+      logoSlug: "bloc",
+      fallbackIcon: Icons.grid_view_rounded,
+      brandColor: Color(0xFF42A5F5),
+    ),
+    RedesignedTool(
+      name: "REST API",
+      logoSlug: "postman",
+      fallbackIcon: Icons.api,
+      brandColor: Color(0xFFFF5722),
+    ),
+    RedesignedTool(
+      name: "Socket.IO",
+      logoSlug: "socketdotio",
+      fallbackIcon: Icons.sync_alt,
+      brandColor: Color(0xFF010101),
+    ),
+    RedesignedTool(
+      name: "Python",
+      logoSlug: "python",
+      fallbackIcon: Icons.terminal,
+      brandColor: Color(0xFF3776AB),
+    ),
+    RedesignedTool(
+      name: "Gemini AI",
+      logoSlug: "googlegemini",
+      fallbackIcon: Icons.blur_on,
+      brandColor: Color(0xFF8E75FF),
+    ),
+    RedesignedTool(
+      name: "OpenAI",
+      logoSlug: "openai",
+      fallbackIcon: Icons.smart_toy,
+      brandColor: Color(0xFF00A67E),
+    ),
+    RedesignedTool(
+      name: "Git",
+      logoSlug: "git",
+      fallbackIcon: Icons.merge_type,
+      brandColor: Color(0xFFF05032),
+    ),
+    RedesignedTool(
+      name: "GitHub",
+      logoSlug: "github",
+      fallbackIcon: Icons.cloud_done,
+      brandColor: Color(0xFFFFFFFF),
+    ),
+    RedesignedTool(
+      name: "VS Code",
+      logoSlug: "visualstudiocode",
+      fallbackIcon: Icons.code_rounded,
+      brandColor: Color(0xFF007ACC),
+    ),
+    RedesignedTool(
+      name: "Android",
+      logoSlug: "android",
+      fallbackIcon: Icons.android,
+      brandColor: Color(0xFF3DDC84),
+    ),
+    RedesignedTool(
+      name: "iOS",
+      logoSlug: "apple",
+      fallbackIcon: Icons.phone_iphone,
+      brandColor: Color(0xFFFFFFFF),
+    ),
+    RedesignedTool(
+      name: "Windows",
+      logoSlug: "windows",
+      fallbackIcon: Icons.window,
+      brandColor: Color(0xFF0078D6),
+    ),
+    RedesignedTool(
+      name: "MacOS",
+      logoSlug: "apple",
+      fallbackIcon: Icons.laptop_mac,
+      brandColor: Color(0xFFFFFFFF),
+    ),
+    RedesignedTool(
+      name: "Linux",
+      logoSlug: "linux",
+      fallbackIcon: Icons.keyboard_command_key,
+      brandColor: Color(0xFFFCC624),
+    ),
+    RedesignedTool(
+      name: "Docker",
+      logoSlug: "docker",
+      fallbackIcon: Icons.storage,
+      brandColor: Color(0xFF2496ED),
+    ),
+    RedesignedTool(
+      name: "Postman",
+      logoSlug: "postman",
+      fallbackIcon: Icons.api,
+      brandColor: Color(0xFFFF6C37),
+    ),
+    RedesignedTool(
+      name: "JMeter",
+      logoSlug: "apachejmeter",
+      fallbackIcon: Icons.speed,
+      brandColor: Color(0xFFD22128),
+    ),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loopController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 40),
+    )..repeat();
+
+    _floatController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 4),
+    )..repeat(reverse: true);
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    )..repeat(reverse: true);
+
+    _screenTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (mounted) {
+        setState(() {
+          _activeScreenIndex = (_activeScreenIndex + 1) % 5;
+        });
+      }
+    });
+  }
 
   @override
   void dispose() {
     _loopController.dispose();
+    _floatController.dispose();
+    _pulseController.dispose();
+    _screenTimer?.cancel();
     super.dispose();
+  }
+
+  void _onHover(PointerEvent event, Size size) {
+    setState(() {
+      _mousePosition = event.localPosition;
+      _isHovered = true;
+
+      final double normalizedX =
+          (event.localPosition.dx - size.width / 2) / (size.width / 2);
+      final double normalizedY =
+          (event.localPosition.dy - size.height / 2) / (size.height / 2);
+
+      _tiltX = -normalizedY * 8.0;
+      _tiltY = normalizedX * 8.0;
+    });
+  }
+
+  void _onHoverExit() {
+    setState(() {
+      _isHovered = false;
+      _tiltX = 0.0;
+      _tiltY = 0.0;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 72),
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1380),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const _BackdropTitle(title: "TOOLS"),
-              const SizedBox(height: 26),
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final bool compact = constraints.maxWidth < 860;
-                  final bool tablet = constraints.maxWidth < 1180;
+    return ScrollReveal(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 72),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1380),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const _BackdropTitle(title: "TOOLS"),
+                const SizedBox(height: 26),
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final bool compact = constraints.maxWidth < 860;
+                    final bool tablet = constraints.maxWidth < 1180;
 
-                  return Container(
-                        width: double.infinity,
-                        padding: EdgeInsets.all(compact ? 20 : 28),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF171717),
-                          borderRadius: BorderRadius.circular(
-                            compact ? 28 : 40,
-                          ),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Color(0x22000000),
-                              blurRadius: 38,
-                              offset: Offset(0, 18),
+                    return Container(
+                          width: double.infinity,
+                          padding: EdgeInsets.all(compact ? 20 : 28),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF171717).withOpacity(0.4),
+                            borderRadius: BorderRadius.circular(
+                              compact ? 28 : 40,
                             ),
-                          ],
-                        ),
-                        child: compact
-                            ? _buildCompactLayout(constraints.maxWidth)
-                            : _buildWideLayout(
-                                constraints.maxWidth,
-                                tablet: tablet,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.05),
+                            ),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Color(0x22000000),
+                                blurRadius: 38,
+                                offset: Offset(0, 18),
                               ),
-                      )
-                      .animate()
-                      .fadeIn(duration: 700.ms)
-                      .slideY(begin: 0.08, end: 0);
-                },
-              ),
-            ],
+                            ],
+                          ),
+                          child: compact
+                              ? _buildCompactLayout(constraints.maxWidth)
+                              : _buildWideLayout(
+                                  constraints.maxWidth,
+                                  tablet: tablet,
+                                ),
+                        )
+                        .animate()
+                        .fadeIn(duration: 700.ms)
+                        .slideY(begin: 0.08, end: 0);
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -104,14 +323,42 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
             right: -10,
             bottom: 16,
             height: tablet ? 250 : 300,
-            child: _WaveLogos(controller: _loopController, compact: false),
+            child: _WaveLogos(
+              controller: _loopController,
+              compact: false,
+              tools: _tools,
+            ),
           ),
           Positioned(
             right: 0,
             bottom: -4,
-            child: _PhoneShowcase(
-              controller: _loopController,
-              width: phoneWidth,
+            child: MouseRegion(
+              onEnter: (_) => setState(() => _isHovered = true),
+              onHover: (e) => _onHover(e, Size(phoneWidth, phoneWidth * 1.95)),
+              onExit: (_) => _onHoverExit(),
+              child: AnimatedBuilder(
+                animation: _floatController,
+                builder: (context, child) {
+                  final double floatVal =
+                      math.sin(_floatController.value * math.pi * 2) * 8.0;
+                  return Transform.translate(
+                    offset: Offset(0, floatVal),
+                    child: Transform(
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateX(_tiltX * math.pi / 180)
+                        ..rotateY(_tiltY * math.pi / 180),
+                      alignment: FractionalOffset.center,
+                      child: child,
+                    ),
+                  );
+                },
+                child: _PhoneShowcase(
+                  width: phoneWidth,
+                  activeScreenIndex: _activeScreenIndex,
+                  pulseController: _pulseController,
+                ),
+              ),
             ),
           ),
         ],
@@ -133,14 +380,45 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
         const SizedBox(height: 24),
         SizedBox(
           height: smallPhone ? 170 : 195,
-          child: _WaveLogos(controller: _loopController, compact: true),
+          child: _WaveLogos(
+            controller: _loopController,
+            compact: true,
+            tools: _tools,
+          ),
         ),
         const SizedBox(height: 16),
         Center(
-          child: _PhoneShowcase(
-            controller: _loopController,
-            width: smallPhone ? 266 : 292,
-            compact: true,
+          child: MouseRegion(
+            onEnter: (_) => setState(() => _isHovered = true),
+            onHover: (e) => _onHover(
+              e,
+              Size(smallPhone ? 266 : 292, (smallPhone ? 266 : 292) * 1.95),
+            ),
+            onExit: (_) => _onHoverExit(),
+            child: AnimatedBuilder(
+              animation: _floatController,
+              builder: (context, child) {
+                final double floatVal =
+                    math.sin(_floatController.value * math.pi * 2) * 6.0;
+                return Transform.translate(
+                  offset: Offset(0, floatVal),
+                  child: Transform(
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.001)
+                      ..rotateX(_tiltX * math.pi / 180)
+                      ..rotateY(_tiltY * math.pi / 180),
+                    alignment: FractionalOffset.center,
+                    child: child,
+                  ),
+                );
+              },
+              child: _PhoneShowcase(
+                width: smallPhone ? 266 : 292,
+                compact: true,
+                activeScreenIndex: _activeScreenIndex,
+                pulseController: _pulseController,
+              ),
+            ),
           ),
         ),
       ],
@@ -169,7 +447,7 @@ class _BackdropTitle extends StatelessWidget {
             maxLines: 1,
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: AppColors.white.withValues(alpha: 0.08),
+              color: AppColors.white.withOpacity(0.05),
               fontSize: fontSize,
               letterSpacing: 0,
               height: 0.92,
@@ -212,7 +490,7 @@ class _SectionCopy extends StatelessWidget {
         ),
         SizedBox(height: center ? 18 : 24),
         Text(
-          "Write faster in all your\napps, on any device",
+          "Tools &\nTechnologies",
           textAlign: center ? TextAlign.center : TextAlign.left,
           style: GoogleFonts.cormorantGaramond(
             color: AppColors.orange,
@@ -225,10 +503,10 @@ class _SectionCopy extends StatelessWidget {
         ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 400),
           child: Text(
-            "Seamless speech-to-text in every application on your phone or computer.",
+            "The technologies, frameworks, platforms, and tools I use to build scalable, high-performance, production-ready applications.",
             textAlign: center ? TextAlign.center : TextAlign.left,
             style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.84),
+              color: Colors.white.withOpacity(0.84),
               fontSize: paragraphSize,
               height: 1.45,
               fontWeight: FontWeight.w500,
@@ -262,7 +540,7 @@ class _PlatformChip extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             label,
-            style: const TextStyle(
+            style: TextStyle(
               color: AppColors.white,
               fontSize: 14,
               fontWeight: FontWeight.w700,
@@ -277,8 +555,13 @@ class _PlatformChip extends StatelessWidget {
 class _WaveLogos extends StatelessWidget {
   final AnimationController controller;
   final bool compact;
+  final List<RedesignedTool> tools;
 
-  const _WaveLogos({required this.controller, required this.compact});
+  const _WaveLogos({
+    required this.controller,
+    required this.compact,
+    required this.tools,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +573,7 @@ class _WaveLogos extends StatelessWidget {
         final double spacing = compact ? 84 : 98;
         final double arcLift = compact ? 22 : 54;
         final double baseY = compact ? waveHeight * 0.56 : waveHeight * 0.62;
-        final double totalTrack = _toolBadges.length * spacing;
+        final double totalTrack = tools.length * spacing;
 
         return AnimatedBuilder(
           animation: controller,
@@ -299,8 +582,8 @@ class _WaveLogos extends StatelessWidget {
             final double travel = progress * totalTrack;
             final List<Widget> badges = [];
 
-            for (int i = 0; i < _toolBadges.length * 2; i++) {
-              final _ToolBadgeData data = _toolBadges[i % _toolBadges.length];
+            for (int i = 0; i < tools.length * 2; i++) {
+              final RedesignedTool data = tools[i % tools.length];
               final double x =
                   ((i * spacing) + travel) % (totalTrack * 2) - badgeSize - 26;
 
@@ -316,9 +599,9 @@ class _WaveLogos extends StatelessWidget {
                   math.sin((progress * math.pi * 2) + i * 0.42) *
                   (compact ? 4 : 6);
               final double y = baseY - arch + floatY;
+              // slight rotation
               final double tilt =
-                  data.tilt +
-                  math.sin((progress * math.pi * 2) + i * 0.16) * 0.04;
+                  math.sin((progress * math.pi * 2) + i * 0.16) * 0.08;
 
               badges.add(
                 Positioned(
@@ -344,57 +627,69 @@ class _WaveLogos extends StatelessWidget {
   }
 }
 
-class _ToolBadgeCard extends StatelessWidget {
-  final _ToolBadgeData data;
+class _ToolBadgeCard extends StatefulWidget {
+  final RedesignedTool data;
   final double size;
 
   const _ToolBadgeCard({required this.data, required this.size});
 
   @override
-  Widget build(BuildContext context) {
-    final bool showWordmark = size >= 64;
+  State<_ToolBadgeCard> createState() => _ToolBadgeCardState();
+}
 
+class _ToolBadgeCardState extends State<_ToolBadgeCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
     return RepaintBoundary(
-      child: Tooltip(
-        message: data.label,
-        child: Container(
-          width: size,
-          height: size,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: Tooltip(
+          message: widget.data.name,
           decoration: BoxDecoration(
-            gradient: data.gradient,
-            color: data.gradient == null ? data.background : null,
-            borderRadius: BorderRadius.circular(size * 0.26),
-            border: Border.all(color: data.borderColor),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x33000000),
-                blurRadius: 22,
-                offset: Offset(0, 12),
-              ),
-            ],
+            color: const Color(0xFF171717).withOpacity(0.92),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFFFF5A36).withOpacity(0.3)),
           ),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  data.icon,
-                  size: showWordmark ? size * 0.28 : size * 0.40,
-                  color: data.foreground,
-                ),
-                if (showWordmark) ...[
-                  SizedBox(height: size * 0.04),
-                  Text(
-                    data.mark,
-                    style: TextStyle(
-                      color: data.foreground,
-                      fontSize: size * 0.14,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.4,
-                    ),
-                  ),
-                ],
-              ],
+          textStyle: const TextStyle(color: Colors.white, fontSize: 11),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            width: widget.size,
+            height: widget.size,
+            decoration: BoxDecoration(
+              color: const Color(0xFF121212),
+              borderRadius: BorderRadius.circular(widget.size * 0.26),
+              border: Border.all(
+                color: _isHovered
+                    ? const Color(0xFFFF5A36)
+                    : Colors.white.withOpacity(0.08),
+                width: 1.5,
+              ),
+              boxShadow: _isHovered
+                  ? [
+                      BoxShadow(
+                        color: const Color(0xFFFF5A36).withOpacity(0.3),
+                        blurRadius: 12,
+                        spreadRadius: 1,
+                      ),
+                    ]
+                  : [
+                      const BoxShadow(
+                        color: Color(0x33000000),
+                        blurRadius: 22,
+                        offset: Offset(0, 12),
+                      ),
+                    ],
+            ),
+            child: Center(
+              child: _BrandIconWidget(
+                slug: widget.data.logoSlug,
+                fallbackIcon: widget.data.fallbackIcon,
+                brandColor: widget.data.brandColor,
+                size: widget.size * 0.46,
+              ),
             ),
           ),
         ),
@@ -403,14 +698,67 @@ class _ToolBadgeCard extends StatelessWidget {
   }
 }
 
+// Brand SVG/Icon wrapper widget
+class _BrandIconWidget extends StatelessWidget {
+  final String slug;
+  final IconData fallbackIcon;
+  final Color brandColor;
+  final double size;
+
+  const _BrandIconWidget({
+    required this.slug,
+    required this.fallbackIcon,
+    required this.brandColor,
+    required this.size,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (slug == "getx" || slug == "riverpod" || slug == "bloc") {
+      final String letter = slug == "getx"
+          ? "G"
+          : (slug == "riverpod" ? "R" : "B");
+      return Container(
+        width: size,
+        height: size,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: brandColor.withOpacity(0.15),
+          border: Border.all(color: brandColor.withOpacity(0.4), width: 1.0),
+        ),
+        child: Text(
+          letter,
+          style: GoogleFonts.outfit(
+            color: brandColor,
+            fontSize: size * 0.65,
+            fontWeight: FontWeight.w900,
+          ),
+        ),
+      );
+    }
+
+    return SvgPicture.network(
+      "https://cdn.simpleicons.org/$slug",
+      width: size,
+      height: size,
+      colorFilter: ColorFilter.mode(brandColor, BlendMode.srcIn),
+      placeholderBuilder: (context) =>
+          Icon(fallbackIcon, color: brandColor, size: size),
+    );
+  }
+}
+
 class _PhoneShowcase extends StatelessWidget {
-  final AnimationController controller;
   final double width;
   final bool compact;
+  final int activeScreenIndex;
+  final AnimationController pulseController;
 
   const _PhoneShowcase({
-    required this.controller,
     required this.width,
+    required this.activeScreenIndex,
+    required this.pulseController,
     this.compact = false,
   });
 
@@ -418,53 +766,45 @@ class _PhoneShowcase extends StatelessWidget {
   Widget build(BuildContext context) {
     final double phoneHeight = width * 1.72;
     final bool tightCompact = compact && width <= 272;
-    final List<_ToolBadgeData> orbitBadges = [
-      _toolBadges[0],
-      _toolBadges[8],
-      _toolBadges[15],
-      _toolBadges[20],
-      _toolBadges[24],
-    ];
 
     return SizedBox(
-      width: width + (compact ? 30 : 110),
-      height: phoneHeight + 40,
+      width: width,
+      height: phoneHeight + 20,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
+          // Ambient back glow
           AnimatedBuilder(
-            animation: controller,
+            animation: pulseController,
             builder: (context, child) {
-              final double progress = controller.value * math.pi * 2;
-              return Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  for (int i = 0; i < orbitBadges.length; i++)
-                    _FloatingOrbitBadge(
-                      data: orbitBadges[i],
-                      progress: progress,
-                      index: i,
-                      compact: compact,
-                    ),
-                ],
-              );
-            },
-          ),
-          AnimatedBuilder(
-            animation: controller,
-            builder: (context, child) {
-              final double progress = controller.value * math.pi * 2;
-              final double phoneLift = math.sin(progress) * 8;
-
+              final glowScale = 1.0 + (pulseController.value * 0.08);
               return Positioned(
-                left: compact ? 16 : 42,
-                bottom: 8,
-                child: Transform.translate(
-                  offset: Offset(0, phoneLift),
-                  child: child,
+                left: -20,
+                right: -20,
+                top: -20,
+                bottom: -20,
+                child: Transform.scale(
+                  scale: glowScale,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: RadialGradient(
+                        colors: [
+                          const Color(0xFFFF5A36).withOpacity(0.12),
+                          Colors.transparent,
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               );
             },
+          ),
+
+          // Main phone container
+          Positioned(
+            left: 0,
+            bottom: 8,
             child: Container(
               width: width,
               height: phoneHeight,
@@ -473,7 +813,7 @@ class _PhoneShowcase extends StatelessWidget {
                 color: const Color(0xFF121212),
                 borderRadius: BorderRadius.circular(36),
                 border: Border.all(
-                  color: AppColors.orange.withValues(alpha: 0.88),
+                  color: const Color(0xFFFF5A36).withOpacity(0.88),
                   width: 2.4,
                 ),
                 boxShadow: const [
@@ -484,58 +824,26 @@ class _PhoneShowcase extends StatelessWidget {
                   ),
                 ],
               ),
-              child: RepaintBoundary(
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: tightCompact ? 60 : 62,
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(
-                          tightCompact ? 12 : 14,
-                          tightCompact ? 12 : 14,
-                          tightCompact ? 12 : 14,
-                          tightCompact ? 10 : 12,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(28),
+                child: Container(
+                  color: const Color(0xFF0D0D0D),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: ScaleTransition(
+                          scale: Tween<double>(
+                            begin: 0.95,
+                            end: 1.0,
+                          ).animate(animation),
+                          child: child,
                         ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1A1A1A),
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        child: _PhoneChatPane(compact: compact),
-                      ),
-                    ),
-                    SizedBox(height: tightCompact ? 6 : 8),
-                    Expanded(
-                      flex: tightCompact ? 40 : 38,
-                      child: Container(
-                        padding: EdgeInsets.fromLTRB(
-                          tightCompact ? 14 : 18,
-                          tightCompact ? 12 : 16,
-                          tightCompact ? 14 : 18,
-                          tightCompact ? 10 : 14,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF161616),
-                          borderRadius: BorderRadius.circular(28),
-                        ),
-                        child: Column(
-                          children: [
-                            const _PhoneActionRow(),
-                            const Spacer(),
-                            _AnimatedWaveform(controller: controller),
-                            const Spacer(),
-                            const Align(
-                              alignment: Alignment.centerLeft,
-                              child: Icon(
-                                Icons.language,
-                                color: AppColors.orange,
-                                size: 22,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                      );
+                    },
+                    child: _buildScreen(activeScreenIndex, tightCompact),
+                  ),
                 ),
               ),
             ),
@@ -544,286 +852,412 @@ class _PhoneShowcase extends StatelessWidget {
       ),
     );
   }
-}
 
-class _PhoneChatPane extends StatelessWidget {
-  final bool compact;
+  Widget _buildScreen(int index, bool dense) {
+    switch (index) {
+      case 0:
+        return _buildChatScreen(dense);
+      case 1:
+        return _buildAIScreen(dense);
+      case 2:
+        return _buildDashboardScreen(dense);
+      case 3:
+        return _buildMeetingScreen(dense);
+      case 4:
+      default:
+        return _buildEcomScreen(dense);
+    }
+  }
 
-  const _PhoneChatPane({required this.compact});
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final bool dense = compact || constraints.maxHeight < 330;
-        final bool ultraDense = constraints.maxHeight < 296;
-        final double gap = ultraDense ? 5 : (dense ? 7 : 10);
-        final double maxBubbleWidth =
-            constraints.maxWidth * (dense ? 0.72 : 0.76);
-
-        return Column(
+  Widget _buildChatScreen(bool dense) {
+    return KeyedSubtree(
+      key: const ValueKey(0),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _PhoneProfileRow(dense: dense),
-            SizedBox(height: ultraDense ? 8 : (dense ? 10 : 12)),
-            _ChatBubble(
-              text: "Cool, extra cream.",
-              isReply: false,
-              small: true,
-              dense: dense,
-              maxWidth: maxBubbleWidth,
-            ),
-            SizedBox(height: gap),
-            _ChatBubble(
-              text: "Also, are you still waiting on feedback\nfor the org doc?",
-              isReply: false,
-              dense: dense,
-              maxWidth: maxBubbleWidth,
-            ),
-            SizedBox(height: gap),
-            _ChatBubble(
-              text: "All good there, the doc\nis fine.",
-              isReply: true,
-              dense: dense,
-              maxWidth: maxBubbleWidth,
-            ),
-            SizedBox(height: gap),
-            // _ChatBubble(
-            //   text: "Actually, wait, do we have\nthe Q1 forecast?",
-            //   isReply: false,
-            //   dense: dense,
-            //   maxWidth: maxBubbleWidth,
-            // ),
-            // SizedBox(height: ultraDense ? 6 : 8),
-            // const Spacer(),
-            // _MessageField(dense: dense),
-          ],
-        );
-      },
-    );
-  }
-}
-
-class _FloatingOrbitBadge extends StatelessWidget {
-  final _ToolBadgeData data;
-  final double progress;
-  final int index;
-  final bool compact;
-
-  const _FloatingOrbitBadge({
-    required this.data,
-    required this.progress,
-    required this.index,
-    required this.compact,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Offset> anchors = compact
-        ? const [
-            Offset(0, 130),
-            Offset(198, 72),
-            Offset(208, 228),
-            Offset(44, 258),
-            Offset(154, 300),
-          ]
-        : const [
-            Offset(0, 156),
-            Offset(266, 72),
-            Offset(288, 228),
-            Offset(40, 292),
-            Offset(230, 368),
-          ];
-
-    final double offsetX = math.cos(progress + (index * 0.95)) * 12;
-    final double offsetY = math.sin(progress + (index * 1.1)) * 10;
-    final double angle = math.sin(progress + index) * 0.08;
-
-    return Positioned(
-      left: anchors[index].dx + offsetX,
-      top: anchors[index].dy + offsetY,
-      child: Transform.rotate(
-        angle: angle,
-        child: _ToolBadgeCard(data: data, size: compact ? 42 : 50),
-      ),
-    );
-  }
-}
-
-class _AnimatedWaveform extends StatelessWidget {
-  final AnimationController controller;
-
-  const _AnimatedWaveform({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    final List<double> bars = [18, 30, 48, 64, 38, 22, 44, 66, 34, 18];
-
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (context, child) {
-        final double progress = controller.value * math.pi * 2;
-
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: List.generate(bars.length, (index) {
-            final double factor =
-                0.62 + (math.sin(progress + (index * 0.55)).abs() * 0.72);
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 3),
-              child: SizedBox(
-                width: 6,
-                height: bars[index] * factor,
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: AppColors.orange,
-                    borderRadius: BorderRadius.circular(999),
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 10,
+                  backgroundColor: Color(0xFFFF5A36),
+                  child: Icon(Icons.person, size: 10, color: Colors.white),
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  "Real-Time Chat",
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: dense ? 10 : 11,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-              ),
-            );
-          }),
-        );
-      },
-    );
-  }
-}
-
-class _PhoneProfileRow extends StatelessWidget {
-  final bool dense;
-
-  const _PhoneProfileRow({required this.dense});
-
-  @override
-  Widget build(BuildContext context) {
-    final bool extraDense = dense;
-    return Row(
-      children: [
-        Container(
-          width: extraDense ? 28 : 32,
-          height: extraDense ? 28 : 32,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: LinearGradient(
-              colors: [Color(0xFF1D1D1D), Color(0xFF365B4F)],
+              ],
             ),
-          ),
-          child: Icon(
-            Icons.person,
-            color: AppColors.orange,
-            size: extraDense ? 15 : 18,
-          ),
+            const Spacer(),
+            _simulatedBubble("Hey! Is the Flutter build ready?", false),
+            const SizedBox(height: 6),
+            _simulatedBubble("Yes! Built using Clean Architecture.", true),
+            const SizedBox(height: 6),
+            _simulatedBubble("Awesome, performance is super smooth!", false),
+            const Spacer(),
+            Container(
+              height: 24,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.04),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Type message...",
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.3),
+                  fontSize: 9,
+                ),
+              ),
+            ),
+          ],
         ),
-        SizedBox(width: extraDense ? 8 : 10),
-        Text(
-          "Jordan",
-          style: TextStyle(
-            color: AppColors.orange,
-            fontSize: extraDense ? 13 : 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ],
+      ),
     );
   }
-}
 
-class _ChatBubble extends StatelessWidget {
-  final String text;
-  final bool isReply;
-  final bool small;
-  final bool dense;
-  final double maxWidth;
+  Widget _buildAIScreen(bool dense) {
+    return KeyedSubtree(
+      key: const ValueKey(1),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Color(0xFFFF5A36),
+                  size: 12,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  "Gemini AI Assistant",
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: dense ? 10 : 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            const Spacer(),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white.withOpacity(0.06)),
+              ),
+              child: const Text(
+                "How can I help you optimize your Flutter application architecture today?",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 9,
+                  height: 1.4,
+                ),
+              ),
+            ),
+            const Spacer(),
+            const Icon(Icons.mic, color: Color(0xFFFF5A36), size: 24)
+                .animate(onPlay: (c) => c.repeat())
+                .scale(
+                  duration: 1000.ms,
+                  begin: Offset(0.9, 0.9),
+                  end: Offset(1.1, 1.1),
+                ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  const _ChatBubble({
-    required this.text,
-    required this.isReply,
-    required this.maxWidth,
-    this.small = false,
-    this.dense = false,
-  });
+  Widget _buildDashboardScreen(bool dense) {
+    return KeyedSubtree(
+      key: const ValueKey(2),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Dashboard",
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontSize: dense ? 11 : 12,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Expanded(child: _statCard("Speed", "60 FPS", Colors.green)),
+                const SizedBox(width: 6),
+                Expanded(child: _statCard("Crash-Free", "99.9%", Colors.blue)),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 54,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.03),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              padding: const EdgeInsets.all(8),
+              child: Row(
+                children: [
+                  const Icon(Icons.trending_up, color: Colors.green, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Text(
+                          "APIs Response Time",
+                          style: TextStyle(color: Colors.white70, fontSize: 8),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "120ms average",
+                          style: GoogleFonts.outfit(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMeetingScreen(bool dense) {
+    return KeyedSubtree(
+      key: const ValueKey(3),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  "Standup Meeting",
+                  style: GoogleFonts.outfit(
+                    color: Colors.white,
+                    fontSize: dense ? 10 : 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: const Text(
+                    "LIVE",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 6,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 6,
+                mainAxisSpacing: 6,
+                physics: const NeverScrollableScrollPhysics(),
+                children: [
+                  _meetingTile("Ashutosh (You)", Colors.orange),
+                  _meetingTile("Client Manager", Colors.blueGrey),
+                  _meetingTile("Backend Lead", Colors.teal),
+                  _meetingTile("QA Engineer", Colors.purple),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEcomScreen(bool dense) {
+    return KeyedSubtree(
+      key: const ValueKey(4),
+      child: Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "Store Showcase",
+              style: GoogleFonts.outfit(
+                color: Colors.white,
+                fontSize: dense ? 11 : 12,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              height: 54,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                image: const DecorationImage(
+                  image: NetworkImage(
+                    "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=120&auto=format&fit=crop&q=60",
+                  ),
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(height: 6),
+            const Text(
+              "Premium Sneakers",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 9,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  "\$120.00",
+                  style: TextStyle(
+                    color: Color(0xFFFF5A36),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF5A36),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    "Buy",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 7,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _simulatedBubble(String text, bool isMe) {
     return Align(
-      alignment: isReply ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(maxWidth: maxWidth),
-        padding: EdgeInsets.symmetric(
-          horizontal: small ? 12 : (dense ? 12 : 14),
-          vertical: small ? 9 : (dense ? 8 : 10),
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: isReply ? const Color(0xFF37352E) : const Color(0xFF292929),
-          borderRadius: BorderRadius.circular(16),
+          color: isMe
+              ? const Color(0xFFFF5A36).withOpacity(0.85)
+              : Colors.white.withOpacity(0.06),
+          borderRadius: BorderRadius.circular(10),
         ),
+        constraints: const BoxConstraints(maxWidth: 100),
         child: Text(
           text,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.86),
-            fontSize: dense ? 11.5 : (small ? 12 : 13.5),
-            height: dense ? 1.12 : 1.16,
-            fontWeight: FontWeight.w600,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 8,
+            height: 1.25,
           ),
         ),
       ),
     );
   }
-}
 
-class _MessageField extends StatelessWidget {
-  final bool dense;
-
-  const _MessageField({required this.dense});
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _statCard(String label, String value, Color color) {
     return Container(
-      height: dense ? 34 : 38,
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(18),
+        color: Colors.white.withOpacity(0.02),
+        borderRadius: BorderRadius.circular(8),
       ),
-      alignment: Alignment.centerLeft,
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Text(
-        "|",
-        style: TextStyle(
-          color: Colors.white.withValues(alpha: 0.35),
-          fontSize: dense ? 15 : 18,
-        ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(color: Colors.white54, fontSize: 7),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            value,
+            style: TextStyle(
+              color: color,
+              fontSize: 10,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+        ],
       ),
     );
   }
-}
 
-class _PhoneActionRow extends StatelessWidget {
-  const _PhoneActionRow();
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 32,
-          height: 32,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color(0xFF2E2E2E),
+  Widget _meetingTile(String label, Color color) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.25),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.4)),
+      ),
+      child: Stack(
+        children: [
+          Center(child: Icon(Icons.videocam, color: color, size: 16)),
+          Positioned(
+            left: 4,
+            bottom: 4,
+            child: Text(
+              label,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 6,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ),
-          child: const Icon(Icons.close, color: AppColors.orange, size: 17),
-        ),
-        const Spacer(),
-        Container(
-          width: 32,
-          height: 32,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: AppColors.orange,
-          ),
-          child: const Icon(Icons.check, color: Colors.black, size: 17),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }
@@ -835,277 +1269,9 @@ class _PlatformData {
   const _PlatformData({required this.label, required this.icon});
 }
 
-class _ToolBadgeData {
-  final String label;
-  final String mark;
-  final Color background;
-  final Color foreground;
-  final Color borderColor;
-  final double tilt;
-  final IconData icon;
-  final Gradient? gradient;
-
-  const _ToolBadgeData({
-    required this.label,
-    required this.mark,
-    required this.background,
-    required this.foreground,
-    required this.borderColor,
-    required this.tilt,
-    required this.icon,
-    this.gradient,
-  });
-}
-
 const List<_PlatformData> _platforms = [
   _PlatformData(label: "iPhone", icon: Icons.phone_iphone_rounded),
   _PlatformData(label: "Mac", icon: Icons.laptop_mac_rounded),
   _PlatformData(label: "Windows", icon: Icons.window_rounded),
   _PlatformData(label: "Android", icon: Icons.android_rounded),
-];
-
-const List<_ToolBadgeData> _toolBadges = [
-  _ToolBadgeData(
-    label: "Slack",
-    mark: "slack",
-    background: Color(0xFFFFFFFF),
-    foreground: Color(0xFF4A154B),
-    borderColor: Color(0x12000000),
-    tilt: -0.22,
-    icon: Icons.forum_rounded,
-  ),
-  _ToolBadgeData(
-    label: "npm",
-    mark: "npm",
-    background: Color(0xFFFFFFFF),
-    foreground: Color(0xFFCB3837),
-    borderColor: Color(0x12000000),
-    tilt: -0.12,
-    icon: Icons.terminal_rounded,
-  ),
-  _ToolBadgeData(
-    label: "VS Code",
-    mark: "code",
-    background: Color(0xFF007ACC),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: -0.18,
-    icon: Icons.code_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Windsurf",
-    mark: "wind",
-    background: Color(0xFF172B3A),
-    foreground: Color(0xFF68F2FF),
-    borderColor: Color(0x12FFFFFF),
-    tilt: -0.10,
-    icon: Icons.air_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Antigravity",
-    mark: "anti",
-    background: Color(0xFF101010),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x28FFFFFF),
-    tilt: -0.08,
-    icon: Icons.rocket_launch_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Codex",
-    mark: "codex",
-    background: Color(0xFFE9F9F0),
-    foreground: Color(0xFF0A6E43),
-    borderColor: Color(0x14000000),
-    tilt: 0.02,
-    icon: Icons.auto_awesome_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Fire Studio",
-    mark: "fire",
-    background: Color(0xFFFF7A1A),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.10,
-    icon: Icons.local_fire_department_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Cursor",
-    mark: "cursor",
-    background: Color(0xFF0D0D0D),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x28FFFFFF),
-    tilt: 0.16,
-    icon: Icons.ads_click_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Jira",
-    mark: "jira",
-    background: Color(0xFF0C66E4),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.20,
-    icon: Icons.view_kanban_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Google Meet",
-    mark: "meet",
-    background: Color(0xFF34A853),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.22,
-    icon: Icons.videocam_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Skype",
-    mark: "skype",
-    background: Color(0xFF00AFF0),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.18,
-    icon: Icons.call_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Microsoft",
-    mark: "ms",
-    background: Color(0xFFFFFFFF),
-    foreground: Color(0xFF2F2F2F),
-    borderColor: Color(0x14000000),
-    tilt: 0.12,
-    icon: Icons.window_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Apple",
-    mark: "apple",
-    background: Color(0xFF111111),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x28FFFFFF),
-    tilt: 0.05,
-    icon: Icons.laptop_mac_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Android",
-    mark: "android",
-    background: Color(0xFF3DDC84),
-    foreground: Color(0xFF111111),
-    borderColor: Color(0x14000000),
-    tilt: 0.02,
-    icon: Icons.android_rounded,
-  ),
-  _ToolBadgeData(
-    label: "iOS",
-    mark: "ios",
-    background: Color(0xFFEDEDED),
-    foreground: Color(0xFF111111),
-    borderColor: Color(0x14000000),
-    tilt: -0.02,
-    icon: Icons.phone_iphone_rounded,
-  ),
-  _ToolBadgeData(
-    label: "AI Cloud",
-    mark: "cloud",
-    background: Color(0xFF171F3C),
-    foreground: Color(0xFFA6C4FF),
-    borderColor: Color(0x14FFFFFF),
-    tilt: -0.08,
-    icon: Icons.cloud_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Gemini",
-    mark: "gem",
-    background: Color(0xFF6449FF),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: -0.14,
-    icon: Icons.blur_on_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Kimi",
-    mark: "kimi",
-    background: Color(0xFF0B4B5A),
-    foreground: Color(0xFFDBFBFF),
-    borderColor: Color(0x14FFFFFF),
-    tilt: -0.20,
-    icon: Icons.nights_stay_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Mobile iOS",
-    mark: "mobile",
-    background: Color(0xFF151515),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x28FFFFFF),
-    tilt: -0.18,
-    icon: Icons.phone_iphone_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Mobile Android",
-    mark: "mobile",
-    background: Color(0xFF93D500),
-    foreground: Color(0xFF141414),
-    borderColor: Color(0x14000000),
-    tilt: -0.10,
-    icon: Icons.phone_android_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Notion",
-    mark: "notion",
-    background: Color(0xFFFFFFFF),
-    foreground: Color(0xFF111111),
-    borderColor: Color(0x14000000),
-    tilt: 0.04,
-    icon: Icons.menu_book_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Microsoft Message",
-    mark: "msg",
-    background: Color(0xFF0078D4),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.08,
-    icon: Icons.message_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Perplexity",
-    mark: "px",
-    background: Color(0xFF0E2027),
-    foreground: Color(0xFF9EF0FF),
-    borderColor: Color(0x14FFFFFF),
-    tilt: 0.12,
-    icon: Icons.psychology_alt_rounded,
-  ),
-  _ToolBadgeData(
-    label: "ChatGPT",
-    mark: "gpt",
-    background: Color(0xFF0F3D35),
-    foreground: Color(0xFFD7FFF5),
-    borderColor: Color(0x14FFFFFF),
-    tilt: 0.18,
-    icon: Icons.smart_toy_rounded,
-  ),
-  _ToolBadgeData(
-    label: "VN",
-    mark: "vn",
-    background: Color(0xFF111111),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x28FFFFFF),
-    tilt: 0.22,
-    icon: Icons.movie_creation_outlined,
-  ),
-  _ToolBadgeData(
-    label: "Picsart",
-    mark: "art",
-    background: Color(0xFFFF4ACB),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.18,
-    icon: Icons.brush_rounded,
-  ),
-  _ToolBadgeData(
-    label: "Keka",
-    mark: "zip",
-    background: Color(0xFF5E3BFF),
-    foreground: Color(0xFFFFFFFF),
-    borderColor: Color(0x14000000),
-    tilt: 0.12,
-    icon: Icons.archive_rounded,
-  ),
 ];

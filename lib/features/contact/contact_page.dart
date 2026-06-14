@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:go_router/go_router.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
@@ -49,38 +50,38 @@ class _ContactPageState extends State<ContactPage>
     return Scaffold(
       backgroundColor: AppColors.black,
       body: Stack(
-        children: [
-          Positioned.fill(
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Color(0xFF090909), Color(0xFF030303)],
+          children: [
+            Positioned.fill(
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Color(0xFF090909), Color(0xFF030303)],
+                  ),
                 ),
               ),
             ),
-          ),
-          FadeTransition(
-            opacity: contentOpacity,
-            child: SlideTransition(
-              position: contentOffset,
-              child: SafeArea(
-                child: ContactContent(onClose: () => context.pop()),
+            FadeTransition(
+              opacity: contentOpacity,
+              child: SlideTransition(
+                position: contentOffset,
+                child: SafeArea(
+                  child: ContactContent(onClose: () => context.pop()),
+                ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: IgnorePointer(
-              ignoring: true,
-              child: BrandTransitionPanels(
-                animation: _controller,
-                label: AppStrings.logoText,
+            Positioned.fill(
+              child: IgnorePointer(
+                ignoring: true,
+                child: BrandTransitionPanels(
+                  animation: _controller,
+                  label: AppStrings.logoText,
+                ),
               ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
   }
 }

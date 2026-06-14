@@ -83,7 +83,7 @@ class TimelineItem extends StatelessWidget {
                     const SizedBox(height: 10),
                     Text(
                       company,
-                      style: const TextStyle(
+                      style: TextStyle(
                         color: AppColors.grey,
                         fontWeight: FontWeight.w600,
                         fontSize: 18,
@@ -92,10 +92,7 @@ class TimelineItem extends StatelessWidget {
                     const SizedBox(height: 15),
                     Text(
                       description,
-                      style: const TextStyle(
-                        color: AppColors.grey,
-                        height: 1.6,
-                      ),
+                      style: TextStyle(color: AppColors.grey, height: 1.6),
                     ),
                   ],
                 ),

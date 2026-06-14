@@ -47,7 +47,7 @@ class ResumePreviewDialog extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Resume Preview',
                         style: TextStyle(
                           color: AppColors.white,
@@ -69,7 +69,7 @@ class ResumePreviewDialog extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: AppColors.white),
+                  icon: Icon(Icons.close, color: AppColors.white),
                 ),
               ],
             ),

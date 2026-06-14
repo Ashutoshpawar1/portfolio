@@ -5,6 +5,7 @@ import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
 import 'glass_container.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'project_details_dialog.dart';
 
 class ProjectCard extends StatefulWidget {
   final ProjectModel project;
@@ -24,63 +25,71 @@ class _ProjectCardState extends State<ProjectCard> {
     final bool isCompactCard = screenWidth < 520;
     final double cardWidth = screenWidth < 440
         ? screenWidth - 40
-        : (screenWidth < 720 ? 320.0 : 350.0);
-    final double cardHeight = screenWidth < 440 ? 640.0 : 600.0;
+        : (screenWidth < 720
+              ? (screenWidth * 0.8 - 20).clamp(320.0, 360.0)
+              : (screenWidth < 1200
+                    ? (screenWidth * 0.45 - 40).clamp(340.0, 420.0)
+                    : (screenWidth * 0.32 - 40).clamp(360.0, 480.0)));
+    final double cardHeight = screenWidth < 440 ? 620.0 : 580.0;
     final double imageHeight = screenWidth < 440
         ? 180.0
         : (screenWidth < 900 ? 200.0 : 220.0);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: TweenAnimationBuilder<double>(
-        duration: const Duration(milliseconds: 200),
-        tween: Tween(begin: 0.0, end: _isHovered ? 1.0 : 0.0),
-        builder: (context, value, child) {
-          final matrix = Matrix4.identity()
-            ..setEntry(3, 2, 0.001)
-            ..translate(0.0, -8.0 * value, 0.0)
-            ..scale(1.0 + (0.012 * value));
-
-          return Transform(
-            transform: matrix,
-            alignment: Alignment.center,
-            child: Container(
-              width: cardWidth,
-              height: cardHeight,
-              margin: EdgeInsets.only(
-                right: screenWidth < 720 ? 12 : 30,
-                bottom: 20,
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  if (_isHovered)
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.4),
-                      blurRadius: 44,
-                      offset: const Offset(0, 24),
+    return GestureDetector(
+      onTap: () {
+        ProjectDetailsDialog.show(context, widget.project, appProjects);
+      },
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child:
+            Container(
+                  width: cardWidth,
+                  height: cardHeight,
+                  margin: EdgeInsets.only(
+                    right: screenWidth < 720 ? 12 : 30,
+                    bottom: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      if (_isHovered)
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.4),
+                          blurRadius: 44,
+                          offset: const Offset(0, 24),
+                        ),
+                    ],
+                  ),
+                  child: GlassContainer(
+                    padding: const EdgeInsets.all(0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildImage(imageHeight),
+                        Expanded(
+                          child: _buildContent(
+                            context,
+                            isCompactCard: isCompactCard,
+                          ),
+                        ),
+                      ],
                     ),
-                ],
-              ),
-              child: GlassContainer(
-                padding: const EdgeInsets.all(0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildImage(imageHeight),
-                    Expanded(
-                      child: _buildContent(
-                        context,
-                        isCompactCard: isCompactCard,
-                      ),
-                    ),
-                  ],
+                  ),
+                )
+                .animate(target: _isHovered ? 1.0 : 0.0)
+                .scale(
+                  begin: const Offset(1.0, 1.0),
+                  end: const Offset(1.015, 1.015),
+                  duration: 250.ms,
+                  curve: Curves.easeOutCubic,
+                )
+                .slideY(
+                  begin: 0.0,
+                  end: -0.012,
+                  duration: 250.ms,
+                  curve: Curves.easeOutCubic,
                 ),
-              ),
-            ),
-          );
-        },
       ),
     );
   }
@@ -90,52 +99,54 @@ class _ProjectCardState extends State<ProjectCard> {
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Stack(
         children: [
-          AnimatedScale(
-            scale: _isHovered ? 1.06 : 1,
-            duration: const Duration(milliseconds: 700),
-            curve: Curves.easeOutCubic,
-            child: CachedNetworkImage(
-              imageUrl: widget.project.imageUrl.isNotEmpty
-                  ? widget.project.imageUrl
-                  : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-              height: imageHeight,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              fadeInDuration: const Duration(milliseconds: 180),
-              fadeOutDuration: const Duration(milliseconds: 100),
-              errorWidget: (context, url, error) {
-                return Container(
-                  height: imageHeight,
-                  width: double.infinity,
-                  color: AppColors.surfaceElevated,
-                  child: const Center(
-                    child: Icon(
-                      Icons.code_rounded,
-                      color: AppColors.grey,
-                      size: 50,
-                    ),
-                  ),
-                );
-              },
-              placeholder: (context, url) {
-                return Container(
-                  height: imageHeight,
-                  width: double.infinity,
-                  color: AppColors.surfaceElevated,
-                  child: Center(
-                    child: SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.white.withValues(alpha: 0.2),
+          CachedNetworkImage(
+                imageUrl: widget.project.imageUrl.isNotEmpty
+                    ? widget.project.imageUrl
+                    : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+                height: imageHeight,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                fadeInDuration: const Duration(milliseconds: 180),
+                fadeOutDuration: const Duration(milliseconds: 100),
+                errorWidget: (context, url, error) {
+                  return Container(
+                    height: imageHeight,
+                    width: double.infinity,
+                    color: AppColors.surfaceElevated,
+                    child: Center(
+                      child: Icon(
+                        Icons.code_rounded,
+                        color: AppColors.grey,
+                        size: 50,
                       ),
                     ),
-                  ),
-                );
-              },
-            ),
-          ),
+                  );
+                },
+                placeholder: (context, url) {
+                  return Container(
+                    height: imageHeight,
+                    width: double.infinity,
+                    color: AppColors.surfaceElevated,
+                    child: Center(
+                      child: SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.white.withValues(alpha: 0.2),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              )
+              .animate(target: _isHovered ? 1.0 : 0.0)
+              .scale(
+                begin: const Offset(1.0, 1.0),
+                end: const Offset(1.06, 1.06),
+                duration: 600.ms,
+                curve: Curves.easeOutCubic,
+              ),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(
@@ -150,19 +161,29 @@ class _ProjectCardState extends State<ProjectCard> {
               ),
             ),
           ),
-          if (_isHovered)
-            Positioned.fill(
-              child: Container(
-                color: Colors.black.withValues(alpha: 0.32),
-                child: Center(
-                  child: Icon(
-                    Icons.open_in_new,
-                    color: Colors.white,
-                    size: 40,
-                  ).animate().scale().fadeIn(),
-                ),
-              ),
+          Positioned.fill(
+            child: IgnorePointer(
+              child:
+                  Container(
+                        color: Colors.black.withValues(alpha: 0.32),
+                        child: Center(
+                          child: const Icon(
+                            Icons.open_in_new,
+                            color: Colors.white,
+                            size: 40,
+                          ),
+                        ),
+                      )
+                      .animate(target: _isHovered ? 1.0 : 0.0)
+                      .fadeIn(duration: 220.ms, curve: Curves.easeOutCubic)
+                      .scale(
+                        begin: const Offset(0.85, 0.85),
+                        end: const Offset(1.0, 1.0),
+                        duration: 220.ms,
+                        curve: Curves.easeOutCubic,
+                      ),
             ),
+          ),
         ],
       ),
     );
@@ -228,16 +249,15 @@ class _ProjectCardState extends State<ProjectCard> {
             children: visibleTech.map(_buildTechBadge).toList(),
           ),
           const SizedBox(height: 16),
-          AnimatedSlide(
-            duration: const Duration(milliseconds: 260),
-            curve: Curves.easeOutCubic,
-            offset: _isHovered ? Offset.zero : const Offset(0, 0.12),
-            child: AnimatedOpacity(
-              duration: const Duration(milliseconds: 260),
-              opacity: _isHovered ? 1 : 0.82,
-              child: Wrap(spacing: 12, runSpacing: 12, children: actionButtons),
-            ),
-          ),
+          Wrap(spacing: 12, runSpacing: 12, children: actionButtons)
+              .animate(target: _isHovered ? 1.0 : 0.0)
+              .fadeIn(duration: 250.ms, curve: Curves.easeOutCubic)
+              .slideY(
+                begin: 0.12,
+                end: 0.0,
+                duration: 250.ms,
+                curve: Curves.easeOutCubic,
+              ),
         ],
       ),
     );
@@ -253,7 +273,7 @@ class _ProjectCardState extends State<ProjectCard> {
       ),
       child: Text(
         label,
-        style: const TextStyle(
+        style: TextStyle(
           color: AppColors.white,
           fontSize: 11,
           fontWeight: FontWeight.w600,

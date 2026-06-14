@@ -8,6 +8,8 @@ import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/glass_container.dart';
 import '../../../utils/components/scroll_reveal.dart';
 import '../../../utils/components/skill_progress_bar.dart';
+import '../../../utils/components/section_divider_transition.dart';
+import '../../../controllers/home_controller.dart';
 
 class SkillsSection extends StatelessWidget {
   const SkillsSection({super.key});
@@ -176,7 +178,7 @@ class SkillsSection extends StatelessWidget {
                 velocity: 42,
                 blankSpace: 120,
                 pauseAfterRound: const Duration(milliseconds: 400),
-                style: const TextStyle(
+                style: TextStyle(
                   color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -184,6 +186,11 @@ class SkillsSection extends StatelessWidget {
                 ),
               ),
             ),
+          ),
+          const SizedBox(height: 40),
+          const SectionDividerTransition(
+            label: "Explore Experience",
+            nextSection: HomeSection.experience,
           ),
         ],
       ),
@@ -262,7 +269,7 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
                     const SizedBox(width: 18),
                     Text(
                       widget.title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 28,
                         color: AppColors.white,
                         fontWeight: FontWeight.w800,

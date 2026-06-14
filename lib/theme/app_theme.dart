@@ -10,7 +10,7 @@ class AppTheme {
       brightness: Brightness.dark,
       primaryColor: AppColors.white,
       scaffoldBackgroundColor: AppColors.black,
-      colorScheme: const ColorScheme.dark(
+      colorScheme: ColorScheme.dark(
         primary: AppColors.white,
         secondary: AppColors.emerald,
         surface: AppColors.surface,

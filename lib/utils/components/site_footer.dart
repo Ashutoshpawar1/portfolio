@@ -105,7 +105,7 @@ class _FooterInfoRow extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.grey,
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -169,7 +169,7 @@ class _FooterLinkColumn extends StatelessWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.grey,
             fontSize: 14,
             fontWeight: FontWeight.w500,
@@ -220,7 +220,7 @@ class _FooterHoverLinkState extends State<_FooterHoverLink> {
               children: [
                 AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 220),
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: AppColors.white,
                     fontSize: 22,
                     fontWeight: FontWeight.w600,
@@ -292,7 +292,7 @@ class _FooterNewsletter extends StatelessWidget {
             borderRadius: BorderRadius.circular(999),
             border: Border.all(color: AppColors.divider),
           ),
-          child: const Center(
+          child: Center(
             child: Text(
               "SUBSCRIBE",
               style: TextStyle(
@@ -318,12 +318,12 @@ class _FooterBottomRow extends StatelessWidget {
     if (compact) {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             "©2025 ASHUTOSH. ALL RIGHTS RESERVED",
             style: TextStyle(color: AppColors.grey, fontSize: 14),
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
             "Privacy Policy • Terms of Service",
             style: TextStyle(color: AppColors.white, fontSize: 16),
@@ -332,7 +332,7 @@ class _FooterBottomRow extends StatelessWidget {
       );
     }
 
-    return const Row(
+    return Row(
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -341,7 +341,7 @@ class _FooterBottomRow extends StatelessWidget {
               "©2025 ASHUTOSH. ALL RIGHTS RESERVED",
               style: TextStyle(color: AppColors.grey, fontSize: 14),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               "Privacy Policy • Terms of Service",
               style: TextStyle(color: AppColors.white, fontSize: 16),

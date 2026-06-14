@@ -159,9 +159,9 @@ class HomePage extends StatelessWidget {
   }) {
     final Widget sectionChild = reveal
         ? ScrollReveal(
-            beginOffset: const Offset(0, 0.045),
-            duration: const Duration(milliseconds: 850),
-            visibleFraction: 0.03,
+            beginOffset: const Offset(0, 0.035),
+            duration: const Duration(milliseconds: 700),
+            visibleFraction: 0.01,
             child: child,
           )
         : child;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 class ScrollReveal extends StatefulWidget {
   final Widget child;
@@ -11,10 +12,10 @@ class ScrollReveal extends StatefulWidget {
   const ScrollReveal({
     super.key,
     required this.child,
-    this.beginOffset = const Offset(0, 0.08),
-    this.duration = const Duration(milliseconds: 850),
-    this.curve = Curves.easeOutExpo,
-    this.visibleFraction = 0.08,
+    this.beginOffset = const Offset(0, 0.04),
+    this.duration = const Duration(milliseconds: 700),
+    this.curve = Curves.easeOutCubic,
+    this.visibleFraction = 0.02,
   });
 
   @override
@@ -42,17 +43,15 @@ class _ScrollRevealState extends State<ScrollReveal> {
     return VisibilityDetector(
       key: _visibilityKey,
       onVisibilityChanged: _handleVisibilityChanged,
-      child: AnimatedOpacity(
-        duration: widget.duration,
-        curve: widget.curve,
-        opacity: _isVisible ? 1 : 0,
-        child: AnimatedSlide(
-          duration: widget.duration,
-          curve: widget.curve,
-          offset: _isVisible ? Offset.zero : widget.beginOffset,
-          child: widget.child,
-        ),
-      ),
+      child: widget.child
+          .animate(target: _isVisible ? 1.0 : 0.0)
+          .fadeIn(duration: widget.duration, curve: widget.curve)
+          .slide(
+            begin: widget.beginOffset,
+            end: Offset.zero,
+            duration: widget.duration,
+            curve: widget.curve,
+          ),
     );
   }
 }

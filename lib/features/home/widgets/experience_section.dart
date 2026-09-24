@@ -6,12 +6,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
 import '../../../controllers/home_controller.dart';
 import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/glass_container.dart';
-import '../../../utils/components/scroll_reveal.dart';
 import '../../../utils/components/section_divider_transition.dart';
 
 class RedesignedExperienceEntry {
@@ -47,9 +45,9 @@ class ExperienceSection extends StatefulWidget {
 
 class _ExperienceSectionState extends State<ExperienceSection> {
   final GlobalKey _sectionKey = GlobalKey();
-  double _scrollFraction = 0.0;
-  Offset _mousePosition = Offset.zero;
-  bool _isHovered = false;
+  final ValueNotifier<double> _scrollFraction = ValueNotifier<double>(0.0);
+  final ValueNotifier<Offset> _mousePosition = ValueNotifier<Offset>(Offset.zero);
+  final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
   bool _isSectionVisible = false;
 
   // Chronological order: Trainee (first) -> Developer (second)
@@ -135,6 +133,9 @@ class _ExperienceSectionState extends State<ExperienceSection> {
     if (Get.isRegistered<HomeController>()) {
       Get.find<HomeController>().scrollController.removeListener(_onScroll);
     }
+    _scrollFraction.dispose();
+    _mousePosition.dispose();
+    _isHovered.dispose();
     super.dispose();
   }
 
@@ -156,25 +157,21 @@ class _ExperienceSectionState extends State<ExperienceSection> {
         fraction = (scrollPassed / (sectionHeight * 0.8)).clamp(0.0, 1.0);
       }
 
-      if ((_scrollFraction - fraction).abs() > 0.01) {
-        setState(() {
-          _scrollFraction = fraction;
-        });
+      if ((_scrollFraction.value - fraction).abs() > 0.015) {
+        _scrollFraction.value = fraction;
       }
     }
   }
 
   void _handleHover(PointerEvent event) {
-    setState(() {
-      _mousePosition = event.localPosition;
-      _isHovered = true;
-    });
+    _mousePosition.value = event.localPosition;
+    if (!_isHovered.value) {
+      _isHovered.value = true;
+    }
   }
 
   void _handleHoverExit() {
-    setState(() {
-      _isHovered = false;
-    });
+    _isHovered.value = false;
   }
 
   @override
@@ -203,26 +200,36 @@ class _ExperienceSectionState extends State<ExperienceSection> {
             ),
 
             // Parallax mouse follow glow
-            if (_isHovered && !isMobile)
-              Positioned(
-                left: _mousePosition.dx - 300,
-                top: _mousePosition.dy - 300,
-                width: 600,
-                height: 600,
-                child: IgnorePointer(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: RadialGradient(
-                        colors: [
-                          const Color(0xFFFF5A36).withOpacity(0.06),
-                          Colors.transparent,
-                        ],
+            ValueListenableBuilder<bool>(
+              valueListenable: _isHovered,
+              builder: (context, hovered, _) {
+                if (!hovered || isMobile) return const SizedBox.shrink();
+                return ValueListenableBuilder<Offset>(
+                  valueListenable: _mousePosition,
+                  builder: (context, pos, _) {
+                    return Positioned(
+                      left: pos.dx - 300,
+                      top: pos.dy - 300,
+                      width: 600,
+                      height: 600,
+                      child: IgnorePointer(
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: RadialGradient(
+                              colors: [
+                                const Color(0xFFFF5A36).withValues(alpha: 0.06),
+                                Colors.transparent,
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                ),
-              ),
+                    );
+                  },
+                );
+              },
+            ),
 
             // Soft glowing blobs
             Positioned(
@@ -295,23 +302,28 @@ class _ExperienceSectionState extends State<ExperienceSection> {
                           left: 20,
                           child: LayoutBuilder(
                             builder: (context, constraints) {
-                              final activeHeight = constraints.maxHeight * _scrollFraction;
-                              return Align(
-                                alignment: Alignment.topCenter,
-                                child: AnimatedContainer(
-                                  duration: const Duration(milliseconds: 200),
-                                  width: 2,
-                                  height: activeHeight,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFFFF5A36),
-                                    boxShadow: [
-                                      BoxShadow(
+                              return ValueListenableBuilder<double>(
+                                valueListenable: _scrollFraction,
+                                builder: (context, fraction, _) {
+                                  final activeHeight = constraints.maxHeight * fraction;
+                                  return Align(
+                                    alignment: Alignment.topCenter,
+                                    child: AnimatedContainer(
+                                      duration: const Duration(milliseconds: 140),
+                                      width: 2,
+                                      height: activeHeight,
+                                      decoration: const BoxDecoration(
                                         color: Color(0xFFFF5A36),
-                                        blurRadius: 4,
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Color(0xFFFF5A36),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
                                       ),
-                                    ],
-                                  ),
-                                ),
+                                    ),
+                                  );
+                                },
                               );
                             },
                           ),
@@ -323,27 +335,33 @@ class _ExperienceSectionState extends State<ExperienceSection> {
                             final entry = _entries[index];
                             final bool isFirst = index == 0;
                             final double activationThreshold = isFirst ? 0.25 : 0.65;
-                            final bool isActivated = _scrollFraction >= activationThreshold;
 
-                            return Stack(
-                              clipBehavior: Clip.none,
-                              children: [
-                                // The Dot
-                                Positioned(
-                                  left: 10,
-                                  top: 30,
-                                  child: _TimelineNodeDot(isActivated: isActivated),
-                                ),
-                                // The Card
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 54, bottom: 40),
-                                  child: _ExperienceHorizontalCard(
-                                    entry: entry,
-                                    isActivated: isActivated,
-                                    index: index,
-                                  ),
-                                ),
-                              ],
+                            return ValueListenableBuilder<double>(
+                              valueListenable: _scrollFraction,
+                              builder: (context, fraction, _) {
+                                final bool isActivated = fraction >= activationThreshold;
+
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    // The Dot
+                                    Positioned(
+                                      left: 10,
+                                      top: 30,
+                                      child: _TimelineNodeDot(isActivated: isActivated),
+                                    ),
+                                    // The Card
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 54, bottom: 40),
+                                      child: _ExperienceHorizontalCard(
+                                        entry: entry,
+                                        isActivated: isActivated,
+                                        index: index,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
                             );
                           }),
                         ),
@@ -371,8 +389,8 @@ class _ExperienceSectionState extends State<ExperienceSection> {
                         ),
                         const SizedBox(height: 24),
                         const SectionDividerTransition(
-                          label: "Explore Tools",
-                          nextSection: HomeSection.tools,
+                          label: "Explore Projects",
+                          nextSection: HomeSection.projects,
                         ),
                       ],
                     ),

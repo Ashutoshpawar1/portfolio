@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
+import 'interactive_cursor.dart';
 
 class SocialLinks extends StatelessWidget {
   const SocialLinks({super.key});
@@ -23,19 +24,18 @@ class SocialLinks extends StatelessWidget {
   Widget _buildSocialIcon(IconData icon, String tooltip, String url) {
     return Tooltip(
       message: tooltip,
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-          onTap: () => openExternalUrl(url),
-          child: Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.white.withValues(alpha: 0.03),
-              border: Border.all(color: AppColors.divider),
-            ),
-            child: Icon(icon, color: AppColors.white, size: 24),
+      child: InteractiveCursor(
+        enableScale: true,
+        hoverScale: 1.12,
+        onTap: () => openExternalUrl(url),
+        child: Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.white.withValues(alpha: 0.03),
+            border: Border.all(color: AppColors.divider),
           ),
+          child: Icon(icon, color: AppColors.white, size: 24),
         ),
       ),
     );

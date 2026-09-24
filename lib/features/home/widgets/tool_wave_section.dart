@@ -1,17 +1,14 @@
-import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:get/get.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 import '../../../constants/app_colors.dart';
-import '../../../constants/app_strings.dart';
-import '../../../utils/components/glass_container.dart';
 import '../../../utils/components/scroll_reveal.dart';
 import '../../../controllers/home_controller.dart';
+import '../../../controllers/app_cursor_controller.dart';
 
 class RedesignedTool {
   final String name;
@@ -42,9 +39,11 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
   ScrollController? _scrollController;
 
   int _selectedPlatformIndex = 0; // 0: iPhone, 1: Mac, 2: Windows, 3: Android
-  double _scrollOffset = 0.0;
-  Offset _mousePosition = Offset.zero;
-  bool _isMouseIn = false;
+  final ValueNotifier<double> _scrollOffset = ValueNotifier<double>(0.0);
+  final ValueNotifier<Offset> _mousePosition = ValueNotifier<Offset>(
+    Offset.zero,
+  );
+  final ValueNotifier<bool> _isMouseIn = ValueNotifier<bool>(false);
 
   static const List<RedesignedTool> _tools = [
     RedesignedTool(
@@ -207,14 +206,18 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
     _floatController.dispose();
     _pulseController.dispose();
     _scrollController?.removeListener(_onScroll);
+    _scrollOffset.dispose();
+    _mousePosition.dispose();
+    _isMouseIn.dispose();
     super.dispose();
   }
 
   void _onScroll() {
     if (mounted && _scrollController != null) {
-      setState(() {
-        _scrollOffset = _scrollController!.offset;
-      });
+      final double offset = _scrollController!.offset;
+      if ((_scrollOffset.value - offset).abs() > 3) {
+        _scrollOffset.value = offset;
+      }
     }
   }
 
@@ -224,16 +227,14 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
     final bool isMobile = width < 900;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isMouseIn = true),
+      onEnter: (_) => _isMouseIn.value = true,
       onHover: (e) {
         final box = context.findRenderObject() as RenderBox?;
         if (box != null) {
-          setState(() {
-            _mousePosition = box.globalToLocal(e.position);
-          });
+          _mousePosition.value = box.globalToLocal(e.position);
         }
       },
-      onExit: (_) => setState(() => _isMouseIn = false),
+      onExit: (_) => _isMouseIn.value = false,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
@@ -285,48 +286,65 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
           ),
 
           // 3. Mouse-Follow Glow Light
-          if (_isMouseIn && !isMobile)
-            Positioned(
-              left: _mousePosition.dx - 250,
-              top: _mousePosition.dy - 250,
-              width: 500,
-              height: 500,
-              child: IgnorePointer(
-                child: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        const Color(0xFFFF5A36).withOpacity(0.045),
-                        Colors.transparent,
-                      ],
+          ValueListenableBuilder<bool>(
+            valueListenable: _isMouseIn,
+            builder: (context, mouseIn, _) {
+              if (!mouseIn || isMobile) return const SizedBox.shrink();
+              return ValueListenableBuilder<Offset>(
+                valueListenable: _mousePosition,
+                builder: (context, mousePos, _) {
+                  return Positioned(
+                    left: mousePos.dx - 250,
+                    top: mousePos.dy - 250,
+                    width: 500,
+                    height: 500,
+                    child: IgnorePointer(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: RadialGradient(
+                            colors: [
+                              const Color(0xFFFF5A36).withValues(alpha: 0.045),
+                              Colors.transparent,
+                            ],
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-            ),
+                  );
+                },
+              );
+            },
+          ),
 
           // 4. Parallax Background Watermark "TOOLS"
-          Positioned(
-            top: 40 + (_scrollOffset * 0.08),
-            left: 0,
-            right: 0,
-            child: IgnorePointer(
-              child: Center(
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Text(
-                    "TOOLS",
-                    style: GoogleFonts.outfit(
-                      color: Colors.white.withOpacity(0.025),
-                      fontSize: width < 600 ? 120 : (width < 1100 ? 180 : 250),
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 20,
+          ValueListenableBuilder<double>(
+            valueListenable: _scrollOffset,
+            builder: (context, offset, _) {
+              return Positioned(
+                top: 40 + (offset * 0.08),
+                left: 0,
+                right: 0,
+                child: IgnorePointer(
+                  child: Center(
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        "TOOLS",
+                        style: GoogleFonts.outfit(
+                          color: Colors.white.withValues(alpha: 0.025),
+                          fontSize: width < 600
+                              ? 120
+                              : (width < 1100 ? 180 : 250),
+                          fontWeight: FontWeight.w900,
+                          letterSpacing: 20,
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
 
           // 5. Main Content Layout (Full-Width Experience, Box Removed)
@@ -430,7 +448,17 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
         final bool isSelected = index == _selectedPlatformIndex;
 
         return MouseRegion(
-          cursor: SystemMouseCursors.click,
+          cursor: SystemMouseCursors.none,
+          onEnter: (_) {
+            if (Get.isRegistered<AppCursorController>()) {
+              AppCursorController.to.setHovered(true);
+            }
+          },
+          onExit: (_) {
+            if (Get.isRegistered<AppCursorController>()) {
+              AppCursorController.to.setHovered(false);
+            }
+          },
           child: GestureDetector(
             onTap: () {
               setState(() {
@@ -1521,12 +1549,18 @@ class _BrandIconWidget extends StatelessWidget {
       );
     }
 
+    if (slug == "openai" || slug == "windows") {
+      return Icon(fallbackIcon, color: brandColor, size: size);
+    }
+
     return SvgPicture.network(
       "https://cdn.simpleicons.org/$slug",
       width: size,
       height: size,
       colorFilter: ColorFilter.mode(brandColor, BlendMode.srcIn),
       placeholderBuilder: (context) =>
+          Icon(fallbackIcon, color: brandColor, size: size),
+      errorBuilder: (context, error, stackTrace) =>
           Icon(fallbackIcon, color: brandColor, size: size),
     );
   }

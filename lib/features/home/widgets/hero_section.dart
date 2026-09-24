@@ -9,6 +9,7 @@ import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
 import '../../../routes/app_router.dart';
 import '../../../controllers/home_controller.dart';
+import '../../../controllers/app_cursor_controller.dart';
 import '../../../utils/components/premium_button.dart';
 import '../../../utils/components/resume_preview_dialog.dart';
 import '../../../utils/components/social_links.dart';
@@ -556,9 +557,19 @@ class _HeaderButtonState extends State<_HeaderButton> {
     final Color contentColor = _isHovered ? Colors.black : Colors.white;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(

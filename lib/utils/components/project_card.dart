@@ -5,6 +5,8 @@ import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
 import 'glass_container.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
+import '../../controllers/app_cursor_controller.dart';
 import 'project_details_dialog.dart';
 
 class ProjectCard extends StatefulWidget {
@@ -40,8 +42,19 @@ class _ProjectCardState extends State<ProjectCard> {
         ProjectDetailsDialog.show(context, widget.project, appProjects);
       },
       child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
+        cursor: SystemMouseCursors.none,
+        onEnter: (_) {
+          setState(() => _isHovered = true);
+          if (Get.isRegistered<AppCursorController>()) {
+            AppCursorController.to.setHovered(true, label: "VIEW");
+          }
+        },
+        onExit: (_) {
+          setState(() => _isHovered = false);
+          if (Get.isRegistered<AppCursorController>()) {
+            AppCursorController.to.setHovered(false);
+          }
+        },
         child:
             Container(
                   width: cardWidth,
@@ -285,7 +298,17 @@ class _ProjectCardState extends State<ProjectCard> {
   Widget _buildActionButton(IconData icon, String label, [String? url]) {
     final bool enabled = url != null && url.isNotEmpty;
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
+      cursor: SystemMouseCursors.none,
+      onEnter: (_) {
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(_isHovered, label: _isHovered ? "VIEW" : null);
+        }
+      },
       child: GestureDetector(
         onTap: enabled ? () => openExternalUrl(url) : null,
         child: AnimatedContainer(

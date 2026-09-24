@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_strings.dart';
 import '../../constants/app_sizes.dart';
 import '../../controllers/home_controller.dart';
+import '../../controllers/app_cursor_controller.dart';
 import 'top_menu_button.dart';
 
 class MenuOverlay extends StatelessWidget {
@@ -21,10 +23,13 @@ class MenuOverlay extends StatelessWidget {
     final List<({String label, HomeSection section})> menuItems = [
       (label: AppStrings.home, section: HomeSection.home),
       (label: AppStrings.aboutMe, section: HomeSection.about),
+      (label: AppStrings.experience, section: HomeSection.experience),
       (label: AppStrings.projectSection, section: HomeSection.projects),
       (label: AppStrings.skills, section: HomeSection.skills),
-      (label: AppStrings.experience, section: HomeSection.experience),
       (label: AppStrings.tools, section: HomeSection.tools),
+      (label: "Blog", section: HomeSection.blog),
+      (label: "GitHub", section: HomeSection.github),
+      (label: "Contact Me", section: HomeSection.contact),
     ];
 
     return Material(
@@ -129,9 +134,19 @@ class _OverlayMenuItemState extends State<_OverlayMenuItem> {
     final double underlineWidth = textPainter.width;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
-      onExit: (_) => setState(() => _hovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _hovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _hovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: widget.onTap,
         child: Column(

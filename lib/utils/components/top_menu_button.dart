@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../constants/app_sizes.dart';
+import 'interactive_cursor.dart';
 
 class TopMenuButton extends StatelessWidget {
   final String label;
@@ -12,8 +13,9 @@ class TopMenuButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isMenu = label == "MENU";
 
-    return InkWell(
-      borderRadius: BorderRadius.circular(999),
+    return InteractiveCursor(
+      enableScale: true,
+      hoverScale: 1.05,
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -23,7 +25,7 @@ class TopMenuButton extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(999),
           border: Border.all(color: AppColors.divider),
-          color: Colors.black.withOpacity(0.25),
+          color: Colors.black.withValues(alpha: 0.25),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

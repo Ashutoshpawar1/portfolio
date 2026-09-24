@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
+import '../../../controllers/app_cursor_controller.dart';
 import '../../../utils/services/external_link_service.dart';
 import 'contact_form_card.dart';
 
@@ -190,9 +192,19 @@ class _InteractiveContactCardState extends State<InteractiveContactCard> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
@@ -302,9 +314,19 @@ class _CTAButtonState extends State<_CTAButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(

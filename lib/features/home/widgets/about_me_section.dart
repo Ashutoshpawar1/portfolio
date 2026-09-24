@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import '../../../constants/app_colors.dart';
 import '../../../controllers/home_controller.dart';
+import '../../../controllers/app_cursor_controller.dart';
 import '../../../utils/components/animated_section_title.dart';
 import '../../../constants/app_strings.dart';
 import '../../../utils/components/glass_container.dart';
@@ -144,8 +145,8 @@ class AboutMeSection extends StatelessWidget {
               ),
               const SizedBox(height: 40),
               const SectionDividerTransition(
-                label: "Explore Projects",
-                nextSection: HomeSection.projects,
+                label: "Explore Experience",
+                nextSection: HomeSection.experience,
               ),
             ],
           ),
@@ -402,12 +403,23 @@ class _InteractiveCardWrapperState extends State<_InteractiveCardWrapper> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() {
-        _isHovered = false;
-        _tiltX = 0;
-        _tiltY = 0;
-      }),
+      cursor: SystemMouseCursors.none,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() {
+          _isHovered = false;
+          _tiltX = 0;
+          _tiltY = 0;
+        });
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
       onHover: (event) {
         final RenderBox? box = context.findRenderObject() as RenderBox?;
         if (box == null) return;

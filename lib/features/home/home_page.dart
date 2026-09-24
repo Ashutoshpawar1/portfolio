@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
-import '../../utils/animated/custom_cursor.dart';
+import '../../controllers/app_cursor_controller.dart';
+import '../../utils/animated/custom_cursor_overlay.dart';
 import '../../utils/animated/floating_circles.dart';
 import '../../utils/components/brand_transition_panels.dart';
 import '../../utils/components/menu_overlay.dart';
@@ -17,6 +17,9 @@ import 'widgets/projects_section.dart';
 import 'widgets/skills_section.dart';
 import 'widgets/experience_section.dart';
 import 'widgets/page_background.dart';
+import 'widgets/github_achievements_section.dart';
+import 'widgets/blog_articles_section.dart';
+import 'widgets/contact_me_section.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -34,7 +37,7 @@ class HomePage extends StatelessWidget {
 
           return MouseRegion(
             cursor: enableDesktopEffects
-                ? SystemMouseCursors.progress
+                ? SystemMouseCursors.none
                 : MouseCursor.defer,
             onHover: enableDesktopEffects
                 ? (event) => controller.updateParallax(
@@ -49,7 +52,22 @@ class HomePage extends StatelessWidget {
                 if (enableDesktopEffects) const FloatingCircles(),
                 Positioned.fill(
                   child: Listener(
-                    onPointerSignal: (enableDesktopEffects && !kIsWeb)
+                    onPointerDown: (_) {
+                      if (Get.isRegistered<AppCursorController>()) {
+                        AppCursorController.to.setPressed(true);
+                      }
+                    },
+                    onPointerUp: (_) {
+                      if (Get.isRegistered<AppCursorController>()) {
+                        AppCursorController.to.setPressed(false);
+                      }
+                    },
+                    onPointerCancel: (_) {
+                      if (Get.isRegistered<AppCursorController>()) {
+                        AppCursorController.to.setPressed(false);
+                      }
+                    },
+                    onPointerSignal: enableDesktopEffects
                         ? (event) {
                             if (event is PointerScrollEvent) {
                               GestureBinding.instance.pointerSignalResolver
@@ -92,23 +110,23 @@ class HomePage extends StatelessWidget {
                           ),
                           SliverToBoxAdapter(
                             child: _sectionWrapper(
-                              key: controller.projectsSectionKey,
+                              key: controller.experienceSectionKey,
                               color: AppColors.black,
+                              child: const ExperienceSection(),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.projectsSectionKey,
+                              color: AppColors.surface,
                               child: const ProjectsSection(),
                             ),
                           ),
                           SliverToBoxAdapter(
                             child: _sectionWrapper(
                               key: controller.skillsSectionKey,
-                              color: AppColors.surface,
-                              child: const SkillsSection(),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: _sectionWrapper(
-                              key: controller.experienceSectionKey,
                               color: AppColors.black,
-                              child: const ExperienceSection(),
+                              child: const SkillsSection(),
                             ),
                           ),
                           SliverToBoxAdapter(
@@ -118,13 +136,33 @@ class HomePage extends StatelessWidget {
                               child: const ToolWaveSection(),
                             ),
                           ),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.blogSectionKey,
+                              color: AppColors.black,
+                              child: const BlogArticlesSection(),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.githubSectionKey,
+                              color: AppColors.surface,
+                              child: const GithubAchievementsSection(),
+                            ),
+                          ),
+                          SliverToBoxAdapter(
+                            child: _sectionWrapper(
+                              key: controller.contactSectionKey,
+                              color: AppColors.black,
+                              child: const ContactMeSection(),
+                            ),
+                          ),
                           const SliverToBoxAdapter(child: SiteFooter()),
                         ],
                       ),
                     ),
                   ),
                 ),
-                if (enableDesktopEffects) const CustomCursor(),
                 Obx(
                   () => controller.isMenuOpen
                       ? MenuOverlay(
@@ -144,6 +182,8 @@ class HomePage extends StatelessWidget {
                         )
                       : const SizedBox.shrink(),
                 ),
+                // Top-most single unified smooth cursor
+                if (enableDesktopEffects) const CustomCursorOverlay(),
               ],
             ),
           );

@@ -189,8 +189,8 @@ class SkillsSection extends StatelessWidget {
           ),
           const SizedBox(height: 40),
           const SectionDividerTransition(
-            label: "Explore Experience",
-            nextSection: HomeSection.experience,
+            label: "Explore Tools & Technologies",
+            nextSection: HomeSection.tools,
           ),
         ],
       ),

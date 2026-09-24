@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../controllers/home_controller.dart';
@@ -12,75 +10,80 @@ class PageBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!enableMotion) {
-      return const _StaticPageBackground();
+      return const RepaintBoundary(child: _StaticPageBackground());
     }
 
     final controller = Get.find<HomeController>();
 
-    return Obx(() {
-      final double scrollShift = controller.scrollOffset * 0.05;
-      final double parallaxX = controller.parallaxX * 18;
-      final double parallaxY = controller.parallaxY * 18;
+    return RepaintBoundary(
+      child: Obx(() {
+        final double scrollShift = controller.scrollOffset * 0.05;
+        final double parallaxX = controller.parallaxX * 18;
+        final double parallaxY = controller.parallaxY * 18;
 
-      return DecoratedBox(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF090909), Color(0xFF030303)],
+        return DecoratedBox(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [Color(0xFF090909), Color(0xFF030303)],
+            ),
           ),
-        ),
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            Positioned(
-              top: -210 + parallaxY,
-              left: -140 + parallaxX,
-              child: _GlowOrb(
-                size: 520,
-                color: Colors.white.withOpacity(0.025),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Positioned(
+                top: -210 + parallaxY,
+                left: -140 + parallaxX,
+                child: _GlowOrb(
+                  size: 520,
+                  color: Colors.white.withValues(alpha: 0.025),
+                ),
               ),
-            ),
-            Positioned(
-              top: 120 + scrollShift,
-              right: 160 - parallaxX,
-              child: _GlowOrb(
-                size: 240,
-                color: const Color(0xFFFF7A59).withOpacity(0.05),
+              Positioned(
+                top: 120 + scrollShift,
+                right: 160 - parallaxX,
+                child: _GlowOrb(
+                  size: 240,
+                  color: const Color(0xFFFF7A59).withValues(alpha: 0.05),
+                ),
               ),
-            ),
-            Positioned(
-              left: 260 - parallaxX,
-              bottom: 180 - scrollShift,
-              child: _GlowOrb(
-                size: 320,
-                color: const Color(0xFF4F46E5).withOpacity(0.04),
+              Positioned(
+                left: 260 - parallaxX,
+                bottom: 180 - scrollShift,
+                child: _GlowOrb(
+                  size: 320,
+                  color: const Color(0xFF4F46E5).withValues(alpha: 0.04),
+                ),
               ),
-            ),
-            Positioned(
-              right: -90,
-              bottom: 140 + parallaxY,
-              child: _GlowOrb(size: 300, color: Colors.white.withOpacity(0.02)),
-            ),
-            Positioned.fill(
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Colors.transparent,
-                      Colors.black.withOpacity(0.08),
-                      Colors.black.withOpacity(0.18),
-                    ],
+              Positioned(
+                right: -90,
+                bottom: 140 + parallaxY,
+                child: _GlowOrb(
+                  size: 300,
+                  color: Colors.white.withValues(alpha: 0.02),
+                ),
+              ),
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withValues(alpha: 0.08),
+                        Colors.black.withValues(alpha: 0.18),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    });
+            ],
+          ),
+        );
+      }),
+    );
   }
 }
 
@@ -167,7 +170,12 @@ class _GlowOrb extends StatelessWidget {
         height: size,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          gradient: RadialGradient(colors: [color, color.withOpacity(0)]),
+          gradient: RadialGradient(
+            colors: [
+              color,
+              color.withValues(alpha: 0.0),
+            ],
+          ),
         ),
       ),
     );

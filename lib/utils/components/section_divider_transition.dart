@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 import '../../controllers/home_controller.dart';
+import '../../controllers/app_cursor_controller.dart';
 
 class SectionDividerTransition extends StatefulWidget {
   final String label;
@@ -48,9 +49,19 @@ class _SectionDividerTransitionState extends State<SectionDividerTransition>
     final controller = Get.find<HomeController>();
 
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true, label: "NEXT");
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: () => controller.navigateToSection(widget.nextSection),
         child: Container(

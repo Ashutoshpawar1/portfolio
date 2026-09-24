@@ -2,7 +2,9 @@ import 'dart:async';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
+import '../../controllers/app_cursor_controller.dart';
 import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
 import 'glass_container.dart';
@@ -1263,9 +1265,19 @@ class _HoverScaleButtonState extends State<_HoverScaleButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedScale(

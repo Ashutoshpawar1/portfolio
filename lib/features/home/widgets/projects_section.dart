@@ -9,6 +9,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../constants/app_colors.dart';
 import '../../../constants/app_strings.dart';
 import '../../../controllers/home_controller.dart';
+import '../../../controllers/app_cursor_controller.dart';
 import '../../../utils/services/external_link_service.dart';
 import '../../../utils/components/glass_container.dart';
 import '../../../utils/components/animated_section_title.dart';
@@ -563,9 +564,19 @@ class _FilterBarState extends State<_FilterBar> {
         final bool isHovered = idx == _hoveredIndex;
 
         return MouseRegion(
-          onEnter: (_) => setState(() => _hoveredIndex = idx),
-          onExit: (_) => setState(() => _hoveredIndex = -1),
-          cursor: SystemMouseCursors.click,
+          onEnter: (_) {
+            setState(() => _hoveredIndex = idx);
+            if (Get.isRegistered<AppCursorController>()) {
+              AppCursorController.to.setHovered(true);
+            }
+          },
+          onExit: (_) {
+            setState(() => _hoveredIndex = -1);
+            if (Get.isRegistered<AppCursorController>()) {
+              AppCursorController.to.setHovered(false);
+            }
+          },
+          cursor: SystemMouseCursors.none,
           child: GestureDetector(
             onTap: () => widget.onTagSelected(tag),
             child: AnimatedScale(
@@ -1314,7 +1325,17 @@ class _FeaturedProjectCardState extends State<_FeaturedProjectCard> {
           runSpacing: 12,
           children: [
             MouseRegion(
-              cursor: SystemMouseCursors.click,
+              cursor: SystemMouseCursors.none,
+              onEnter: (_) {
+                if (Get.isRegistered<AppCursorController>()) {
+                  AppCursorController.to.setHovered(true, label: "DETAILS");
+                }
+              },
+              onExit: (_) {
+                if (Get.isRegistered<AppCursorController>()) {
+                  AppCursorController.to.setHovered(false);
+                }
+              },
               child: GestureDetector(
                 onTap: widget.onTap,
                 child: AnimatedContainer(
@@ -1402,9 +1423,19 @@ class _FeaturedActionBtnState extends State<_FeaturedActionBtn> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      cursor: SystemMouseCursors.none,
       child: GestureDetector(
         onTap: () => openExternalUrl(widget.url),
         child: AnimatedContainer(
@@ -1612,7 +1643,17 @@ class _PremiumProjectCardState extends State<_PremiumProjectCard> {
                           ),
                           const SizedBox(height: 22),
                           MouseRegion(
-                            cursor: SystemMouseCursors.click,
+                            cursor: SystemMouseCursors.none,
+                            onEnter: (_) {
+                              if (Get.isRegistered<AppCursorController>()) {
+                                AppCursorController.to.setHovered(true, label: "DETAILS");
+                              }
+                            },
+                            onExit: (_) {
+                              if (Get.isRegistered<AppCursorController>()) {
+                                AppCursorController.to.setHovered(false);
+                              }
+                            },
                             child: GestureDetector(
                               onTap: widget.onTap,
                               child: AnimatedContainer(
@@ -1930,7 +1971,17 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
           ),
           const Spacer(),
           MouseRegion(
-            cursor: SystemMouseCursors.click,
+            cursor: SystemMouseCursors.none,
+            onEnter: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(true);
+              }
+            },
+            onExit: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(false);
+              }
+            },
             child: GestureDetector(
               onTap: () => Navigator.of(context).pop(),
               child: Container(
@@ -2054,7 +2105,17 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
 
   Widget _modalLinkBtn(IconData icon, String label, String url) {
     return MouseRegion(
-      cursor: SystemMouseCursors.click,
+      cursor: SystemMouseCursors.none,
+      onEnter: (_) {
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true);
+        }
+      },
+      onExit: (_) {
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
       child: GestureDetector(
         onTap: () => openExternalUrl(url),
         child: Container(
@@ -2128,7 +2189,17 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
                 children: List.generate(_project.screenshots.length, (idx) {
                   final bool isActive = _activeScreenshotIndex == idx;
                   return MouseRegion(
-                    cursor: SystemMouseCursors.click,
+                    cursor: SystemMouseCursors.none,
+                    onEnter: (_) {
+                      if (Get.isRegistered<AppCursorController>()) {
+                        AppCursorController.to.setHovered(true);
+                      }
+                    },
+                    onExit: (_) {
+                      if (Get.isRegistered<AppCursorController>()) {
+                        AppCursorController.to.setHovered(false);
+                      }
+                    },
                     child: GestureDetector(
                       onTap: () => setState(() => _activeScreenshotIndex = idx),
                       child: AnimatedContainer(
@@ -2477,7 +2548,17 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
         children: [
           // Previous Project
           MouseRegion(
-            cursor: SystemMouseCursors.click,
+            cursor: SystemMouseCursors.none,
+            onEnter: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(true);
+              }
+            },
+            onExit: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(false);
+              }
+            },
             child: GestureDetector(
               onTap: () => _switchProject(prevProj),
               child: Column(
@@ -2516,7 +2597,17 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
           ),
           // Next Project
           MouseRegion(
-            cursor: SystemMouseCursors.click,
+            cursor: SystemMouseCursors.none,
+            onEnter: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(true);
+              }
+            },
+            onExit: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(false);
+              }
+            },
             child: GestureDetector(
               onTap: () => _switchProject(nextProj),
               child: Column(

@@ -1,30 +1,79 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:ashu_portfolio/main.dart';
+import 'package:ashu_portfolio/controllers/app_cursor_controller.dart';
+import 'package:ashu_portfolio/controllers/home_controller.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  group('AppCursorController Tests', () {
+    late AppCursorController controller;
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    setUp(() {
+      controller = AppCursorController();
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    tearDown(() {
+      controller.onClose();
+    });
+
+    test('Initializes with default values and is hidden until pointer moves', () {
+      expect(controller.isVisible.value, isFalse);
+      expect(controller.isHovered.value, isFalse);
+      expect(controller.isPressed.value, isFalse);
+      expect(controller.isTouchDevice.value, isFalse);
+      expect(controller.cursorType.value, CursorType.normal);
+    });
+
+    test('updatePosition updates position and marks visible', () {
+      controller.updatePosition(const Offset(100, 200));
+      expect(controller.pointerPosition.value, const Offset(100, 200));
+      expect(controller.isVisible.value, isTrue);
+    });
+
+    test('setHovered correctly changes hover state and label', () {
+      controller.setHovered(true, type: CursorType.interactive, label: 'EXPLORE');
+      expect(controller.isHovered.value, isTrue);
+      expect(controller.cursorType.value, CursorType.interactive);
+      expect(controller.hoverLabel.value, 'EXPLORE');
+
+      controller.setHovered(false);
+      expect(controller.isHovered.value, isFalse);
+      expect(controller.cursorType.value, CursorType.normal);
+      expect(controller.hoverLabel.value, '');
+    });
+
+    test('markAsTouch suppresses cursor for mobile devices', () {
+      controller.updatePosition(const Offset(50, 50));
+      expect(controller.isVisible.value, isTrue);
+
+      controller.markAsTouch();
+      expect(controller.isTouchDevice.value, isTrue);
+      expect(controller.isVisible.value, isFalse);
+    });
+  });
+
+  group('HomeController Smooth Scroll Tests', () {
+    late HomeController homeController;
+
+    setUp(() {
+      homeController = HomeController();
+    });
+
+    tearDown(() {
+      homeController.onClose();
+    });
+
+    test('Initial state of menu and parallax', () {
+      expect(homeController.isMenuOpen, isFalse);
+      expect(homeController.parallaxX, 0.0);
+      expect(homeController.parallaxY, 0.0);
+    });
+
+    test('toggleMenu and closeMenu work properly', () {
+      homeController.toggleMenu();
+      expect(homeController.isMenuOpen, isTrue);
+      homeController.closeMenu();
+      expect(homeController.isMenuOpen, isFalse);
+    });
   });
 }

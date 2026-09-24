@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import '../../constants/app_colors.dart';
+import '../../controllers/app_cursor_controller.dart';
 
 class PremiumButton extends StatefulWidget {
   final String label;
@@ -24,11 +26,26 @@ class PremiumButton extends StatefulWidget {
 class _PremiumButtonState extends State<PremiumButton> {
   bool _isHovered = false;
 
+  void _onEnter(PointerEvent _) {
+    setState(() => _isHovered = true);
+    if (Get.isRegistered<AppCursorController>()) {
+      AppCursorController.to.setHovered(true);
+    }
+  }
+
+  void _onExit(PointerEvent _) {
+    setState(() => _isHovered = false);
+    if (Get.isRegistered<AppCursorController>()) {
+      AppCursorController.to.setHovered(false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.none,
+      onEnter: _onEnter,
+      onExit: _onExit,
       child: GestureDetector(
         onTap: widget.onTap,
         child: AnimatedContainer(
@@ -49,7 +66,7 @@ class _PremiumButtonState extends State<PremiumButton> {
             boxShadow: [
               if (_isHovered)
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.25),
+                  color: Colors.black.withValues(alpha: 0.25),
                   blurRadius: 20,
                   offset: const Offset(0, 10),
                 ),
@@ -74,11 +91,11 @@ class _PremiumButtonState extends State<PremiumButton> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(
                               colors: [
-                                Colors.white.withOpacity(0),
-                                Colors.white.withOpacity(
-                                  widget.isPrimary ? 0.22 : 0.12,
+                                Colors.white.withValues(alpha: 0),
+                                Colors.white.withValues(
+                                  alpha: widget.isPrimary ? 0.22 : 0.12,
                                 ),
-                                Colors.white.withOpacity(0),
+                                Colors.white.withValues(alpha: 0),
                               ],
                             ),
                           ),

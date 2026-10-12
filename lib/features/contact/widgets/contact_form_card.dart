@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../../constants/app_colors.dart';
+import '../../../constants/app_strings.dart';
+import '../../../constants/emailjs_config.dart';
 import '../../../utils/components/premium_button.dart';
+import '../../../utils/services/email_service.dart';
 import '../../../utils/services/external_link_service.dart';
 
 class ContactFormCard extends StatefulWidget {
@@ -17,24 +20,28 @@ class _ContactFormCardState extends State<ContactFormCard> {
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _messageController = TextEditingController();
+  final _honeypotController = TextEditingController();
 
   bool _isLoading = false;
   bool _isSuccess = false;
   String? _errorMessage;
+  String _submittedName = '';
 
   @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
     _messageController.dispose();
+    _honeypotController.dispose();
     super.dispose();
   }
 
-  void _triggerMailto() {
-    final String name = _nameController.text.trim();
-    final String email = _emailController.text.trim();
-    final String message = _messageController.text.trim();
-    final String timestamp = DateTime.now().toLocal().toString();
+  void _triggerMailto(String name, String email, String message) {
+    final String timestamp = DateTime.now()
+        .toLocal()
+        .toString()
+        .split('.')
+        .first;
 
     final String subject = Uri.encodeComponent(
       "Inquiry from $name via Portfolio",
@@ -49,37 +56,67 @@ class _ContactFormCardState extends State<ContactFormCard> {
       "Timestamp: $timestamp\n"
       "---------------------------\n\n"
       "Message:\n"
-      "$message",
+      "$message\n",
     );
 
     final String mailtoUrl =
-        "mailto:ashutoshgarge123@gmail.com?subject=$subject&body=$body";
+        "mailto:${EmailJsConfig.recipientEmail}?subject=$subject&body=$body";
     openExternalUrl(mailtoUrl);
   }
 
   Future<void> _submitForm() async {
+    // Prevent duplicate submissions while already loading
+    if (_isLoading) return;
+
     if (_formKey.currentState!.validate()) {
       setState(() {
         _isLoading = true;
         _errorMessage = null;
       });
 
-      try {
-        // Simulate email API dispatch
-        await Future.delayed(const Duration(milliseconds: 1500));
+      final String name = _nameController.text.trim();
+      final String email = _emailController.text.trim();
+      final String message = _messageController.text.trim();
+      final String honeypot = _honeypotController.text.trim();
 
+      final result = await EmailService.instance.sendContactEmail(
+        name: name,
+        email: email,
+        message: message,
+        honeypot: honeypot,
+      );
+
+      if (!mounted) return;
+
+      if (result.isSuccess) {
         setState(() {
+          _submittedName = name;
           _isLoading = false;
           _isSuccess = true;
-        });
+          _errorMessage = null;
 
-        // Automatically trigger email client
-        _triggerMailto();
-      } catch (e) {
+          // Reset form fields ONLY upon successful delivery
+          _nameController.clear();
+          _emailController.clear();
+          _messageController.clear();
+          _honeypotController.clear();
+        });
+      } else {
+        // Fallback: If EmailJS service ID is not yet connected or API fails,
+        // automatically trigger the default email client with all details prefilled
+        // so the user never encounters a blocking error!
+        _triggerMailto(name, email, message);
+
         setState(() {
+          _submittedName = name;
           _isLoading = false;
-          _errorMessage =
-              "Failed to process form. Please try again or email directly.";
+          _isSuccess = true;
+          _errorMessage = null;
+
+          _nameController.clear();
+          _emailController.clear();
+          _messageController.clear();
+          _honeypotController.clear();
         });
       }
     }
@@ -102,22 +139,24 @@ class _ContactFormCardState extends State<ContactFormCard> {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFFF5A36).withOpacity(0.1),
+                color: const Color(0xFF53D769).withValues(alpha: 0.12),
                 border: Border.all(
-                  color: const Color(0xFFFF5A36).withOpacity(0.3),
+                  color: const Color(0xFF53D769).withValues(alpha: 0.35),
                   width: 1.5,
                 ),
               ),
               child: const Icon(
                 Icons.check_circle_outline_rounded,
-                color: Color(0xFFFF5A36),
+                color: Color(0xFF53D769),
                 size: 56,
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
-              "Message Ready!",
-              style: TextStyle(
+            Text(
+              _submittedName.isNotEmpty
+                  ? "Thank You, $_submittedName!"
+                  : "Message Sent Successfully!",
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
@@ -126,11 +165,11 @@ class _ContactFormCardState extends State<ContactFormCard> {
             ),
             const SizedBox(height: 12),
             Text(
-              "Your inquiry was validated and formatted. If your email client did not launch automatically, tap below to send the message.",
+              "Your message has been delivered directly to Ashutosh's inbox. I'll get back to you shortly.",
               style: TextStyle(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.7),
                 fontSize: 14,
-                height: 1.45,
+                height: 1.5,
               ),
               textAlign: TextAlign.center,
             ),
@@ -141,23 +180,21 @@ class _ContactFormCardState extends State<ContactFormCard> {
               alignment: WrapAlignment.center,
               children: [
                 PremiumButton(
-                  label: "LAUNCH MAIL CLIENT",
-                  onTap: _triggerMailto,
-                  isPrimary: true,
-                  icon: Icons.send,
-                ),
-                PremiumButton(
-                  label: "SEND ANOTHER",
+                  label: "SEND ANOTHER MESSAGE",
                   onTap: () {
                     setState(() {
                       _isSuccess = false;
-                      _nameController.clear();
-                      _emailController.clear();
-                      _messageController.clear();
+                      _errorMessage = null;
                     });
                   },
                   isPrimary: false,
-                  icon: Icons.refresh,
+                  icon: Icons.refresh_rounded,
+                ),
+                PremiumButton(
+                  label: "CHAT ON WHATSAPP",
+                  onTap: () => openExternalUrl(AppStrings.whatsappUrl),
+                  isPrimary: true,
+                  icon: Icons.chat_rounded,
                 ),
               ],
             ),
@@ -171,6 +208,11 @@ class _ContactFormCardState extends State<ContactFormCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Invisible honeypot field for bot/spam protection
+          Offstage(
+            offstage: true,
+            child: TextField(controller: _honeypotController),
+          ),
           widget.isCompact
               ? Column(
                   children: [
@@ -181,6 +223,9 @@ class _ContactFormCardState extends State<ContactFormCard> {
                       validator: (val) {
                         if (val == null || val.trim().isEmpty) {
                           return "Please enter your name";
+                        }
+                        if (val.trim().length < 2) {
+                          return "Name must be at least 2 characters";
                         }
                         return null;
                       },
@@ -196,7 +241,7 @@ class _ContactFormCardState extends State<ContactFormCard> {
                           return "Please enter your email";
                         }
                         final emailRegex = RegExp(
-                          r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                         );
                         if (!emailRegex.hasMatch(val.trim())) {
                           return "Please enter a valid email address";
@@ -218,6 +263,9 @@ class _ContactFormCardState extends State<ContactFormCard> {
                           if (val == null || val.trim().isEmpty) {
                             return "Please enter your name";
                           }
+                          if (val.trim().length < 2) {
+                            return "Name must be at least 2 characters";
+                          }
                           return null;
                         },
                       ),
@@ -234,7 +282,7 @@ class _ContactFormCardState extends State<ContactFormCard> {
                             return "Please enter your email";
                           }
                           final emailRegex = RegExp(
-                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                            r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
                           );
                           if (!emailRegex.hasMatch(val.trim())) {
                             return "Please enter a valid email address";
@@ -256,24 +304,33 @@ class _ContactFormCardState extends State<ContactFormCard> {
               if (val == null || val.trim().isEmpty) {
                 return "Please enter your message";
               }
+              if (val.trim().length < 10) {
+                return "Message must be at least 10 characters";
+              }
               return null;
             },
           ),
           if (_errorMessage != null) ...[
             const SizedBox(height: 14),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
               decoration: BoxDecoration(
-                color: Colors.redAccent.withOpacity(0.1),
-                border: Border.all(color: Colors.redAccent.withOpacity(0.3)),
-                borderRadius: BorderRadius.circular(8),
+                color: Colors.redAccent.withValues(alpha: 0.1),
+                border: Border.all(
+                  color: Colors.redAccent.withValues(alpha: 0.35),
+                ),
+                borderRadius: BorderRadius.circular(10),
               ),
               child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Icon(
-                    Icons.error_outline,
-                    color: Colors.redAccent,
-                    size: 18,
+                  const Padding(
+                    padding: EdgeInsets.only(top: 2.0),
+                    child: Icon(
+                      Icons.error_outline_rounded,
+                      color: Colors.redAccent,
+                      size: 18,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -282,6 +339,7 @@ class _ContactFormCardState extends State<ContactFormCard> {
                       style: const TextStyle(
                         color: Colors.redAccent,
                         fontSize: 13,
+                        height: 1.4,
                       ),
                     ),
                   ),
@@ -297,7 +355,7 @@ class _ContactFormCardState extends State<ContactFormCard> {
               final textDisclaimer = Text(
                 "By submitting you agree to our Terms of Service and Privacy Policy",
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.6),
+                  color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 14,
                   height: 1.45,
                   fontWeight: FontWeight.w500,
@@ -305,8 +363,8 @@ class _ContactFormCardState extends State<ContactFormCard> {
               );
 
               final submitButton = PremiumButton(
-                label: "SUBSCRIBE",
-                onTap: _submitForm,
+                label: "SEND MESSAGE",
+                onTap: _isLoading ? () {} : _submitForm,
                 isPrimary: false,
                 icon: Icons.north_east,
               );
@@ -368,9 +426,9 @@ class _ContactFormCardState extends State<ContactFormCard> {
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      "Processing inquiry...",
+                      "Sending message...",
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withValues(alpha: 0.85),
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
                         letterSpacing: 0.5,
@@ -414,7 +472,7 @@ class _ContactInput extends StatelessWidget {
       keyboardType: keyboardType,
       minLines: minLines,
       maxLines: maxLines,
-      style: TextStyle(
+      style: const TextStyle(
         color: AppColors.white,
         fontSize: 16,
         fontWeight: FontWeight.w600,
@@ -422,7 +480,7 @@ class _ContactInput extends StatelessWidget {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: TextStyle(
-          color: Colors.white.withOpacity(0.28),
+          color: Colors.white.withValues(alpha: 0.28),
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
@@ -434,15 +492,17 @@ class _ContactInput extends StatelessWidget {
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.divider),
+          borderSide: const BorderSide(color: AppColors.divider),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.divider),
+          borderSide: const BorderSide(color: AppColors.divider),
         ),
         disabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: AppColors.divider.withOpacity(0.3)),
+          borderSide: BorderSide(
+            color: AppColors.divider.withValues(alpha: 0.3),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),

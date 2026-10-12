@@ -7,7 +7,11 @@ class AppStrings {
   static const String githubUrl = "https://github.com/Ashutoshpawar1";
   static const String emailAddress = "ashutoshgarge123@gmail.com";
   static const String emailUrl = "mailto:ashutoshgarge123@gmail.com";
-  static const String whatsappUrl = "https://wa.me/919131246012";
+  static const String whatsappNumber = "919131246012";
+  static const String whatsappGreeting =
+      "Hello! I visited your portfolio and would like to discuss a project with you.";
+  static String get whatsappUrl =>
+      "https://wa.me/$whatsappNumber?text=${Uri.encodeComponent(whatsappGreeting)}";
   static const String scheduleCallUrl = "https://calendly.com/ashutosh-garge";
   static const String twitterUrl = "";
   static const String resumeWebPath = "resume/ashutosh_resume.pdf";

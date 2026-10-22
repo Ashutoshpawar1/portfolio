@@ -7,7 +7,7 @@ import '../../constants/app_colors.dart';
 import '../../controllers/app_cursor_controller.dart';
 import '../../constants/app_strings.dart';
 import '../services/external_link_service.dart';
-import 'glass_container.dart';
+import '../animated/custom_cursor_overlay.dart';
 
 class ProjectExtendedDetails {
   final String category;
@@ -89,12 +89,11 @@ final Map<String, ProjectExtendedDetails> _extendedDetailsMap = {
       "Constructing advanced offline syncing mechanisms using Riverpod and local SQLite.",
     ],
     screenshots: [
-      "https://images.unsplash.com/photo-1494412651409-8963ce7935a7",
-      "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
-      "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+      "lib/assets/images/project_jayhyzmat_banner.png",
+      "lib/assets/images/project_jayhyzmat_logo.png",
     ],
     liveDemoUrl: "https://jayhyzmat.com",
-    caseStudyPdfUrl: "https://jayhyzmat.com/case-study.pdf",
+    caseStudyPdfUrl: "",
   ),
   "Intercessory Army": ProjectExtendedDetails(
     category: "Community & Video Collaboration Platform",
@@ -138,9 +137,8 @@ final Map<String, ProjectExtendedDetails> _extendedDetailsMap = {
       "Custom Android/iOS native platform channel configuration for SDK integrations.",
     ],
     screenshots: [
-      "https://images.unsplash.com/photo-1504052434569-70ad5836ab65",
-      "https://images.unsplash.com/photo-1516321318423-f06f85e504b3",
-      "https://images.unsplash.com/photo-1543269865-cbf427effbad",
+      "lib/assets/images/project_intercessory_banner.png",
+      "lib/assets/images/project_intercessory_logo.png",
     ],
     liveDemoUrl: "https://intercessoryarmy.org",
   ),
@@ -186,9 +184,7 @@ final Map<String, ProjectExtendedDetails> _extendedDetailsMap = {
       "Local database migration and caching strategies in Flutter.",
     ],
     screenshots: [
-      "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
-      "https://images.unsplash.com/photo-1526256262350-7da7584cf5eb",
-      "https://images.unsplash.com/photo-1461749280684-dccba630e2f6",
+      "lib/assets/images/project_lifevibe_banner.png",
     ],
     liveDemoUrl: "https://lifevibe.app",
   ),
@@ -509,6 +505,9 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
                     right: 16,
                     child: _buildCloseButton(context),
                   ),
+
+                  // Custom cursor overlay
+                  const CustomCursorOverlay(),
                 ],
               ),
             ),
@@ -633,8 +632,17 @@ class _ProjectDetailsDialogState extends State<ProjectDetailsDialog> {
               },
               itemCount: _details.screenshots.length,
               itemBuilder: (context, index) {
+                final String src = _details.screenshots[index];
+                if (src.startsWith('lib/assets/') || src.startsWith('assets/')) {
+                  return Image.asset(
+                    src,
+                    fit: BoxFit.contain,
+                    width: double.infinity,
+                    height: bannerHeight,
+                  );
+                }
                 return Image.network(
-                  _details.screenshots[index],
+                  src,
                   fit: BoxFit.cover,
                   width: double.infinity,
                   height: bannerHeight,

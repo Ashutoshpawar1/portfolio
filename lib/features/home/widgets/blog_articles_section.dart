@@ -16,6 +16,7 @@ class BlogArticle {
   final String url;
   final String readTime;
   final List<String> tags;
+  final bool isUpcoming;
 
   const BlogArticle({
     required this.title,
@@ -25,10 +26,22 @@ class BlogArticle {
     required this.url,
     required this.readTime,
     required this.tags,
+    this.isUpcoming = false,
   });
 }
 
 final List<BlogArticle> _blogArticles = const [
+  BlogArticle(
+    title: 'Flutter Localization Made Easy: A Clean Approach with L10n.tr',
+    subtitle: 'A Complete Guide • Multi-language • Code Gen',
+    description:
+        'Learn how to manage multiple languages in Flutter using ARB files, code generation, and a simple L10n.tr helper — without repeating AppLocalizations.of(context) everywhere.',
+    imageAsset: 'lib/assets/images/blog_flutter_localization.png',
+    url:
+        'https://medium.com/@ashutoshgarge123/flutter-localization-made-easy-a-clean-approach-with-l10n-tr-e887d5dc4876',
+    readTime: '6 min read',
+    tags: ['Flutter', 'Dart', 'Localization', 'Clean Code'],
+  ),
   BlogArticle(
     title: 'Two Ways to Deploy a Flutter App on iOS: IPA vs. Xcode',
     subtitle: 'Build • Upload • TestFlight • App Store',
@@ -50,6 +63,16 @@ final List<BlogArticle> _blogArticles = const [
         'https://medium.com/@ashutoshgarge123/the-ultimate-guide-to-naming-conventions-01e13b44af0d',
     readTime: '5 min read',
     tags: ['Clean Code', 'Dart', 'Architecture', 'Best Practices'],
+  ),
+  BlogArticle(
+    title: 'Coming Soon',
+    subtitle: 'Coming Soon • Local Storage • Sync Engine',
+    description: 'Coming Soon',
+    imageAsset: '',
+    url: 'https://medium.com/@ashutoshgarge123',
+    readTime: 'Upcoming',
+    tags: ['Flutter', 'Offline-First', 'Architecture', 'State Management'],
+    isUpcoming: true,
   ),
 ];
 
@@ -239,6 +262,164 @@ class _BlogCardState extends State<_BlogCard> {
   }
 
   Widget _buildBannerImage(double height) {
+    if (widget.article.isUpcoming || widget.article.imageAsset.isEmpty) {
+      return SizedBox(
+        height: height,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Dark futuristic gradient background
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFF161B22),
+                    Color(0xFF0D1117),
+                    Color(0xFF030303),
+                  ],
+                ),
+              ),
+            ),
+            // Decorative subtle pattern / glowing icon
+            Center(
+              child: AnimatedScale(
+                scale: _isHovered ? 1.08 : 1.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutCubic,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.orange.withValues(alpha: 0.12),
+                    border: Border.all(
+                      color: AppColors.orange.withValues(alpha: 0.35),
+                      width: 1.5,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.orange.withValues(alpha: 0.2),
+                        blurRadius: 28,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.auto_stories_rounded,
+                    color: AppColors.orange,
+                    size: 34,
+                  ),
+                ),
+              ),
+            ),
+            // Gradient fade into card surface
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              height: 36,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.transparent,
+                      AppColors.surface.withValues(alpha: 0.85),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Top metadata chips
+            Positioned(
+              top: 14,
+              left: 14,
+              right: 14,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(
+                        color: AppColors.glassBorder,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 12,
+                          color: AppColors.orange.withValues(alpha: 0.9),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Upcoming",
+                          style: TextStyle(
+                            color: AppColors.white.withValues(alpha: 0.9),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.72),
+                      borderRadius: BorderRadius.circular(100),
+                      border: Border.all(
+                        color: AppColors.glassBorder,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF64B5F6),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          "In Progress",
+                          style: TextStyle(
+                            color: AppColors.white.withValues(alpha: 0.95),
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            letterSpacing: 0.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return SizedBox(
       height: height,
       width: double.infinity,
@@ -450,7 +631,9 @@ class _BlogCardState extends State<_BlogCard> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Read on Medium",
+                widget.article.isUpcoming
+                    ? "Coming Soon on Medium"
+                    : "Read on Medium",
                 style: TextStyle(
                   color: _isHovered ? AppColors.white : AppColors.grey,
                   fontSize: 13.5,
@@ -475,7 +658,9 @@ class _BlogCardState extends State<_BlogCard> {
                 ),
                 child: Center(
                   child: Icon(
-                    Icons.arrow_outward_rounded,
+                    widget.article.isUpcoming
+                        ? Icons.notifications_none_rounded
+                        : Icons.arrow_outward_rounded,
                     size: 18,
                     color: _isHovered ? AppColors.black : AppColors.white,
                   ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_colors.dart';
@@ -7,8 +8,52 @@ import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/scroll_reveal.dart';
 import '../../../utils/services/external_link_service.dart';
 
-class GithubAchievementsSection extends StatelessWidget {
+enum GithubProfileType { personal, company }
+
+class GithubAchievementsSection extends StatefulWidget {
   const GithubAchievementsSection({super.key});
+
+  @override
+  State<GithubAchievementsSection> createState() =>
+      _GithubAchievementsSectionState();
+}
+
+class _GithubAchievementsSectionState extends State<GithubAchievementsSection> {
+  GithubProfileType _currentProfile = GithubProfileType.personal;
+  Timer? _autoSwitchTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startAutoSwitchTimer();
+  }
+
+  void _startAutoSwitchTimer() {
+    _autoSwitchTimer?.cancel();
+    _autoSwitchTimer = Timer.periodic(const Duration(seconds: 4), (timer) {
+      if (!mounted) return;
+      setState(() {
+        _currentProfile = _currentProfile == GithubProfileType.personal
+            ? GithubProfileType.company
+            : GithubProfileType.personal;
+      });
+    });
+  }
+
+  void _selectProfile(GithubProfileType profile) {
+    if (_currentProfile == profile) return;
+    setState(() {
+      _currentProfile = profile;
+    });
+    // Reset timer when user manually selects so it doesn't instantly flip
+    _startAutoSwitchTimer();
+  }
+
+  @override
+  void dispose() {
+    _autoSwitchTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,65 +83,208 @@ class GithubAchievementsSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 64),
-          ScrollReveal(child: _buildUnifiedContributionCard(isMobile)),
+          ScrollReveal(
+            child: _buildUnifiedContributionCard(isMobile),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildUnifiedContributionCard(bool isMobile) {
+    final bool isPersonal = _currentProfile == GithubProfileType.personal;
+    final String currentUrl = isPersonal
+        ? AppStrings.githubPersonalUrl
+        : AppStrings.githubCompanyUrl;
+    final String contributionsTitle = isPersonal
+        ? "65 contributions in the last year"
+        : "654 contributions in the last year";
+    final String imagePath = isPersonal
+        ? 'lib/assets/images/github_contribution_personal.png'
+        : 'lib/assets/images/github_contribution_company.png';
+
     return _HoverCard(
       width: isMobile ? double.infinity : 992,
       padding: EdgeInsets.all(isMobile ? 20 : 32),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Header Row
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.emerald.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+          // Top Header Row with Profile Toggle and Link
+          if (isMobile)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.emerald.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                        Icons.auto_graph_rounded,
+                        color: AppColors.emerald,
+                        size: 22,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 350),
+                        child: Text(
+                          contributionsTitle,
+                          key: ValueKey(contributionsTitle),
+                          style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                child: const Icon(
-                  Icons.auto_graph_rounded,
-                  color: AppColors.emerald,
-                  size: 22,
+                const SizedBox(height: 18),
+                Row(
+                  children: [
+                    _ProfileSelectorChip(
+                      label: "Personal",
+                      username: "Ashutoshpawar1",
+                      isSelected: isPersonal,
+                      onTap: () => _selectProfile(GithubProfileType.personal),
+                    ),
+                    const SizedBox(width: 10),
+                    _ProfileSelectorChip(
+                      label: "Company",
+                      username: "dbaashutosh",
+                      isSelected: !isPersonal,
+                      onTap: () => _selectProfile(GithubProfileType.company),
+                    ),
+                    const Spacer(),
+                    _GithubLinkButton(
+                      url: currentUrl,
+                      username: isPersonal ? "@Ashutoshpawar1" : "@dbaashutosh",
+                    ),
+                  ],
                 ),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Text(
-                  "713 contributions in the last year",
-                  style: TextStyle(
-                    color: AppColors.white,
-                    fontSize: isMobile ? 16 : 20,
-                    fontWeight: FontWeight.w600,
+              ],
+            )
+          else
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.emerald.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  overflow: TextOverflow.ellipsis,
+                  child: const Icon(
+                    Icons.auto_graph_rounded,
+                    color: AppColors.emerald,
+                    size: 22,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              const _GithubLinkButton(),
-            ],
-          ),
-          const SizedBox(height: 28),
-          // Contribution Graph Graphic
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-              borderRadius: BorderRadius.circular(14),
-              color: Colors.black.withValues(alpha: 0.25),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    child: Text(
+                      contributionsTitle,
+                      key: ValueKey(contributionsTitle),
+                      style: const TextStyle(
+                        color: AppColors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                // Seamless tab pills
+                Container(
+                  padding: const EdgeInsets.all(3),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(100),
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.08),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _ProfileSelectorChip(
+                        label: "Personal",
+                        username: "Ashutoshpawar1",
+                        isSelected: isPersonal,
+                        onTap: () => _selectProfile(GithubProfileType.personal),
+                      ),
+                      const SizedBox(width: 4),
+                      _ProfileSelectorChip(
+                        label: "Company",
+                        username: "dbaashutosh",
+                        isSelected: !isPersonal,
+                        onTap: () => _selectProfile(GithubProfileType.company),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 14),
+                _GithubLinkButton(
+                  url: currentUrl,
+                  username: isPersonal ? "@Ashutoshpawar1" : "@dbaashutosh",
+                ),
+              ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(14),
-              child: Image.asset(
-                'lib/assets/images/github_contribution.png',
+          const SizedBox(height: 28),
+          // Contribution Graph Graphic with Crossfade Animation & Click to open corresponding GitHub
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            onEnter: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(
+                  true,
+                  label: isPersonal ? "ASHUTOSH" : "COMPANY",
+                );
+              }
+            },
+            onExit: (_) {
+              if (Get.isRegistered<AppCursorController>()) {
+                AppCursorController.to.setHovered(false);
+              }
+            },
+            child: GestureDetector(
+              onTap: () => openExternalUrl(currentUrl),
+              child: Container(
                 width: double.infinity,
-                fit: BoxFit.contain,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                  color: Colors.black.withValues(alpha: 0.25),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(14),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 600),
+                    transitionBuilder: (child, animation) {
+                      return FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      );
+                    },
+                    child: Image.asset(
+                      imagePath,
+                      key: ValueKey(imagePath),
+                      width: double.infinity,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -115,17 +303,17 @@ class GithubAchievementsSection extends StatelessWidget {
                 _StatBox(
                   icon: Icons.book_rounded,
                   label: "Repositories",
-                  value: "35+",
+                  value: isPersonal ? "35+" : "45+",
                   accentColor: AppColors.orange,
-                  onTap: () => openExternalUrl(AppStrings.githubUrl),
+                  onTap: () => openExternalUrl(currentUrl),
                 ),
                 const SizedBox(height: 12),
                 _StatBox(
                   icon: Icons.commit_rounded,
                   label: "Total Commits",
-                  value: "1.2k+",
+                  value: isPersonal ? "1.2k+" : "2.4k+",
                   accentColor: AppColors.emerald,
-                  onTap: () => openExternalUrl(AppStrings.githubUrl),
+                  onTap: () => openExternalUrl(currentUrl),
                 ),
                 const SizedBox(height: 12),
                 _StatBox(
@@ -133,7 +321,7 @@ class GithubAchievementsSection extends StatelessWidget {
                   label: "Open Source PRs",
                   value: "10+",
                   accentColor: const Color(0xFF64B5F6),
-                  onTap: () => openExternalUrl(AppStrings.githubUrl),
+                  onTap: () => openExternalUrl(currentUrl),
                 ),
               ],
             )
@@ -144,9 +332,9 @@ class GithubAchievementsSection extends StatelessWidget {
                   child: _StatBox(
                     icon: Icons.book_rounded,
                     label: "Repositories",
-                    value: "35+",
+                    value: isPersonal ? "35+" : "45+",
                     accentColor: AppColors.orange,
-                    onTap: () => openExternalUrl(AppStrings.githubUrl),
+                    onTap: () => openExternalUrl(currentUrl),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -154,9 +342,9 @@ class GithubAchievementsSection extends StatelessWidget {
                   child: _StatBox(
                     icon: Icons.commit_rounded,
                     label: "Total Commits",
-                    value: "1.2k+",
+                    value: isPersonal ? "1.2k+" : "2.4k+",
                     accentColor: AppColors.emerald,
-                    onTap: () => openExternalUrl(AppStrings.githubUrl),
+                    onTap: () => openExternalUrl(currentUrl),
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -166,7 +354,7 @@ class GithubAchievementsSection extends StatelessWidget {
                     label: "Open Source PRs",
                     value: "10+",
                     accentColor: const Color(0xFF64B5F6),
-                    onTap: () => openExternalUrl(AppStrings.githubUrl),
+                    onTap: () => openExternalUrl(currentUrl),
                   ),
                 ),
               ],
@@ -295,8 +483,109 @@ class _StatBoxState extends State<_StatBox> {
   }
 }
 
+class _ProfileSelectorChip extends StatefulWidget {
+  final String label;
+  final String username;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _ProfileSelectorChip({
+    required this.label,
+    required this.username,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  State<_ProfileSelectorChip> createState() => _ProfileSelectorChipState();
+}
+
+class _ProfileSelectorChipState extends State<_ProfileSelectorChip> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      onEnter: (_) {
+        setState(() => _isHovered = true);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(true, label: widget.label.toUpperCase());
+        }
+      },
+      onExit: (_) {
+        setState(() => _isHovered = false);
+        if (Get.isRegistered<AppCursorController>()) {
+          AppCursorController.to.setHovered(false);
+        }
+      },
+      child: GestureDetector(
+        onTap: widget.onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 240),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+          decoration: BoxDecoration(
+            color: widget.isSelected
+                ? AppColors.orange
+                : (_isHovered
+                    ? Colors.white.withValues(alpha: 0.08)
+                    : Colors.transparent),
+            borderRadius: BorderRadius.circular(100),
+            boxShadow: [
+              if (widget.isSelected)
+                BoxShadow(
+                  color: AppColors.orange.withValues(alpha: 0.35),
+                  blurRadius: 12,
+                  offset: const Offset(0, 2),
+                ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 6,
+                height: 6,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: widget.isSelected
+                      ? Colors.white
+                      : (widget.label == "Personal"
+                          ? AppColors.emerald
+                          : const Color(0xFF64B5F6)),
+                ),
+              ),
+              const SizedBox(width: 7),
+              Text(
+                widget.label,
+                style: TextStyle(
+                  color: widget.isSelected
+                      ? Colors.white
+                      : (_isHovered
+                          ? AppColors.white
+                          : AppColors.grey.withValues(alpha: 0.9)),
+                  fontSize: 12.5,
+                  fontWeight: widget.isSelected ? FontWeight.w700 : FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _GithubLinkButton extends StatefulWidget {
-  const _GithubLinkButton();
+  final String url;
+  final String username;
+
+  const _GithubLinkButton({
+    required this.url,
+    required this.username,
+  });
 
   @override
   State<_GithubLinkButton> createState() => _GithubLinkButtonState();
@@ -322,7 +611,7 @@ class _GithubLinkButtonState extends State<_GithubLinkButton> {
         }
       },
       child: GestureDetector(
-        onTap: () => openExternalUrl(AppStrings.githubUrl),
+        onTap: () => openExternalUrl(widget.url),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 250),
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
@@ -340,7 +629,7 @@ class _GithubLinkButtonState extends State<_GithubLinkButton> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                "GitHub",
+                widget.username,
                 style: TextStyle(
                   color: _isHovered
                       ? AppColors.orange

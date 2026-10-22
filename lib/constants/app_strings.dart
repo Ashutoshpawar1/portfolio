@@ -5,6 +5,8 @@ class AppStrings {
   static const String linkedinUrl =
       "https://www.linkedin.com/in/ashutosh-garge-3037a5240";
   static const String githubUrl = "https://github.com/Ashutoshpawar1";
+  static const String githubPersonalUrl = "https://github.com/Ashutoshpawar1";
+  static const String githubCompanyUrl = "https://github.com/dbaashutosh";
   static const String emailAddress = "ashutoshgarge123@gmail.com";
   static const String emailUrl = "mailto:ashutoshgarge123@gmail.com";
   static const String whatsappNumber = "919131246012";
@@ -80,20 +82,20 @@ final List<ProjectModel> appProjects = [
   ProjectModel(
     title: "JayHyzmat",
     description:
-        "Industrial e-commerce platform for procurement workflows with product listings, authentication, and responsive ordering journeys.",
-    tech: ["Flutter", "REST APIs", "Firebase", "Responsive UI"],
-    imageUrl: "https://images.unsplash.com/photo-1494412651409-8963ce7935a7",
+        "B2B & B2C building materials and electronics e-commerce store with product catalogs, shopping cart, and multi-category order management.",
+    tech: ["Flutter", "REST APIs", "Firebase", "Responsive UI", "E-Commerce"],
+    imageUrl: "lib/assets/images/project_jayhyzmat_banner.png",
     githubUrl: "#",
     playStoreUrl:
-        "https://play.google.com/store/apps/details?id=com.jayhyzmat.app&pcampaignid=web_share&utm_source=chatgpt.com",
-    appStoreUrl: "https://apps.apple.com/in/app/jayhyzmat/id6743439907",
+        "https://play.google.com/store/apps/details?id=com.jayhyzmat.app&hl=en_IN",
+    appStoreUrl: "", // Not uploaded to Apple App Store
   ),
   ProjectModel(
     title: "Intercessory Army",
     description:
-        "Faith-based community platform enabling prayer meetings and real-time engagement systems.",
-    tech: ["Flutter", "Firebase", "Jitsi Meet", "Notifications"],
-    imageUrl: "https://images.unsplash.com/photo-1504052434569-70ad5836ab65",
+        "Comprehensive church prayer cell platform enabling interactive prayer points, testimonies, meetings, and real-time community engagement.",
+    tech: ["Flutter", "Firebase", "Jitsi Meet", "Notifications", "Realtime"],
+    imageUrl: "lib/assets/images/project_intercessory_banner.png",
     githubUrl: "#",
     playStoreUrl:
         "https://play.google.com/store/apps/details?id=com.intercessory.army",
@@ -102,12 +104,12 @@ final List<ProjectModel> appProjects = [
   ProjectModel(
     title: "LifeVibe",
     description:
-        "AI-powered wellness application focused on nutrition tracking, habit monitoring, and analytics visualization.",
-    tech: ["Flutter", "AI Concepts", "Charts", "Firebase"],
-    imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+        "Smart wellness and nutrition companion app with daily activity logs, progress analytics, and interactive health charts.",
+    tech: ["Flutter", "Charts", "Firebase", "Health Tracking"],
+    imageUrl: "lib/assets/images/project_lifevibe_banner.png",
     githubUrl: "#",
     playStoreUrl:
-        "https://play.google.com/store/apps/details?id=com.laon.laon_app&pcampaignid=web_share",
+        "https://play.google.com/store/apps/details?id=com.vibeja.app&hl=en_IN",
     appStoreUrl: "https://apps.apple.com/us/app/lifevibe/id6756407133",
   ),
   ProjectModel(

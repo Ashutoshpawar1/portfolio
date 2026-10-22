@@ -742,11 +742,11 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
       ("Riverpod", Offset(-240 * scale, -180 * scale)),
       ("GetX", Offset(200 * scale, -190 * scale)),
       ("BLoC", Offset(-260 * scale, 140 * scale)),
-      ("Docker", Offset(240 * scale, 150 * scale)),
+      ("Firebase", Offset(240 * scale, 150 * scale)),
       ("OpenAI", Offset(-120 * scale, -230 * scale)),
       ("GitHub", Offset(100 * scale, -240 * scale)),
       ("Postman", Offset(-80 * scale, 220 * scale)),
-      ("JMeter", Offset(80 * scale, 230 * scale)),
+      ("Android", Offset(80 * scale, 230 * scale)),
     ];
 
     return placements.map((p) {

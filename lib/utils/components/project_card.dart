@@ -112,54 +112,83 @@ class _ProjectCardState extends State<ProjectCard> {
       borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       child: Stack(
         children: [
-          CachedNetworkImage(
-                imageUrl: widget.project.imageUrl.isNotEmpty
-                    ? widget.project.imageUrl
-                    : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
-                height: imageHeight,
-                width: double.infinity,
-                fit: BoxFit.cover,
-                fadeInDuration: const Duration(milliseconds: 180),
-                fadeOutDuration: const Duration(milliseconds: 100),
-                errorWidget: (context, url, error) {
-                  return Container(
-                    height: imageHeight,
-                    width: double.infinity,
-                    color: AppColors.surfaceElevated,
-                    child: Center(
-                      child: Icon(
-                        Icons.code_rounded,
-                        color: AppColors.grey,
-                        size: 50,
-                      ),
-                    ),
-                  );
-                },
-                placeholder: (context, url) {
-                  return Container(
-                    height: imageHeight,
-                    width: double.infinity,
-                    color: AppColors.surfaceElevated,
-                    child: Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.white.withValues(alpha: 0.2),
+          (widget.project.imageUrl.startsWith('lib/assets/') ||
+                  widget.project.imageUrl.startsWith('assets/'))
+              ? Image.asset(
+                  widget.project.imageUrl,
+                  height: imageHeight,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: imageHeight,
+                      width: double.infinity,
+                      color: AppColors.surfaceElevated,
+                      child: Center(
+                        child: Icon(
+                          Icons.code_rounded,
+                          color: AppColors.grey,
+                          size: 50,
                         ),
                       ),
-                    ),
-                  );
-                },
-              )
-              .animate(target: _isHovered ? 1.0 : 0.0)
-              .scale(
-                begin: const Offset(1.0, 1.0),
-                end: const Offset(1.06, 1.06),
-                duration: 600.ms,
-                curve: Curves.easeOutCubic,
-              ),
+                    );
+                  },
+                )
+                  .animate(target: _isHovered ? 1.0 : 0.0)
+                  .scale(
+                    begin: const Offset(1.0, 1.0),
+                    end: const Offset(1.06, 1.06),
+                    duration: 600.ms,
+                    curve: Curves.easeOutCubic,
+                  )
+              : CachedNetworkImage(
+                  imageUrl: widget.project.imageUrl.isNotEmpty
+                      ? widget.project.imageUrl
+                      : "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
+                  height: imageHeight,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  fadeInDuration: const Duration(milliseconds: 180),
+                  fadeOutDuration: const Duration(milliseconds: 100),
+                  errorWidget: (context, url, error) {
+                    return Container(
+                      height: imageHeight,
+                      width: double.infinity,
+                      color: AppColors.surfaceElevated,
+                      child: Center(
+                        child: Icon(
+                          Icons.code_rounded,
+                          color: AppColors.grey,
+                          size: 50,
+                        ),
+                      ),
+                    );
+                  },
+                  placeholder: (context, url) {
+                    return Container(
+                      height: imageHeight,
+                      width: double.infinity,
+                      color: AppColors.surfaceElevated,
+                      child: Center(
+                        child: SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.white.withValues(alpha: 0.2),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                )
+                  .animate(target: _isHovered ? 1.0 : 0.0)
+                  .scale(
+                    begin: const Offset(1.0, 1.0),
+                    end: const Offset(1.06, 1.06),
+                    duration: 600.ms,
+                    curve: Curves.easeOutCubic,
+                  ),
           Positioned.fill(
             child: DecoratedBox(
               decoration: BoxDecoration(

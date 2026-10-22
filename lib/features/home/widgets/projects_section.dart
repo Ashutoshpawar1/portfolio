@@ -14,6 +14,7 @@ import '../../../utils/services/external_link_service.dart';
 import '../../../utils/components/glass_container.dart';
 import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/section_divider_transition.dart';
+import '../../../utils/animated/custom_cursor_overlay.dart';
 
 // Rich local metadata for each project to power case studies
 class RichProjectData {
@@ -141,8 +142,8 @@ List<RichProjectData> _getRichProjects() {
           "Implemented background API polling queues to synchronize local caches.",
         ],
         screenshots: [
-          "https://images.unsplash.com/photo-1494412651409-8963ce7935a7",
-          "https://images.unsplash.com/photo-1511578314322-379afb476865",
+          "lib/assets/images/project_jayhyzmat_banner.png",
+          "lib/assets/images/project_jayhyzmat_logo.png",
         ],
         tags: ["Flutter", "Enterprise", "E-Commerce"],
         businessImpact:
@@ -185,8 +186,8 @@ List<RichProjectData> _getRichProjects() {
           "Engineered Firestore listeners to feed fluid real-time chat widgets.",
         ],
         screenshots: [
-          "https://images.unsplash.com/photo-1504052434569-70ad5836ab65",
-          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
+          "lib/assets/images/project_intercessory_banner.png",
+          "lib/assets/images/project_intercessory_logo.png",
         ],
         tags: ["Flutter", "Firebase", "Real-Time"],
         businessImpact:
@@ -228,10 +229,7 @@ List<RichProjectData> _getRichProjects() {
           "Crafted precise system instructions to receive structured JSON objects from the LLM.",
           "Implemented canvas rendering tools to draw clean tracking statistics.",
         ],
-        screenshots: [
-          "https://images.unsplash.com/photo-1517836357463-d25dfeac3438",
-          "https://images.unsplash.com/photo-1501706362039-c6e80948f11f",
-        ],
+        screenshots: ["lib/assets/images/project_lifevibe_banner.png"],
         tags: ["Flutter", "Firebase", "AI"],
         businessImpact:
             "Achieved a 25% increase in user retention by removing friction from food entries through instant Gemini image analysis.",
@@ -357,7 +355,7 @@ class _ProjectsSectionState extends State<ProjectsSection> {
               left: isMobile ? 18 : 40,
               right: isMobile ? 18 : 40,
             ),
-             child: Column(
+            child: Column(
               children: [
                 // Main section title
                 const AnimatedSectionTitle(title: AppStrings.projectsTitle),
@@ -894,8 +892,6 @@ class _ParticlesPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _ParticlesPainter oldDelegate) => true;
 }
-
-
 
 // Stats Counter Row
 class _ProjectsStatsRow extends StatelessWidget {
@@ -1646,7 +1642,10 @@ class _PremiumProjectCardState extends State<_PremiumProjectCard> {
                             cursor: SystemMouseCursors.none,
                             onEnter: (_) {
                               if (Get.isRegistered<AppCursorController>()) {
-                                AppCursorController.to.setHovered(true, label: "DETAILS");
+                                AppCursorController.to.setHovered(
+                                  true,
+                                  label: "DETAILS",
+                                );
                               }
                             },
                             onExit: (_) {
@@ -1883,65 +1882,76 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
               BoxShadow(color: Colors.black.withOpacity(0.8), blurRadius: 40),
             ],
           ),
-          child: Column(
+          child: Stack(
             children: [
-              // Header Close Bar
-              _buildCloseHeader(),
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 18 : 36,
-                    vertical: 24,
+              Column(
+                children: [
+                  // Header Close Bar
+                  _buildCloseHeader(),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      padding: EdgeInsets.symmetric(
+                        horizontal: isMobile ? 18 : 36,
+                        vertical: 24,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Overview Panel & Screenshot Slideshow Grid
+                          isMobile
+                              ? Column(
+                                  children: [
+                                    _buildSlideshow(300),
+                                    const SizedBox(height: 24),
+                                    _buildOverviewPanel(),
+                                  ],
+                                )
+                              : Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Expanded(
+                                      flex: 3,
+                                      child: _buildOverviewPanel(),
+                                    ),
+                                    const SizedBox(width: 32),
+                                    Expanded(
+                                      flex: 5,
+                                      child: _buildSlideshow(350),
+                                    ),
+                                  ],
+                                ),
+                          const SizedBox(height: 36),
+
+                          // Narrative Details (Problem / Solution)
+                          _buildNarrativeGrid(isMobile),
+                          const SizedBox(height: 36),
+
+                          // Architecture Showcase
+                          _buildArchitectureSection(isMobile),
+                          const SizedBox(height: 36),
+
+                          // Key Features List
+                          _buildFeaturesGrid(isMobile),
+                          const SizedBox(height: 36),
+
+                          // Tech Stack Chips
+                          _buildTechStackChips(),
+                          const SizedBox(height: 36),
+
+                          // Challenges, Learnings & Business Impact & Contribution
+                          _buildNarrativeExtraGrid(isMobile),
+                          const SizedBox(height: 48),
+
+                          // Previous / Next Navigation
+                          _buildPrevNextNavigation(),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Overview Panel & Screenshot Slideshow Grid
-                      isMobile
-                          ? Column(
-                              children: [
-                                _buildSlideshow(300),
-                                const SizedBox(height: 24),
-                                _buildOverviewPanel(),
-                              ],
-                            )
-                          : Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(flex: 3, child: _buildOverviewPanel()),
-                                const SizedBox(width: 32),
-                                Expanded(flex: 5, child: _buildSlideshow(350)),
-                              ],
-                            ),
-                      const SizedBox(height: 36),
-
-                      // Narrative Details (Problem / Solution)
-                      _buildNarrativeGrid(isMobile),
-                      const SizedBox(height: 36),
-
-                      // Architecture Showcase
-                      _buildArchitectureSection(isMobile),
-                      const SizedBox(height: 36),
-
-                      // Key Features List
-                      _buildFeaturesGrid(isMobile),
-                      const SizedBox(height: 36),
-
-                      // Tech Stack Chips
-                      _buildTechStackChips(),
-                      const SizedBox(height: 36),
-
-                      // Challenges, Learnings & Business Impact & Contribution
-                      _buildNarrativeExtraGrid(isMobile),
-                      const SizedBox(height: 48),
-
-                      // Previous / Next Navigation
-                      _buildPrevNextNavigation(),
-                    ],
-                  ),
-                ),
+                ],
               ),
+              const CustomCursorOverlay(),
             ],
           ),
         ),
@@ -2155,12 +2165,27 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
             Positioned.fill(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
-                child: CachedNetworkImage(
+                child: Builder(
                   key: ValueKey(_activeScreenshotIndex),
-                  imageUrl: _project.screenshots[_activeScreenshotIndex],
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  height: double.infinity,
+                  builder: (context) {
+                    final String src =
+                        _project.screenshots[_activeScreenshotIndex];
+                    if (src.startsWith('lib/assets/') ||
+                        src.startsWith('assets/')) {
+                      return Image.asset(
+                        src,
+                        fit: BoxFit.contain,
+                        width: double.infinity,
+                        height: double.infinity,
+                      );
+                    }
+                    return CachedNetworkImage(
+                      imageUrl: src,
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                      height: double.infinity,
+                    );
+                  },
                 ),
               ),
             ),
@@ -2649,5 +2674,3 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
     );
   }
 }
-
-

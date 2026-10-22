@@ -15,7 +15,7 @@ class SkillsSection extends StatelessWidget {
   const SkillsSection({super.key});
 
   static const String _technologyLine =
-      'Flutter   |   Dart   |   Flutter Web   |   Responsive UI   |   GetX   |   Riverpod   |   Bloc   |   REST APIs   |   Node.js   |   Express.js   |   MongoDB   |   Socket.io   |   Jitsi Meet   |   Twilio   |   ChatGPT   |   Claude   |   Gemini   |   Ollama   |   Gamma AI';
+      'Flutter   |   Dart   |   Android   |   iOS   |   GetX   |   BLoC   |   Riverpod   |   Clean Architecture   |   Firebase   |   REST APIs   |   Dio   |   FastAPI   |   Python   |   Socket.IO   |   WebSocket   |   MongoDB   |   SQLite   |   SQL   |   Flutter Localization   |   Syncfusion   |   fl_chart   |   Shorebird   |   CI/CD   |   Play Console   |   App Store Connect   |   Docker   |   Cursor   |   Windsurf   |   Antigravity   |   ChatGPT   |   Claude   |   Gemini';
 
   @override
   Widget build(BuildContext context) {
@@ -63,99 +63,125 @@ class SkillsSection extends StatelessWidget {
           ScrollReveal(
             child: LayoutBuilder(
               builder: (context, constraints) {
+                final double cardWidth = isMobile
+                    ? constraints.maxWidth
+                    : (constraints.maxWidth - 40) / 2;
+
                 return Wrap(
                   spacing: 40,
                   runSpacing: 40,
                   alignment: WrapAlignment.center,
                   children: [
+                    // 1. Flutter & UI Development
                     _SkillCategoryCard(
-                      title: "Mobile Stack",
-                      accentColor: const Color(0xFF6366F1),
+                      title: "Flutter & UI Development",
+                      accentColor: const Color(0xFF6366F1), // Indigo
                       skills: const [
-                        _SkillData("Flutter", 0.95, Icons.flutter_dash),
+                        _SkillData("Flutter & Dart", 0.96, Icons.flutter_dash),
                         _SkillData(
-                          "Flutter Web / Responsive UI",
-                          0.92,
-                          Icons.brush_rounded,
+                          "Android & iOS Native",
+                          0.90,
+                          Icons.phone_android_rounded,
                         ),
                         _SkillData(
-                          "Pixel-perfect UI",
-                          0.93,
-                          Icons.crop_free_rounded,
+                          "Responsive UI & Custom Widgets",
+                          0.94,
+                          Icons.dashboard_customize_rounded,
                         ),
                         _SkillData(
-                          "Animation Integration",
-                          0.88,
+                          "Animations & Cupertino Design",
+                          0.91,
                           Icons.animation_rounded,
                         ),
-                        _SkillData(
-                          "Production Architecture",
-                          0.90,
-                          Icons.account_tree_outlined,
-                        ),
                       ],
-                      width: isMobile
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - 60) / 2,
+                      width: cardWidth,
                     ),
+
+                    // 2. State & Architecture
                     _SkillCategoryCard(
-                      title: "State & APIs",
-                      accentColor: const Color(0xFF10B981),
+                      title: "State & Architecture",
+                      accentColor: const Color(0xFF10B981), // Emerald
                       skills: const [
                         _SkillData(
                           "GetX (Advanced)",
-                          0.95,
+                          0.96,
                           Icons.account_tree_outlined,
                         ),
                         _SkillData(
-                          "Riverpod / Bloc",
-                          0.76,
+                          "BLoC & Riverpod",
+                          0.88,
                           Icons.layers_rounded,
                         ),
-                        _SkillData("REST APIs", 0.88, Icons.api_rounded),
                         _SkillData(
-                          "Authentication & CRUD",
-                          0.85,
-                          Icons.verified_user_rounded,
+                          "Clean Architecture (SOLID)",
+                          0.92,
+                          Icons.architecture_rounded,
                         ),
                         _SkillData(
-                          "Third-party Integrations",
-                          0.86,
-                          Icons.extension_rounded,
+                          "Modular Patterns & Localization",
+                          0.93,
+                          Icons.translate_rounded,
                         ),
                       ],
-                      width: isMobile
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - 60) / 2,
+                      width: cardWidth,
                     ),
+
+                    // 3. Backend & Data
                     _SkillCategoryCard(
-                      title: "Realtime & Tools",
-                      accentColor: const Color(0xFFF97316),
+                      title: "Backend & Integrations",
+                      accentColor: const Color(0xFFF97316), // Orange
                       skills: const [
                         _SkillData(
-                          "Socket.io / Twilio / Jitsi",
-                          0.78,
-                          Icons.hub_rounded,
+                          "Firebase (Auth, Firestore, Cloud)",
+                          0.93,
+                          Icons.local_fire_department_rounded,
                         ),
                         _SkillData(
-                          "Notifications / WhatsApp",
-                          0.74,
-                          Icons.notifications_active_rounded,
+                          "REST APIs (Dio & HTTP)",
+                          0.94,
+                          Icons.api_rounded,
                         ),
                         _SkillData(
-                          "Node.js / Express / MongoDB",
-                          0.76,
+                          "Socket.IO, WebSocket & Realtime",
+                          0.88,
+                          Icons.sync_alt_rounded,
+                        ),
+                        _SkillData(
+                          "SQL, SQLite & MongoDB Storage",
+                          0.89,
                           Icons.storage_rounded,
                         ),
+                      ],
+                      width: cardWidth,
+                    ),
+
+                    // 4. DevOps & AI Tools
+                    _SkillCategoryCard(
+                      title: "DevOps & AI Tools",
+                      accentColor: const Color(0xFF8B5CF6), // Purple
+                      skills: const [
                         _SkillData(
-                          "ChatGPT / Claude / Gemini",
-                          0.86,
+                          "Play Console & App Store Connect",
+                          0.92,
+                          Icons.shop_rounded,
+                        ),
+                        _SkillData(
+                          "Shorebird OTA & CI/CD Pipelines",
+                          0.88,
+                          Icons.flash_on_rounded,
+                        ),
+                        _SkillData(
+                          "Cursor, Windsurf & Antigravity",
+                          0.95,
                           Icons.auto_awesome_rounded,
                         ),
+                        _SkillData(
+                          "ChatGPT, Claude & Gemini AI",
+                          0.94,
+                          Icons.psychology_rounded,
+                        ),
                       ],
-                      width: isMobile
-                          ? constraints.maxWidth
-                          : (constraints.maxWidth - 60) / 2,
+                      width: cardWidth,
                     ),
                   ],
                 );

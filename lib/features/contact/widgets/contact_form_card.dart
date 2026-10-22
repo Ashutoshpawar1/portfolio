@@ -472,6 +472,8 @@ class _ContactInput extends StatelessWidget {
       keyboardType: keyboardType,
       minLines: minLines,
       maxLines: maxLines,
+      cursorColor: const Color(0xFFFF5A36),
+      cursorWidth: 2.0,
       style: const TextStyle(
         color: AppColors.white,
         fontSize: 16,

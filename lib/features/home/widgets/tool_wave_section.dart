@@ -213,7 +213,10 @@ class _ToolWaveSectionState extends State<ToolWaveSection>
   }
 
   void _onScroll() {
-    if (mounted && _scrollController != null) {
+    if (mounted &&
+        _scrollController != null &&
+        _scrollController!.hasClients &&
+        _scrollController!.position.hasContentDimensions) {
       final double offset = _scrollController!.offset;
       if ((_scrollOffset.value - offset).abs() > 3) {
         _scrollOffset.value = offset;
@@ -1579,70 +1582,88 @@ class _MarqueeRow extends StatefulWidget {
 
 class _MarqueeRowState extends State<_MarqueeRow>
     with SingleTickerProviderStateMixin {
-  late final ScrollController _scrollController;
   late final AnimationController _animController;
+  final GlobalKey _rowKey = GlobalKey();
+  double _halfWidth = 0.0;
 
   @override
   void initState() {
     super.initState();
-    _scrollController = ScrollController();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 24),
+      duration: const Duration(seconds: 32),
     )..repeat();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) {
-        _animController.addListener(_updateScrollOffset);
+      if (mounted && _rowKey.currentContext != null) {
+        final renderBox =
+            _rowKey.currentContext?.findRenderObject() as RenderBox?;
+        if (renderBox != null && renderBox.hasSize) {
+          setState(() {
+            _halfWidth = renderBox.size.width;
+          });
+        }
       }
     });
   }
 
-  void _updateScrollOffset() {
-    if (!_scrollController.hasClients) return;
-    final maxScroll = _scrollController.position.maxScrollExtent;
-    final halfScroll = maxScroll / 2;
-
-    double val = _animController.value;
-    if (widget.reverse) {
-      val = 1.0 - val;
-    }
-
-    final double targetOffset = val * halfScroll;
-    _scrollController.jumpTo(targetOffset);
-  }
-
   @override
   void dispose() {
-    _animController.removeListener(_updateScrollOffset);
     _animController.dispose();
-    _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildChipRow({Key? key}) {
+    return Row(
+      key: key,
+      mainAxisSize: MainAxisSize.min,
+      children: widget.tools
+          .map((tool) => Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: _ToolCompactChip(data: tool),
+              ))
+          .toList(),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    // Duplicate tools array to allow infinite seamless jumping loop
-    final List<RedesignedTool> duplicated = [...widget.tools, ...widget.tools];
-
     return MouseRegion(
       onEnter: (_) => _animController.stop(canceled: false),
       onExit: (_) => _animController.repeat(),
       child: SizedBox(
         height: 72,
-        child: RepaintBoundary(
-          child: ListView.builder(
-            controller: _scrollController,
-            scrollDirection: Axis.horizontal,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: duplicated.length,
-            itemBuilder: (context, index) {
-              final tool = duplicated[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                child: _ToolCompactChip(data: tool),
-              );
-            },
+        child: ClipRect(
+          child: RepaintBoundary(
+            child: AnimatedBuilder(
+              animation: _animController,
+              builder: (context, child) {
+                if (_halfWidth <= 0) {
+                  return child!;
+                }
+                final double progress = _animController.value;
+                final double offset = widget.reverse
+                    ? (1.0 - progress) * _halfWidth
+                    : progress * _halfWidth;
+                return Transform.translate(
+                  offset: Offset(-offset, 0),
+                  child: child,
+                );
+              },
+              child: OverflowBox(
+                minWidth: 0.0,
+                maxWidth: double.infinity,
+                alignment: Alignment.centerLeft,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildChipRow(key: _rowKey),
+                    _buildChipRow(),
+                    _buildChipRow(),
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

@@ -131,7 +131,22 @@ class _GithubAchievementsSectionState extends State<GithubAchievementsSection> {
                     const SizedBox(width: 14),
                     Expanded(
                       child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 350),
+                        duration: const Duration(milliseconds: 300),
+                        layoutBuilder: (currentChild, previousChildren) {
+                          return Stack(
+                            alignment: Alignment.centerLeft,
+                            children: <Widget>[
+                              ...previousChildren,
+                              if (currentChild != null) currentChild,
+                            ],
+                          );
+                        },
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
                         child: Text(
                           contributionsTitle,
                           key: ValueKey(contributionsTitle),
@@ -140,14 +155,18 @@ class _GithubAchievementsSectionState extends State<GithubAchievementsSection> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 18),
-                Row(
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     _ProfileSelectorChip(
                       label: "Personal",
@@ -155,14 +174,12 @@ class _GithubAchievementsSectionState extends State<GithubAchievementsSection> {
                       isSelected: isPersonal,
                       onTap: () => _selectProfile(GithubProfileType.personal),
                     ),
-                    const SizedBox(width: 10),
                     _ProfileSelectorChip(
                       label: "Company",
                       username: "dbaashutosh",
                       isSelected: !isPersonal,
                       onTap: () => _selectProfile(GithubProfileType.company),
                     ),
-                    const Spacer(),
                     _GithubLinkButton(
                       url: currentUrl,
                       username: isPersonal ? "@Ashutoshpawar1" : "@dbaashutosh",

@@ -50,8 +50,9 @@ class _ExperienceSectionState extends State<ExperienceSection> {
   final ValueNotifier<bool> _isHovered = ValueNotifier<bool>(false);
   bool _isSectionVisible = false;
 
-  // Chronological order: Trainee (first) -> Developer (second)
+  // Active Experience: Developer Bazaar Technologies (Young Decade commented out per request)
   static const List<RedesignedExperienceEntry> _entries = [
+    /*
     RedesignedExperienceEntry(
       role: "Junior / Trainee Flutter Developer",
       company: "Young Decade",
@@ -85,10 +86,11 @@ class _ExperienceSectionState extends State<ExperienceSection> {
         "Code Reviews": "40+",
       },
     ),
+    */
     RedesignedExperienceEntry(
       role: "Flutter Developer",
       company: "Developer Bazaar Technologies",
-      duration: "November 2024 - Present",
+      duration: "February 2023 - Present",
       location: "Indore, India",
       employmentType: "Full-Time",
       description:
@@ -157,7 +159,9 @@ class _ExperienceSectionState extends State<ExperienceSection> {
     if (!mounted || !_isSectionVisible) return;
     final context = _sectionKey.currentContext;
     if (context != null) {
-      final RenderBox box = context.findRenderObject() as RenderBox;
+      final renderObj = context.findRenderObject();
+      if (renderObj is! RenderBox || !renderObj.hasSize) return;
+      final RenderBox box = renderObj;
       final position = box.localToGlobal(Offset.zero);
       final double viewportHeight = MediaQuery.of(context).size.height;
       final double sectionTop = position.dy;

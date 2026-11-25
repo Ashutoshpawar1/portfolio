@@ -171,16 +171,16 @@ class HomePage extends StatelessWidget {
                         )
                       : const SizedBox.shrink(),
                 ),
-                Obx(
-                  () => controller.isSectionTransitionVisible
-                      ? Positioned.fill(
-                          child: BrandTransitionOverlay(
+                Positioned.fill(
+                  child: Obx(
+                    () => controller.isSectionTransitionVisible
+                        ? BrandTransitionOverlay(
                             label: "ASHUTOSH",
                             onReveal: controller.navigateToPendingSection,
                             onComplete: controller.finishSectionTransition,
-                          ),
-                        )
-                      : const SizedBox.shrink(),
+                          )
+                        : const IgnorePointer(child: SizedBox.shrink()),
+                  ),
                 ),
                 // Top-most single unified smooth cursor
                 if (enableDesktopEffects) const CustomCursorOverlay(),

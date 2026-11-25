@@ -10,6 +10,7 @@ Future<void> downloadFile(String url, String fileName) async {
   final html.AnchorElement anchor =
       html.AnchorElement(href: url)
         ..download = fileName
+        ..target = '_blank'
         ..style.display = 'none';
 
   html.document.body?.append(anchor);

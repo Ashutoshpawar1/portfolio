@@ -246,6 +246,9 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
 
   @override
   Widget build(BuildContext context) {
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final bool isSmall = screenWidth < 640;
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -255,7 +258,9 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
         curve: Curves.easeOutBack,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 360),
-          width: widget.width.clamp(320.0, 620.0).toDouble(),
+          width: isSmall
+              ? double.infinity
+              : widget.width.clamp(280.0, 620.0).toDouble(),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30),
             boxShadow: [
@@ -271,7 +276,7 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
           child: GlassContainer(
             borderRadius: 30,
             blur: 14,
-            padding: const EdgeInsets.all(40),
+            padding: EdgeInsets.all(isSmall ? 22 : 40),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -279,8 +284,8 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
                   children: [
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 260),
-                      width: _isHovered ? 40 : 4,
-                      height: 32,
+                      width: _isHovered ? (isSmall ? 24 : 40) : 4,
+                      height: isSmall ? 26 : 32,
                       decoration: BoxDecoration(
                         color: widget.accentColor,
                         borderRadius: BorderRadius.circular(10),
@@ -292,30 +297,34 @@ class _SkillCategoryCardState extends State<_SkillCategoryCard> {
                         ],
                       ),
                     ),
-                    const SizedBox(width: 18),
-                    Text(
-                      widget.title,
-                      style: TextStyle(
-                        fontSize: 28,
-                        color: AppColors.white,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.8,
+                    SizedBox(width: isSmall ? 12 : 18),
+                    Expanded(
+                      child: Text(
+                        widget.title,
+                        style: TextStyle(
+                          fontSize: isSmall ? 21 : 28,
+                          color: AppColors.white,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: isSmall ? 32 : 50),
                 ...List.generate(widget.skills.length, (index) {
                   final skill = widget.skills[index];
                   return Padding(
-                        padding: const EdgeInsets.only(bottom: 35),
-                        child: SkillProgressBar(
-                          skill: skill.name,
-                          progress: skill.progress,
-                          icon: skill.icon,
-                          accentColor: widget.accentColor,
-                        ),
-                      )
+                    padding: EdgeInsets.only(bottom: isSmall ? 24 : 35),
+                    child: SkillProgressBar(
+                      skill: skill.name,
+                      progress: skill.progress,
+                      icon: skill.icon,
+                      accentColor: widget.accentColor,
+                    ),
+                  )
                       .animate()
                       .fadeIn(delay: (180 + (index * 90)).ms, duration: 560.ms)
                       .slideX(begin: 0.08, curve: Curves.easeOutCubic);

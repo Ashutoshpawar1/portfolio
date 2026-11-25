@@ -608,7 +608,7 @@ class _AboutParagraphs extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final List<String> paragraphs = [
-      "I am a Flutter Developer with 2+ years of experience building scalable mobile and web applications focused on performance, maintainability, and user experience.",
+      "I am a Flutter Developer with 3+ years of experience building scalable mobile and web applications focused on performance, maintainability, and user experience.",
       "My expertise includes Flutter, Firebase, REST APIs, state management solutions such as BLoC, Riverpod, and GetX, along with real-time communication systems and scalable application architecture.",
       "Throughout my journey, I have developed production-ready applications across multiple domains including healthcare, employee management, e-commerce, meeting platforms, and wildlife management systems.",
       "Currently, I am expanding my expertise in Artificial Intelligence, Local LLMs, Voice AI, intelligent automation, and next-generation software solutions.",
@@ -655,7 +655,7 @@ class _AboutStatsGrid extends StatelessWidget {
     final bool isMobile = width < 820;
 
     final List<Widget> stats = const [
-      _MetricCounter(endValue: 2, suffix: '+', label: 'Years Experience'),
+      _MetricCounter(endValue: 3, suffix: '+', label: 'Years Experience'),
       _MetricCounter(endValue: 5, suffix: '+', label: 'Projects Delivered'),
       _MetricCounter(endValue: 10, suffix: '+', label: 'Technologies Used'),
       _MetricCounter(

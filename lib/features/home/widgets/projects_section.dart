@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -14,7 +15,6 @@ import '../../../utils/services/external_link_service.dart';
 import '../../../utils/components/glass_container.dart';
 import '../../../utils/components/animated_section_title.dart';
 import '../../../utils/components/section_divider_transition.dart';
-import '../../../utils/animated/custom_cursor_overlay.dart';
 
 // Rich local metadata for each project to power case studies
 class RichProjectData {
@@ -508,22 +508,30 @@ class _ProjectsSectionState extends State<ProjectsSection> {
       barrierColor: Colors.black.withOpacity(0.82),
       transitionDuration: const Duration(milliseconds: 320),
       pageBuilder: (context, anim1, anim2) {
-        return _ProjectDetailsModal(
-          initialProject: project,
-          allProjects: _allProjects,
+        return MouseRegion(
+          cursor: SystemMouseCursors.basic,
+          opaque: true,
+          child: _ProjectDetailsModal(
+            initialProject: project,
+            allProjects: _allProjects,
+          ),
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
-        return BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: 16 * anim1.value,
-            sigmaY: 16 * anim1.value,
-          ),
-          child: ScaleTransition(
-            scale: Tween<double>(begin: 0.95, end: 1.0).animate(
-              CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic),
+        return MouseRegion(
+          cursor: SystemMouseCursors.basic,
+          opaque: true,
+          child: BackdropFilter(
+            filter: ImageFilter.blur(
+              sigmaX: 16 * anim1.value,
+              sigmaY: 16 * anim1.value,
             ),
-            child: FadeTransition(opacity: anim1, child: child),
+            child: ScaleTransition(
+              scale: Tween<double>(begin: 0.95, end: 1.0).animate(
+                CurvedAnimation(parent: anim1, curve: Curves.easeOutCubic),
+              ),
+              child: FadeTransition(opacity: anim1, child: child),
+            ),
           ),
         );
       },
@@ -905,7 +913,7 @@ class _ProjectsStatsRow extends StatelessWidget {
       alignment: WrapAlignment.center,
       children: const [
         _ProjectStatItem(value: 5, suffix: "+", label: "Projects Delivered"),
-        _ProjectStatItem(value: 2, suffix: "+", label: "Years Experience"),
+        _ProjectStatItem(value: 3, suffix: "+", label: "Years Experience"),
         _ProjectStatItem(value: 10, suffix: "+", label: "Technologies"),
         _ProjectStatItem(value: 100, suffix: "%", label: "Production Focus"),
       ],
@@ -1003,6 +1011,76 @@ class _ProjectStatItemState extends State<_ProjectStatItem>
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Reusable image loader supporting both local asset paths and network URLs with animated shimmer
+class _ProjectBannerImage extends StatelessWidget {
+  final String imageUrl;
+  final BoxFit fit;
+
+  const _ProjectBannerImage({
+    super.key,
+    required this.imageUrl,
+    this.fit = BoxFit.cover,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final String trimmed = imageUrl.trim();
+
+    // 1. Local Asset
+    if (trimmed.startsWith('assets/') || trimmed.startsWith('lib/assets/')) {
+      return Image.asset(
+        trimmed,
+        width: double.infinity,
+        height: double.infinity,
+        fit: fit,
+        errorBuilder: (_, __, ___) => _buildPlaceholder(),
+      );
+    }
+
+    // 2. Remote Network Image with Shimmer placeholder
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      return CachedNetworkImage(
+        imageUrl: trimmed,
+        width: double.infinity,
+        height: double.infinity,
+        fit: fit,
+        placeholder: (_, __) => _buildShimmer(),
+        errorWidget: (_, __, ___) => _buildPlaceholder(),
+      );
+    }
+
+    return _buildPlaceholder();
+  }
+
+  Widget _buildShimmer() {
+    return Container(
+          width: double.infinity,
+          height: double.infinity,
+          color: const Color(0xFF141722),
+        )
+        .animate(onPlay: (controller) => controller.repeat())
+        .shimmer(
+          duration: const Duration(milliseconds: 1400),
+          color: Colors.white.withOpacity(0.09),
+        );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: const Color(0xFF10121A),
+      child: Center(
+        child: Icon(
+          Icons.image_outlined,
+          color: Colors.white.withOpacity(0.18),
+          size: 36,
         ),
       ),
     );
@@ -1112,76 +1190,82 @@ class _FeaturedProjectCardState extends State<_FeaturedProjectCard> {
   }
 
   Widget _buildBannerImage(double height) {
-    return ClipRRect(
-      borderRadius: const BorderRadius.only(
-        topLeft: Radius.circular(28),
-        bottomLeft: Radius.circular(0),
-        topRight: Radius.circular(28),
-        bottomRight: Radius.circular(0),
-      ),
-      child: Stack(
-        children: [
-          Positioned.fill(
-            child: AnimatedScale(
-              scale: _isHovered ? 1.05 : 1.0,
-              duration: const Duration(milliseconds: 600),
-              curve: Curves.easeOutCubic,
-              child: CachedNetworkImage(
-                imageUrl: widget.data.project.imageUrl,
-                fit: BoxFit.cover,
-                errorWidget: (_, __, ___) => Container(color: Colors.grey[900]),
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: ClipRRect(
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(28),
+          bottomLeft: Radius.circular(0),
+          topRight: Radius.circular(28),
+          bottomRight: Radius.circular(0),
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: AnimatedScale(
+                scale: _isHovered ? 1.05 : 1.0,
+                duration: const Duration(milliseconds: 600),
+                curve: Curves.easeOutCubic,
+                child: _ProjectBannerImage(
+                  imageUrl: widget.data.project.imageUrl,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
-          ),
-          Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black.withOpacity(0.15),
-                    Colors.black.withOpacity(0.55),
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.15),
+                      Colors.black.withOpacity(0.55),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // Featured Tag overlay
+            Positioned(
+              top: 24,
+              left: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 7,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF5A36),
+                  borderRadius: BorderRadius.circular(999),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFFFF5A36).withOpacity(0.4),
+                      blurRadius: 10,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Icon(Icons.star_rounded, size: 14, color: Colors.white),
+                    SizedBox(width: 4),
+                    Text(
+                      "FEATURED PROJECT",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-          // Featured Tag overlay
-          Positioned(
-            top: 24,
-            left: 24,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF5A36),
-                borderRadius: BorderRadius.circular(999),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFFFF5A36).withOpacity(0.4),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Icon(Icons.star_rounded, size: 14, color: Colors.white),
-                  SizedBox(width: 4),
-                  Text(
-                    "FEATURED PROJECT",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -1734,6 +1818,7 @@ class _PremiumProjectCardState extends State<_PremiumProjectCard> {
       borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       child: SizedBox(
         height: 165,
+        width: double.infinity,
         child: Stack(
           children: [
             Positioned.fill(
@@ -1741,11 +1826,9 @@ class _PremiumProjectCardState extends State<_PremiumProjectCard> {
                 scale: _isHovered ? 1.06 : 1.0,
                 duration: const Duration(milliseconds: 600),
                 curve: Curves.easeOutCubic,
-                child: CachedNetworkImage(
+                child: _ProjectBannerImage(
                   imageUrl: widget.data.project.imageUrl,
                   fit: BoxFit.cover,
-                  errorWidget: (_, __, ___) =>
-                      Container(color: Colors.grey[900]),
                 ),
               ),
             ),
@@ -1816,17 +1899,20 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
   int _activeScreenshotIndex = 0;
   Timer? _carouselTimer;
   final ScrollController _scrollController = ScrollController();
+  final FocusNode _focusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _startCarousel();
+    _focusNode.requestFocus();
   }
 
   @override
   void dispose() {
     _carouselTimer?.cancel();
     _scrollController.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -1864,95 +1950,122 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
     final double w = MediaQuery.of(context).size.width;
     final bool isMobile = w < 760;
 
-    return Center(
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          width: isMobile ? double.infinity : w * 0.85,
-          height: isMobile
-              ? double.infinity
-              : MediaQuery.of(context).size.height * 0.88,
-          decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.96),
-            borderRadius: isMobile
-                ? BorderRadius.zero
-                : BorderRadius.circular(28),
-            border: Border.all(color: Colors.white.withOpacity(0.05)),
-            boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.8), blurRadius: 40),
-            ],
-          ),
-          child: Stack(
-            children: [
-              Column(
-                children: [
-                  // Header Close Bar
-                  _buildCloseHeader(),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: _scrollController,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: isMobile ? 18 : 36,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Overview Panel & Screenshot Slideshow Grid
-                          isMobile
-                              ? Column(
-                                  children: [
-                                    _buildSlideshow(300),
-                                    const SizedBox(height: 24),
-                                    _buildOverviewPanel(),
-                                  ],
-                                )
-                              : Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Expanded(
-                                      flex: 3,
-                                      child: _buildOverviewPanel(),
-                                    ),
-                                    const SizedBox(width: 32),
-                                    Expanded(
-                                      flex: 5,
-                                      child: _buildSlideshow(350),
-                                    ),
-                                  ],
-                                ),
-                          const SizedBox(height: 36),
-
-                          // Narrative Details (Problem / Solution)
-                          _buildNarrativeGrid(isMobile),
-                          const SizedBox(height: 36),
-
-                          // Architecture Showcase
-                          _buildArchitectureSection(isMobile),
-                          const SizedBox(height: 36),
-
-                          // Key Features List
-                          _buildFeaturesGrid(isMobile),
-                          const SizedBox(height: 36),
-
-                          // Tech Stack Chips
-                          _buildTechStackChips(),
-                          const SizedBox(height: 36),
-
-                          // Challenges, Learnings & Business Impact & Contribution
-                          _buildNarrativeExtraGrid(isMobile),
-                          const SizedBox(height: 48),
-
-                          // Previous / Next Navigation
-                          _buildPrevNextNavigation(),
-                        ],
-                      ),
+    return KeyboardListener(
+      focusNode: _focusNode,
+      onKeyEvent: (event) {
+        if (event is KeyDownEvent &&
+            event.logicalKey == LogicalKeyboardKey.escape) {
+          if (Get.isRegistered<AppCursorController>()) {
+            AppCursorController.to.setHovered(false);
+          }
+          Navigator.of(context).maybePop();
+        }
+      },
+      child: MouseRegion(
+        cursor: SystemMouseCursors.basic,
+        opaque: true,
+        child: Center(
+          child: Material(
+            color: Colors.transparent,
+            child: ClipRRect(
+              borderRadius: isMobile
+                  ? BorderRadius.zero
+                  : BorderRadius.circular(28),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 24, sigmaY: 24),
+                child: Container(
+                  width: isMobile ? double.infinity : w * 0.85,
+                  height: isMobile
+                      ? double.infinity
+                      : MediaQuery.of(context).size.height * 0.88,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF0C0E14).withOpacity(0.92),
+                    borderRadius: isMobile
+                        ? BorderRadius.zero
+                        : BorderRadius.circular(28),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.12),
+                      width: 1.2,
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.8),
+                        blurRadius: 40,
+                        offset: const Offset(0, 16),
+                      ),
+                    ],
                   ),
-                ],
+                  child: Column(
+                    children: [
+                      // Header Close Bar
+                      _buildCloseHeader(),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          controller: _scrollController,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: isMobile ? 18 : 36,
+                            vertical: 24,
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // Overview Panel & Screenshot Slideshow Grid
+                              isMobile
+                                  ? Column(
+                                      children: [
+                                        _buildSlideshow(300),
+                                        const SizedBox(height: 24),
+                                        _buildOverviewPanel(),
+                                      ],
+                                    )
+                                  : Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Expanded(
+                                          flex: 3,
+                                          child: _buildOverviewPanel(),
+                                        ),
+                                        const SizedBox(width: 32),
+                                        Expanded(
+                                          flex: 5,
+                                          child: _buildSlideshow(350),
+                                        ),
+                                      ],
+                                    ),
+                              const SizedBox(height: 36),
+
+                              // Narrative Details (Problem / Solution)
+                              _buildNarrativeGrid(isMobile),
+                              const SizedBox(height: 36),
+
+                              // Architecture Showcase
+                              _buildArchitectureSection(isMobile),
+                              const SizedBox(height: 36),
+
+                              // Key Features List
+                              _buildFeaturesGrid(isMobile),
+                              const SizedBox(height: 36),
+
+                              // Tech Stack Chips
+                              _buildTechStackChips(),
+                              const SizedBox(height: 36),
+
+                              // Challenges, Learnings & Business Impact & Contribution
+                              _buildNarrativeExtraGrid(isMobile),
+                              const SizedBox(height: 48),
+
+                              // Previous / Next Navigation
+                              _buildPrevNextNavigation(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              const CustomCursorOverlay(),
-            ],
+            ),
           ),
         ),
       ),
@@ -1980,31 +2093,48 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
             ],
           ),
           const Spacer(),
-          MouseRegion(
-            cursor: SystemMouseCursors.none,
-            onEnter: (_) {
-              if (Get.isRegistered<AppCursorController>()) {
-                AppCursorController.to.setHovered(true);
-              }
-            },
-            onExit: (_) {
-              if (Get.isRegistered<AppCursorController>()) {
-                AppCursorController.to.setHovered(false);
-              }
-            },
-            child: GestureDetector(
-              onTap: () => Navigator.of(context).pop(),
-              child: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withOpacity(0.04),
-                  border: Border.all(color: Colors.white.withOpacity(0.05)),
-                ),
-                child: const Icon(
-                  Icons.close_rounded,
-                  color: Colors.white,
-                  size: 20,
+          Tooltip(
+            message: "Close Case Study (Esc)",
+            child: MouseRegion(
+              cursor: SystemMouseCursors.click,
+              onEnter: (_) {
+                if (Get.isRegistered<AppCursorController>()) {
+                  AppCursorController.to.setHovered(true);
+                }
+              },
+              onExit: (_) {
+                if (Get.isRegistered<AppCursorController>()) {
+                  AppCursorController.to.setHovered(false);
+                }
+              },
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(24),
+                  hoverColor: Colors.white.withOpacity(0.15),
+                  splashColor: Colors.white.withOpacity(0.25),
+                  highlightColor: Colors.white.withOpacity(0.10),
+                  onTap: () {
+                    if (Get.isRegistered<AppCursorController>()) {
+                      AppCursorController.to.setHovered(false);
+                    }
+                    Navigator.of(context).maybePop();
+                  },
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withOpacity(0.08),
+                      border: Border.all(color: Colors.white.withOpacity(0.18)),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Icon(
+                      Icons.close_rounded,
+                      color: Colors.white,
+                      size: 22,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -2018,9 +2148,16 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.01),
+        color: const Color(0xFF141722).withOpacity(0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.03)),
+        border: Border.all(color: Colors.white.withOpacity(0.1)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2115,7 +2252,7 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
 
   Widget _modalLinkBtn(IconData icon, String label, String url) {
     return MouseRegion(
-      cursor: SystemMouseCursors.none,
+      cursor: SystemMouseCursors.click,
       onEnter: (_) {
         if (Get.isRegistered<AppCursorController>()) {
           AppCursorController.to.setHovered(true);
@@ -2160,32 +2297,16 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
       borderRadius: BorderRadius.circular(20),
       child: SizedBox(
         height: height,
+        width: double.infinity,
         child: Stack(
           children: [
             Positioned.fill(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 600),
-                child: Builder(
+                child: _ProjectBannerImage(
                   key: ValueKey(_activeScreenshotIndex),
-                  builder: (context) {
-                    final String src =
-                        _project.screenshots[_activeScreenshotIndex];
-                    if (src.startsWith('lib/assets/') ||
-                        src.startsWith('assets/')) {
-                      return Image.asset(
-                        src,
-                        fit: BoxFit.contain,
-                        width: double.infinity,
-                        height: double.infinity,
-                      );
-                    }
-                    return CachedNetworkImage(
-                      imageUrl: src,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      height: double.infinity,
-                    );
-                  },
+                  imageUrl: _project.screenshots[_activeScreenshotIndex],
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -2214,7 +2335,7 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
                 children: List.generate(_project.screenshots.length, (idx) {
                   final bool isActive = _activeScreenshotIndex == idx;
                   return MouseRegion(
-                    cursor: SystemMouseCursors.none,
+                    cursor: SystemMouseCursors.click,
                     onEnter: (_) {
                       if (Get.isRegistered<AppCursorController>()) {
                         AppCursorController.to.setHovered(true);
@@ -2280,9 +2401,16 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.01),
+        color: const Color(0xFF141722).withOpacity(0.9),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withOpacity(0.03)),
+        border: Border.all(color: accentColor.withOpacity(0.35), width: 1.2),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withOpacity(0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2306,8 +2434,8 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
           Text(
             text,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
-              fontSize: 14,
+              color: Colors.white.withOpacity(0.9),
+              fontSize: 14.5,
               height: 1.7,
               fontWeight: FontWeight.w400,
             ),
@@ -2346,9 +2474,9 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.015),
+                      color: const Color(0xFF141722).withOpacity(0.9),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withOpacity(0.04)),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -2411,9 +2539,9 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.01),
+                      color: const Color(0xFF141722).withOpacity(0.9),
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: Colors.white.withOpacity(0.03)),
+                      border: Border.all(color: Colors.white.withOpacity(0.1)),
                     ),
                     child: Row(
                       children: [
@@ -2491,9 +2619,19 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
           width: double.infinity,
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.01),
+            color: const Color(0xFF141722).withOpacity(0.9),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withOpacity(0.03)),
+            border: Border.all(
+              color: const Color(0xFFFF9F1C).withOpacity(0.35),
+              width: 1.2,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFFFF9F1C).withOpacity(0.06),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -2573,7 +2711,7 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
         children: [
           // Previous Project
           MouseRegion(
-            cursor: SystemMouseCursors.none,
+            cursor: SystemMouseCursors.click,
             onEnter: (_) {
               if (Get.isRegistered<AppCursorController>()) {
                 AppCursorController.to.setHovered(true);
@@ -2622,7 +2760,7 @@ class _ProjectDetailsModalState extends State<_ProjectDetailsModal> {
           ),
           // Next Project
           MouseRegion(
-            cursor: SystemMouseCursors.none,
+            cursor: SystemMouseCursors.click,
             onEnter: (_) {
               if (Get.isRegistered<AppCursorController>()) {
                 AppCursorController.to.setHovered(true);

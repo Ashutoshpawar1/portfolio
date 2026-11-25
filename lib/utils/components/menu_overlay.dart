@@ -122,7 +122,9 @@ class _OverlayMenuItemState extends State<_OverlayMenuItem> {
   Widget build(BuildContext context) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double fontSize = screenWidth < 640 ? 38 : 56;
-    final TextStyle baseStyle = Theme.of(context).textTheme.displayMedium!.copyWith(
+    final TextStyle baseStyle = (Theme.of(context).textTheme.displayMedium ??
+            const TextStyle())
+        .copyWith(
       fontSize: fontSize,
       color: _hovered ? AppColors.orange : AppColors.white,
     );

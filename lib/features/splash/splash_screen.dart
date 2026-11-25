@@ -113,32 +113,35 @@ class _SplashScreenState extends State<SplashScreen>
                       fontWeight: FontWeight.w800,
                       letterSpacing: 3,
                     ),
-                  ).animate().fadeIn(duration: 400.ms),
+                  ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.baseline,
-                    textBaseline: TextBaseline.alphabetic,
-                    children: [
-                      Text(
-                        percentage.toString().padLeft(2, '0'),
-                        style: const TextStyle(
-                          color: Color(0xFFFF5A36),
-                          fontSize: 100,
-                          fontWeight: FontWeight.w900,
-                          height: 1,
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          percentage.toString().padLeft(2, '0'),
+                          style: const TextStyle(
+                            color: Color(0xFFFF5A36),
+                            fontSize: 100,
+                            fontWeight: FontWeight.w900,
+                            height: 1,
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        "%",
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.2),
-                          fontSize: 40,
-                          fontWeight: FontWeight.w800,
+                        const SizedBox(width: 4),
+                        Text(
+                          "%",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.2),
+                            fontSize: 40,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ),

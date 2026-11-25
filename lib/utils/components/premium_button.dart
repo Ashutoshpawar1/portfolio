@@ -43,10 +43,11 @@ class _PremiumButtonState extends State<PremiumButton> {
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
-      cursor: SystemMouseCursors.none,
+      cursor: SystemMouseCursors.click,
       onEnter: _onEnter,
       onExit: _onExit,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 300),

@@ -41,26 +41,35 @@ class TransitionPanel extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            label,
-                            style: Theme.of(context).textTheme.displayLarge
-                                ?.copyWith(
-                                  color: Colors.black.withOpacity(0.92),
-                                  fontSize: 110,
-                                  height: 0.9,
-                                ),
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              label,
+                              style: Theme.of(context).textTheme.displayLarge
+                                  ?.copyWith(
+                                    color: Colors.black.withOpacity(0.92),
+                                    fontSize: 64,
+                                    height: 0.95,
+                                  ),
+                            ),
                           ),
-                          const SizedBox(height: 26),
+                          const SizedBox(height: 18),
                           Align(
                             alignment: Alignment.centerRight,
-                            child: Text(
-                              "Beyond\nVisuals.\nBuilt with\nVision.",
-                              textAlign: TextAlign.right,
-                              style: Theme.of(context).textTheme.displayMedium
-                                  ?.copyWith(
-                                    color: Colors.black.withOpacity(0.9),
-                                    fontSize: 42,
-                                  ),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: Alignment.centerRight,
+                              child: Text(
+                                "Beyond\nVisuals.\nBuilt with\nVision.",
+                                textAlign: TextAlign.right,
+                                style: Theme.of(context).textTheme.displayMedium
+                                    ?.copyWith(
+                                      color: Colors.black.withOpacity(0.9),
+                                      fontSize: 26,
+                                      height: 1.2,
+                                    ),
+                              ),
                             ),
                           ),
                         ],

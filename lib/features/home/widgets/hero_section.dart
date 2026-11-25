@@ -688,12 +688,19 @@ class _HeroIntroBlock extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             DefaultTextStyle(
-              style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                color: AppColors.white.withOpacity(0.9),
-                fontSize: isCompact ? 16 : 20,
-                fontWeight: FontWeight.w600,
-                height: 1.35,
-              ),
+              style:
+                  Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.white.withOpacity(0.9),
+                    fontSize: isCompact ? 16 : 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ) ??
+                  TextStyle(
+                    color: AppColors.white.withOpacity(0.9),
+                    fontSize: isCompact ? 16 : 20,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
               child: AnimatedTextKit(
                 totalRepeatCount: 1,
                 isRepeatingAnimation: false,
@@ -710,7 +717,7 @@ class _HeroIntroBlock extends StatelessWidget {
             ),
             SizedBox(height: contentSpacing),
             Text(
-              "With 2+ years of experience developing production-ready Flutter applications, I specialize in scalable architectures, real-time communication systems, API integrations, Firebase solutions, and AI-powered experiences.\n\nFocused on performance, clean architecture, maintainability, and exceptional user experiences.",
+              "With 3+ years of experience developing production-ready Flutter applications, I specialize in scalable architectures, real-time communication systems, API integrations, Firebase solutions, and AI-powered experiences.\n\nFocused on performance, clean architecture, maintainability, and exceptional user experiences.",
               style: TextStyle(
                 fontSize: bodyFontSize ?? (isCompact ? 14 : 15),
                 color: AppColors.grey,
@@ -812,13 +819,15 @@ class _HeroSidePitch extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                     ],
-                    Text(
-                      item,
-                      textAlign: align,
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
-                        fontSize: isCompact ? 13 : 14,
-                        fontWeight: FontWeight.w600,
+                    Flexible(
+                      child: Text(
+                        item,
+                        textAlign: align,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.7),
+                          fontSize: isCompact ? 13 : 14,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                     if (!centerAligned && !isCompact) ...[
@@ -959,44 +968,46 @@ class _HeroVisualContent extends StatelessWidget {
                         ),
                     // Floating Card 1 (Top Left)
                     Positioned(
-                          left: -32,
-                          top: size * 0.15,
-                          child: const _FloatingCard(
-                            emoji: "🚀",
-                            title: "5+ Projects",
-                            subtitle: "Delivered",
-                          ),
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .moveY(
-                          begin: 4,
-                          end: -6,
-                          duration: 2500.ms,
-                          curve: Curves.easeInOut,
-                        ),
+                      left: -32,
+                      top: size * 0.15,
+                      child:
+                          const _FloatingCard(
+                                emoji: "🚀",
+                                title: "5+ Projects",
+                                subtitle: "Delivered",
+                              )
+                              .animate(
+                                onPlay: (controller) =>
+                                    controller.repeat(reverse: true),
+                              )
+                              .moveY(
+                                begin: 4,
+                                end: -6,
+                                duration: 2500.ms,
+                                curve: Curves.easeInOut,
+                              ),
+                    ),
                     // Floating Card 2 (Bottom Right)
                     Positioned(
-                          right: -32,
-                          bottom: size * 0.15,
-                          child: const _FloatingCard(
-                            emoji: "🤖",
-                            title: "AI Integration",
-                            subtitle: "Specialist",
-                          ),
-                        )
-                        .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true),
-                        )
-                        .moveY(
-                          begin: -6,
-                          end: 4,
-                          duration: 2700.ms,
-                          curve: Curves.easeInOut,
-                        ),
+                      right: -32,
+                      bottom: size * 0.15,
+                      child:
+                          const _FloatingCard(
+                                emoji: "🤖",
+                                title: "AI Integration",
+                                subtitle: "Specialist",
+                              )
+                              .animate(
+                                onPlay: (controller) =>
+                                    controller.repeat(reverse: true),
+                              )
+                              .moveY(
+                                begin: -6,
+                                end: 4,
+                                duration: 2700.ms,
+                                curve: Curves.easeInOut,
+                              ),
+                    ),
                   ],
                 )
                 .animate()
@@ -1156,7 +1167,7 @@ class _HeroStatsRow extends StatelessWidget {
         label: "PROJECTS DELIVERED",
       ),
       const _AnimatedCounter(
-        targetValue: 2,
+        targetValue: 3,
         suffix: "+",
         label: "YEARS EXPERIENCE",
       ),

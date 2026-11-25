@@ -11,10 +11,10 @@ import 'utils/components/app_scroll_behavior.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  // Throttle visibility checks to 20ms to eliminate synchronous scroll stalls
+  // Throttle visibility checks to 100ms to eliminate synchronous scroll stalls
   // while ensuring instant, lag-free scroll reveal animations.
   VisibilityDetectorController.instance.updateInterval = const Duration(
-    milliseconds: 20,
+    milliseconds: 100,
   );
 
   // Inject global controllers

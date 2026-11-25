@@ -307,20 +307,28 @@ class ProjectDetailsDialog extends StatefulWidget {
       barrierColor: Colors.black.withOpacity(0.75),
       transitionDuration: const Duration(milliseconds: 380),
       transitionBuilder: (context, animation, secondaryAnimation, child) {
-        return ScaleTransition(
-          scale: CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutQuart,
-            reverseCurve: Curves.easeInQuart,
-          ),
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
+        return MouseRegion(
+          cursor: SystemMouseCursors.basic,
+          opaque: true,
+          child: ScaleTransition(
+            scale: CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeOutQuart,
+              reverseCurve: Curves.easeInQuart,
+            ),
+            child: FadeTransition(
+              opacity: animation,
+              child: child,
+            ),
           ),
         );
       },
       pageBuilder: (context, anim1, anim2) {
-        return ProjectDetailsDialog(project: project, allProjects: allProjects);
+        return MouseRegion(
+          cursor: SystemMouseCursors.basic,
+          opaque: true,
+          child: ProjectDetailsDialog(project: project, allProjects: allProjects),
+        );
       },
     );
   }
@@ -1285,8 +1293,9 @@ class _HoverScaleButtonState extends State<_HoverScaleButton> {
           AppCursorController.to.setHovered(false);
         }
       },
-      cursor: SystemMouseCursors.none,
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: widget.onTap,
         child: AnimatedScale(
           scale: _isHovered ? 1.03 : 1.0,

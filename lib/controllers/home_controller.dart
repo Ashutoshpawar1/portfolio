@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
@@ -138,17 +139,34 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
 
   /// Continuous physics-based momentum scroll engine.
   /// Works across both Web and Desktop with high-framerate exponential decay.
+  /// High-performance momentum smooth scrolling.
+  /// Trackpads get immediate 1:1 response with native inertia;
+  /// Mouse wheels get buttery-smooth exponential decay (like Lenis/React smooth scroll).
   void smoothScrollBy(double delta) {
-    if (!scrollController.hasClients) {
+    if (!scrollController.hasClients ||
+        !scrollController.position.hasContentDimensions) {
       return;
     }
 
     final ScrollPosition position = scrollController.position;
     final double current = position.pixels;
+
+    // Trackpads emit tiny continuous deltas (< 24). Keep 1:1 zero-latency response.
+    if (delta.abs() < 24.0) {
+      _stopSmoothScrollTicker();
+      final double next = (current + delta).clamp(
+        position.minScrollExtent,
+        position.maxScrollExtent,
+      );
+      scrollController.jumpTo(next);
+      return;
+    }
+
+    // Discrete mouse wheel notch: smooth exponential glide with buffer protection
     final double currentTarget = _smoothScrollTarget ?? current;
-    final double nextTarget = (currentTarget + (delta * 1.05)).clamp(
-      position.minScrollExtent,
-      position.maxScrollExtent,
+    final double nextTarget = (currentTarget + (delta * 1.15)).clamp(
+      math.max(position.minScrollExtent, current - 480.0),
+      math.min(position.maxScrollExtent, current + 480.0),
     );
 
     _smoothScrollTarget = nextTarget;
@@ -157,7 +175,9 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
 
   void _startSmoothScrollTicker() {
     _smoothScrollTicker ??= createTicker((_) {
-      if (!scrollController.hasClients || _smoothScrollTarget == null) {
+      if (!scrollController.hasClients ||
+          !scrollController.position.hasContentDimensions ||
+          _smoothScrollTarget == null) {
         _stopSmoothScrollTicker();
         return;
       }
@@ -167,14 +187,14 @@ class HomeController extends GetxController with GetTickerProviderStateMixin {
       final target = _smoothScrollTarget!;
       final diff = target - current;
 
-      if (diff.abs() < 0.6) {
+      if (diff.abs() < 0.5) {
         scrollController.jumpTo(target);
         _stopSmoothScrollTicker();
         return;
       }
 
-      // 0.16 exponential decay factor yields liquid-smooth continuous gliding at 60/120fps
-      final double step = diff * 0.16;
+      // 0.28 factor delivers rapid initiation with silky exponential decay (ultra pro smooth)
+      final double step = diff * 0.28;
       final double next = (current + step).clamp(
         position.minScrollExtent,
         position.maxScrollExtent,

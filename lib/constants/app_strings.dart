@@ -25,7 +25,7 @@ class AppStrings {
   static const String devSubtitle =
       "State Management (GetX / Riverpod / Bloc)\n\nReal-time Systems (Socket.io)\n\nScalable Flutter Architecture\n\nPerformance Optimization\n\nResponsive UI Engineering\n\nClean Architecture (SOLID)";
   static const String devDescriptionLong =
-      "Flutter Developer with 2+ years of experience building production-level mobile and web applications.\n\nFocused on responsive UI systems, API integrations, real-time communication, scalable architecture, and AI-powered application experiences.";
+      "Flutter Developer with 3+ years of experience building production-level mobile and web applications.\n\nFocused on responsive UI systems, API integrations, real-time communication, scalable architecture, and AI-powered application experiences.";
   static const String heroSpecialtiesTitle =
       "Beyond Visuals.\nBuilt with\nVision.";
 
@@ -49,7 +49,7 @@ class AppStrings {
 
   static const String aboutTitle = "ABOUT ME";
   static const String aboutContent =
-      "I'm a Flutter Developer with 2+ years of practical experience building scalable mobile and web applications.\n\nI specialize in responsive UI systems, API integration, Firebase services, state management, and real-time features. My development approach focuses on creating smooth user experiences with clean, maintainable, and production-ready architecture.\n\nOver the years, I've worked on real-world applications including e-commerce systems, meeting platforms, health & wellness apps, employee management systems, and wildlife shelter management solutions.\n\nCurrently, I'm exploring AI-integrated applications, local LLM systems, voice AI, and intelligent automation workflows.";
+      "I'm a Flutter Developer with 3+ years of practical experience building scalable mobile and web applications.\n\nI specialize in responsive UI systems, API integration, Firebase services, state management, and real-time features. My development approach focuses on creating smooth user experiences with clean, maintainable, and production-ready architecture.\n\nOver the years, I've worked on real-world applications including e-commerce systems, meeting platforms, health & wellness apps, employee management systems, and wildlife shelter management solutions.\n\nCurrently, I'm exploring AI-integrated applications, local LLM systems, voice AI, and intelligent automation workflows.";
 
   static const String projectsTitle = "PROJECTS";
 
